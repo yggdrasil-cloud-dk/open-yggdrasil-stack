@@ -38,7 +38,7 @@ network:
       addresses: [10.0.60.1/24]
     # neutron external vlan
     # TODO: might need to change
-    neutron_external:
+    neutron_ext:
       id: 100
       link: $interface
       addresses: [10.0.100.1/24]
