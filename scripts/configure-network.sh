@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -xe
+
 # install net-tools
 apt install -y net-tools
 
@@ -20,23 +22,23 @@ network:
 
   vlans:
     # openstack management vlan
-    vlan.10:
+    openstack_mgmt:
       id: 10
       link: $interface
       addresses: [10.0.10.1/24]
     # ceph public vlan
-    vlan.50:
+    ceph_public:
       id: 50
       link: $interface
       addresses: [10.0.50.1/24]
     # ceph cluster vlan
-    vlan.60:
+    ceph_cluster:
       id: 60
       link: $interface
       addresses: [10.0.60.1/24]
     # neutron external vlan
     # TODO: might need to change
-    vlan.100:
+    neutron_external:
       id: 100
       link: $interface
       addresses: [10.0.100.1/24]

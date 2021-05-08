@@ -17,7 +17,8 @@ apt install python3-dev libffi-dev gcc libssl-dev
 apt install python3-venv
 
 # create venv
-python3 -m venv kolla-venv
+# NOTE: adding `--system-site-packages` because it needs python-apt module`
+python3 -m venv --system-site-packages kolla-venv
 
 # source path
 source kolla-venv/bin/activate
@@ -26,4 +27,4 @@ source kolla-venv/bin/activate
 pip install -U pip
 
 # install ansible
-pip install 'ansible<3.0'
+pip install -U 'ansible==2.9.*'

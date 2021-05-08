@@ -4,7 +4,7 @@
 
 INVENTORY="${INVENTORY:=all-in-one}"
 
-set -x
+set -xe
 
 # source venv
 cd workspace
@@ -20,17 +20,7 @@ mkdir -p etc/kolla
 cp -r kolla-venv/share/kolla-ansible/etc_examples/kolla/* etc/kolla
 
 # create inventory directory in workspace
-mkdir -p inventories
+mkdir -p inventory
 
 # copy inventory files to current dir
-cp kolla-venv/share/kolla-ansible/ansible/inventory/* inventories
-
-# configure ansible
-cat > ansible.cfg << EOF
-[defaults]
-host_key_checking=False
-pipelining=True
-forks=10
-inventory = inventories/$INVENTORY
-force_valid_group_names = ignore
-EOF
+cp kolla-venv/share/kolla-ansible/ansible/inventory/* inventory

@@ -4,6 +4,7 @@
 
 CONFIG_DIR=etc/kolla
 
+# just sets `<key>: <value>` in globals.yml
 function set_global_config () {
 	config_key=$1
 	config_value=$2
@@ -11,7 +12,7 @@ function set_global_config () {
 	sed -i "s/#\?\( *$config_key:\).*/\1 $config_value/g" $CONFIG_DIR/globals.yml
 }
 
-set -x
+set -xe
 
 # source venv
 cd workspace
@@ -23,7 +24,20 @@ kolla-genpwd -p $CONFIG_DIR/passwords.yml
 # set global configs
 set_global_config kolla_base_distro ubuntu
 set_global_config kolla_install_type source
-#TODO: fix these
-set_global_config network_interface eth1
-set_global_config neutron_external_interface eth2
-set_global_config kolla_internal_vip_address 10.3.5.10
+set_global_config network_interface openstack_mgmt
+set_global_config neutron_external_interface neutron_external
+set_global_config kolla_internal_vip_address 10.0.10.100
+
+# get python path in venv
+PYTHON_PATH=$(realpath -s kolla-venv/bin/python)
+
+# configure ansible
+cat > ansible.cfg << EOF
+[defaults]
+host_key_checking=False
+pipelining=True
+forks=10
+inventory = inventory/$INVENTORY
+force_valid_group_names = ignore
+interpreter_python = $PYTHON_PATH
+EOF
