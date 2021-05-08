@@ -2,7 +2,7 @@
 
 # Based on https://docs.openstack.org/kolla-ansible/latest/user/quickstart.html
 
-CONFIGDIR="${CONFIGDIR:=etc/kolla/}"
+CONFIG_DIR=etc/kolla
 
 set -xe
 
@@ -11,10 +11,10 @@ cd workspace
 source kolla-venv/bin/activate
 
 # bootstrap server
-kolla-ansible --configdir $CONFIGDIR bootstrap-servers
+kolla-ansible --configdir $CONFIG_DIR bootstrap-servers
 
 # pre-deployment checks
-kolla-ansible --configdir $CONFIGDIR prechecks
+kolla-ansible --configdir $CONFIG_DIR prechecks
 
 # deploy
-kolla-ansible --configdir $CONFIGDIR deploy
+kolla-ansible --configdir $CONFIG_DIR deploy

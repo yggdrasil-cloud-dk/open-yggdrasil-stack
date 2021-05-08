@@ -41,7 +41,10 @@ ping-nodes:
 
 # Get all targets except "clean" and delete their files
 clean:
-	@rm $$(ls | grep ".*\.done" | grep -v 01-configure-network)   # excluding configure network because its a pain to lose connection
+	-rm $$(ls | grep ".*\.done" | grep -v 01-configure-network)   # excluding configure network because its a pain to lose connection
 
 clean-all: clean
-	@rm -rf workspace
+	-docker rm -f $$(docker ps -aq)
+	-docker volume rm -f $$(docker volume ls -q)
+	-ip addr del 10.0.10.100/32 dev openstack_mgmt
+	-rm -rf workspace
