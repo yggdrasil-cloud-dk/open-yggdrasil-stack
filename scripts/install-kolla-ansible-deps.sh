@@ -11,10 +11,10 @@ cd workspace
 apt update
 
 # install python and deps
-apt install python3-dev libffi-dev gcc libssl-dev
+apt install -y python3-dev libffi-dev gcc libssl-dev
 
 # install venv
-apt install python3-venv
+apt install -y python3-venv
 
 # create venv
 # NOTE: adding `--system-site-packages` because it needs python-apt module`

@@ -1,9 +1,6 @@
 # TODO: Write status to make_state, do like vagrant hosts file?
 
 
-DONE_FILES = 01-configure-network 10-install-deps 20-install-kolla-ansible 30-configure-kolla-ansible 40-deploy-kolla-ansible
-$(DONE_FILES): %: %.done
-
 TAGS = 
 
 #########
@@ -14,7 +11,11 @@ TAGS =
 	scripts/configure-network.sh
 	touch $@
 
-10-install-cephadm.done: 01-configure-network.done
+09-configure-loop-devices.done: 01-configure-network.done
+	scripts/configure-loop-devices.sh
+	touch $@
+
+10-install-cephadm.done: 09-configure-loop-devices.done
 	scripts/install-cephadm.sh
 	touch $@
 
@@ -27,7 +28,7 @@ TAGS =
 	touch $@
 
 20-install-kolla-ansible-deps.done: 12-create-pools.done
-	scripts/install-dependencies.sh
+	scripts/install-kolla-ansible-deps.sh
 	touch $@
 
 21-install-kolla-ansible.done: 20-install-kolla-ansible-deps.done

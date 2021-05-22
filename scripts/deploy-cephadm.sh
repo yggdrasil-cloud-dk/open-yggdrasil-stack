@@ -33,7 +33,7 @@ cephadm shell -- bash -c "
 ceph-volume lvm zap /dev/vg-0/lv-0
 ceph-volume lvm zap /dev/vg-1/lv-1
 ceph-volume lvm zap /dev/vg-2/lv-2
-"
+" || true
 
 # add osds
 ceph orch daemon add osd `hostname`:/dev/vg-0/lv-0
