@@ -9,7 +9,7 @@ cd workspace
 source kolla-venv/bin/activate
 
 # install openstack client
-pip install -U openstackclient
+pip install -U python-openstackclient
 
 # install cryptography version because of annoying warning
 pip install -U cryptography==3.3

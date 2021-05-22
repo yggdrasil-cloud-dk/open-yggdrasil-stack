@@ -22,5 +22,4 @@ sudo ./cephadm install
 cephadm install ceph-common
 
 # remove tmp file
-cd ..
-rm -rf /tmp/cephadm
+rm cephadm

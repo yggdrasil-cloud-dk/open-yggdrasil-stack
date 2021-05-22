@@ -28,13 +28,14 @@ cephadm bootstrap --config initial-ceph.conf --allow-overwrite --mon-ip $CEPH_PU
 # remove file
 rm initial-ceph.conf
 
-# remove partition/filesystem info from lvm
-# taken from https://github.com/ceph/ceph/blob/master/src/ceph-volume/ceph_volume/devices/lvm/zap.py#L63
-dd if=/dev/zero of=/dev/vg-0/lv-0 bs=1M count=10 conv=fsync
-dd if=/dev/zero of=/dev/vg-1/lv-1 bs=1M count=10 conv=fsync
-dd if=/dev/zero of=/dev/vg-2/lv-2 bs=1M count=10 conv=fsync
+# wipe partition/filesystem info from lvm
+cephadm shell -- bash -c "
+ceph-volume lvm zap /dev/vg-0/lv-0
+ceph-volume lvm zap /dev/vg-1/lv-1
+ceph-volume lvm zap /dev/vg-2/lv-2
+"
 
 # add osds
-cephadm shell -- ceph orch daemon add osd `hostname`:/dev/vg-0/lv-0
-cephadm shell -- ceph orch daemon add osd `hostname`:/dev/vg-1/lv-1
-cephadm shell -- ceph orch daemon add osd `hostname`:/dev/vg-2/lv-2
+ceph orch daemon add osd `hostname`:/dev/vg-0/lv-0
+ceph orch daemon add osd `hostname`:/dev/vg-1/lv-1
+ceph orch daemon add osd `hostname`:/dev/vg-2/lv-2

@@ -14,40 +14,52 @@ TAGS =
 	scripts/configure-network.sh
 	touch $@
 
-10-install-deps.done: 01-configure-network.done
+10-install-cephadm.done: 01-configure-network.done
+	scripts/install-cephadm.sh
+	touch $@
+
+11-deploy-cephadm.done: 10-install-cephadm.done
+	scripts/deploy-cephadm.sh
+	touch $@
+
+12-create-pools.done: 11-deploy-cephadm.done
+	scripts/create-pools.sh
+	touch $@
+
+20-install-kolla-ansible-deps.done: 12-create-pools.done
 	scripts/install-dependencies.sh
 	touch $@
 
-20-install-kolla-ansible.done: 10-install-deps.done
+21-install-kolla-ansible.done: 20-install-kolla-ansible-deps.done
 	scripts/install-kolla-ansible.sh
 	touch $@
 
-30-configure-kolla-ansible.done: 20-install-kolla-ansible.done
+22-configure-kolla-ansible.done: 21-install-kolla-ansible.done
 	scripts/configure-kolla-ansible.sh
 	touch $@
 
-40-bootstrap-kolla-ansible.done: 30-configure-kolla-ansible.done
+23-bootstrap-kolla-ansible.done: 22-configure-kolla-ansible.done
 	scripts/kolla-ansible.sh bootstrap-servers
 	touch $@
 
-45-prechecks-kolla-ansible.done: 40-bootstrap-kolla-ansible.done
+24-prechecks-kolla-ansible.done: 23-bootstrap-kolla-ansible.done
 	scripts/kolla-ansible.sh prechecks
 	touch $@
 
-50-deploy-kolla-ansible.done: 45-prechecks-kolla-ansible.done
+25-deploy-kolla-ansible.done: 24-prechecks-kolla-ansible.done
 	scripts/kolla-ansible.sh deploy
 	touch $@
 
-51-postdeploy-kolla-ansible.done: 50-deploy-kolla-ansible.done
+26-postdeploy-kolla-ansible.done: 25-deploy-kolla-ansible.done
 	scripts/kolla-ansible.sh post-deploy
 	touch $@
 
-52-install-os-client.done: 51-postdeploy-kolla-ansible.done
+31-install-os-client.done: 26-postdeploy-kolla-ansible.done
 	scripts/install-os-client.sh
 	touch $@
 
-53-upload-images.done: 52-install-os-client.done
-	scripts/upload-images.sh
+32-create-initial-resources.done: 31-install-os-client.done
+	scripts/create-initial-resources.sh
 	touch $@
 
 ########
@@ -73,6 +85,7 @@ clean:
 
 #TODO: clean things here and make it noice
 clean-all: clean
+	-scripts/destroy-cephadm.sh
 	#- scripts/kolla-ansible.sh destroy 
 	-docker rm -f $$(docker ps -aq)
 	-docker volume rm -f $$(docker volume ls -q)
