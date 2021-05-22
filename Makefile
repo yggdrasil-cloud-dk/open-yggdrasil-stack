@@ -85,10 +85,11 @@ clean:
 
 #TODO: clean things here and make it noice
 clean-all: clean
-	-scripts/destroy-cephadm.sh
-	#- scripts/kolla-ansible.sh destroy 
+	-scripts/kolla-ansible.sh destroy 
 	-docker rm -f $$(docker ps -aq)
 	-docker volume rm -f $$(docker volume ls -q)
 	-ip addr del 10.0.10.100/32 dev openstack_mgmt
 	# why are we using /etc/kolla? and /run/libvirt?
-	-rm -rf workspace /etc/kolla /run/libvirt  
+	-rm -rf workspace /etc/kolla /run/libvirt
+	-ls /sys/class/net | grep -v "eno\|ceph\|neutron\|openstack\|lo\|docker"| xargs -I% ip link delete %
+	-scripts/destroy-cephadm.sh

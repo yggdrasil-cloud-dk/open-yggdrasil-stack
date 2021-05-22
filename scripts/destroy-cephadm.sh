@@ -11,7 +11,7 @@ set -x
 apt remove --purge -y ceph-common
 
 # remove unused dependencies
-apt autoremove
+apt -y autoremove
 
 # remove repo
 cephadm rm-repo
