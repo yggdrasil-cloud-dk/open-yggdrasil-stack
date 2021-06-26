@@ -80,6 +80,10 @@ deploy-kolla-ansible-tags:
 reconfigure-kolla-ansible-tags:
 	scripts/kolla-ansible.sh reconfigure -t $(TAGS)
 
+destroy-cephadm:
+	scripts/destroy-cephadm.sh
+	rm -rf 10-install-cephadm.done
+
 # Get all targets except "clean" and delete their files
 clean:
 	-rm $$(ls | grep ".*\.done" | grep -v 01-configure-network)   # excluding configure network because its a pain to lose connection

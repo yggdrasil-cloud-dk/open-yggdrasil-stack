@@ -15,9 +15,9 @@ set -xe
 cd /mnt
 
 # create image files
-truncate -s 200G disk-0.img
-truncate -s 200G disk-1.img
-truncate -s 200G disk-2.img
+truncate -s 8G disk-0.img
+truncate -s 8G disk-1.img
+truncate -s 8G disk-2.img
 
 # create loop devices
 losetup /dev/loop10 disk-0.img

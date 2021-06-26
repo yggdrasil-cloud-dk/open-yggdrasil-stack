@@ -5,7 +5,7 @@
 set -x
 
 # destroy ceph
-./scripts/external/cephadm-purge.sh $(ceph fsid)
+./scripts/external/cephadm-purge.sh $(cephadm shell -- bash -c 'ceph fsid' 2>/dev/null)
 
 # remove ceph-common
 apt remove --purge -y ceph-common
