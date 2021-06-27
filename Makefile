@@ -11,7 +11,11 @@ TAGS =
 	scripts/configure-network.sh
 	touch $@
 
-09-configure-loop-devices.done: 01-configure-network.done
+02-install-system-deps.done: 01-configure-network.done
+	scripts/install-sys-deps.sh
+	touch $@
+
+09-configure-loop-devices.done: 02-install-system-deps.done
 	scripts/configure-loop-devices.sh
 	touch $@
 
@@ -102,3 +106,4 @@ clean-all: clean
 	-rm -rf workspace /etc/kolla /run/libvirt
 	-ls /sys/class/net | grep -v "eno\|ceph\|neutron\|openstack\|lo\|docker"| xargs -I% ip link delete %
 	-scripts/destroy-cephadm.sh
+	-scripts/destroy-loop-devices.sh

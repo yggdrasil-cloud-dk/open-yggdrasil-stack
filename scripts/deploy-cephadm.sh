@@ -11,8 +11,18 @@ mkdir -p /etc/ceph
 # get mon ip address
 CEPH_PUBLIC_IP=$(ifconfig ceph_public | awk '/inet / {print $2}')
 
+# create initial config file
+cat <<EOF > initial-ceph.conf
+[global]
+osd_pool_default_size = 1
+osd_pool_default_min size = 1
+EOF
+
 # bootstrap cluster
-cephadm bootstrap --mon-ip $CEPH_PUBLIC_IP
+cephadm bootstrap --config initial-ceph.conf --allow-overwrite --mon-ip $CEPH_PUBLIC_IP
+
+# remove file
+rm initial-ceph.conf
 
 # wipe partition/filesystem info from lvm
 cephadm shell -- bash -c "

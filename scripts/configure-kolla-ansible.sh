@@ -38,6 +38,14 @@ set_global_config nova_backend_ceph yes
 set_global_config ceph_nova_keyring ceph.client.admin.keyring
 set_global_config ceph_nova_user admin
 
+set_global_config enable_cinder yes
+set_global_config cinder_backend_ceph yes
+set_global_config ceph_cinder_keyring ceph.client.admin.keyring
+set_global_config ceph_cinder_user admin
+
+set_global_config enable_cinder_backup no
+
+
 # TODO: Add cinder and cinder backup
 
 # create custom config dirs
