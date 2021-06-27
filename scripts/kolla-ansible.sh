@@ -16,7 +16,7 @@ kolla-ansible --configdir $CONFIG_DIR $@
 # TODO: build new packages in images
 docker ps | grep -o "glance_api\|nova_compute\|cinder_volume\|cinder_backup" | xargs -I % docker exec -u 0 % bash -c "
 test -f /etc/apt/sources.list.d/ceph.list || (
-  echo 'deb https://download.ceph.com/debian-pacific/ focal main' > /etc/apt/sources.list.d/ceph.list
+  echo 'deb https://download.ceph.com/debian-octopus/ focal main' > /etc/apt/sources.list.d/ceph.list
   curl https://download.ceph.com/keys/release.asc --output release.asc
   apt-key add release.asc
   apt update

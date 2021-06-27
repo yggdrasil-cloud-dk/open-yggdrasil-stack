@@ -7,11 +7,11 @@ set -x
 # destroy ceph
 ./scripts/external/cephadm-purge.sh $(cephadm shell -- bash -c 'ceph fsid' 2>/dev/null)
 
+# remove repo
+cephadm rm-repo
+
 # remove ceph-common
-apt remove --purge -y ceph-common
+apt remove --purge -y ceph-common cephadm
 
 # remove unused dependencies
 apt -y autoremove
-
-# remove repo
-cephadm rm-repo

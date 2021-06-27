@@ -1,25 +1,22 @@
 #!/bin/bash
 
-# Based on https://docs.ceph.com/en/octopus/install/ceph-deploy/quick-ceph-deploy/
+# Based on https://docs.ceph.com/en/octopus/cephadm/install/
 
 set -xe
 
-# install ceph-adm
-#apt install -y cephadm
+# download cephadm
+curl --silent --remote-name --location https://github.com/ceph/ceph/raw/octopus/src/cephadm/cephadm
+chmod +x cephadm
 
-# installing like this because of bug https://tracker.ceph.com/issues/49910
-cd /tmp
-curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm  
-chmod +x cephadm  
-sudo ./cephadm add-repo --release pacific
-sudo rm /etc/apt/trusted.gpg.d/ceph.release.gpg  
-wget https://download.ceph.com/keys/release.asc  
-sudo apt-key add release.asc  
-sudo apt update  
-sudo ./cephadm install
+# add cephadm repo to apt sources
+./cephadm add-repo --release octopus
 
-# install ceph-common to allow host access to ceph commands
+# install ceph adm
+./cephadm install
+
+# delete downloaded cephadm file
+rm -f cephadm
+
+# install ceph-common
 cephadm install ceph-common
 
-# remove tmp file
-rm cephadm

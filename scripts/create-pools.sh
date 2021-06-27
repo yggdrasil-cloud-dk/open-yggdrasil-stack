@@ -15,4 +15,3 @@ rbd pool init volumes
 rbd pool init images
 rbd pool init backups
 rbd pool init vms
-

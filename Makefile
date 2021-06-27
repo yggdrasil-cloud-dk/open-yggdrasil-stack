@@ -82,7 +82,11 @@ reconfigure-kolla-ansible-tags:
 
 destroy-cephadm:
 	scripts/destroy-cephadm.sh
-	rm -rf 10-install-cephadm.done
+	rm -rf 10-install-cephadm.done 11-deploy-cephadm.done
+
+destroy-loop-devices:
+	scripts/destroy-loop-devices.sh
+	rm -rf 09-configure-loop-devices.done
 
 # Get all targets except "clean" and delete their files
 clean:
