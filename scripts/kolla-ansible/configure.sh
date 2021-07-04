@@ -48,13 +48,12 @@ set_global_config enable_cinder_backup no
 
 # TODO: Add cinder and cinder backup
 
-# create custom config dirs
-mkdir -p /etc/kolla/config/glance/
-mkdir -p /etc/kolla/config/nova/
 
-# copy keyring and ceph.conf to those dirs
-cp /etc/ceph/ceph.c* /etc/kolla/config/glance/
-cp /etc/ceph/ceph.c* /etc/kolla/config/nova/
+for service in glance nova cinder/cinder-volume; do
+	mkdir -p /etc/kolla/config/$service/
+	cp /etc/ceph/ceph.client.admin.keyring /etc/kolla/config/$service/
+	cat /etc/ceph/ceph.conf | sed 's/^\t//g' > /etc/kolla/config/$service/ceph.conf
+done
 
 
 # get python path in venv

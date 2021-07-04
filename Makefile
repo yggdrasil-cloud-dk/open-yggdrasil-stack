@@ -7,64 +7,72 @@ TAGS =
 # Setup #
 #########
 
-01-configure-network.done:
-	scripts/configure-network.sh
+# devices #
+
+01-devices-deps.done:
+	scripts/devices/deps.sh
 	touch $@
 
-02-install-system-deps.done: 01-configure-network.done
-	scripts/install-sys-deps.sh
+02-devices-network.done: 01-devices-deps.done
+	scripts/devices/network.sh
 	touch $@
 
-09-configure-loop-devices.done: 02-install-system-deps.done
-	scripts/configure-loop-devices.sh
+03-devices-loop.done: 02-devices-network.done
+	scripts/devices/loop.sh
 	touch $@
 
-10-install-cephadm.done: 09-configure-loop-devices.done
-	scripts/install-cephadm.sh
+# cephadm #
+
+10-cephadm-install.done: 03-devices-loop.done
+	scripts/cephadm/install.sh
 	touch $@
 
-11-deploy-cephadm.done: 10-install-cephadm.done
-	scripts/deploy-cephadm.sh
+11-cephadm-deploy.done: 10-cephadm-install.done
+	scripts/cephadm/deploy.sh
 	touch $@
 
-12-create-pools.done: 11-deploy-cephadm.done
-	scripts/create-pools.sh
+12-cephadm-pools.done: 11-cephadm-deploy.done
+	scripts/cephadm/pools.sh
 	touch $@
 
-20-install-kolla-ansible-deps.done: 12-create-pools.done
-	scripts/install-kolla-ansible-deps.sh
+# kolla-ansible #
+
+20-kolla-ansible-deps.done: 12-cephadm-pools.done
+	scripts/kolla-ansible/deps.sh
 	touch $@
 
-21-install-kolla-ansible.done: 20-install-kolla-ansible-deps.done
-	scripts/install-kolla-ansible.sh
+21-kolla-ansible-install.done: 20-kolla-ansible-deps.done
+	scripts/kolla-ansible/install.sh
 	touch $@
 
-22-configure-kolla-ansible.done: 21-install-kolla-ansible.done
-	scripts/configure-kolla-ansible.sh
+22-kolla-ansible-configure.done: 21-kolla-ansible-install.done
+	scripts/kolla-ansible/configure.sh
 	touch $@
 
-23-bootstrap-kolla-ansible.done: 22-configure-kolla-ansible.done
-	scripts/kolla-ansible.sh bootstrap-servers
+23-kolla-ansible-bootstrap.done: 22-kolla-ansible-configure.done
+	scripts/kolla-ansible/kolla-ansible.sh bootstrap-servers
 	touch $@
 
-24-prechecks-kolla-ansible.done: 23-bootstrap-kolla-ansible.done
-	scripts/kolla-ansible.sh prechecks
+24-kolla-ansible-prechecks.done: 23-kolla-ansible-bootstrap.done
+	scripts/kolla-ansible/kolla-ansible.sh prechecks
 	touch $@
 
-25-deploy-kolla-ansible.done: 24-prechecks-kolla-ansible.done
-	scripts/kolla-ansible.sh deploy
+25-kolla-ansible-deploy.done: 24-kolla-ansible-prechecks.done
+	scripts/kolla-ansible/kolla-ansible.sh deploy
 	touch $@
 
-26-postdeploy-kolla-ansible.done: 25-deploy-kolla-ansible.done
-	scripts/kolla-ansible.sh post-deploy
+26-kolla-ansible-postdeploy.done: 25-kolla-ansible-deploy.done
+	scripts/kolla-ansible/kolla-ansible.sh post-deploy
 	touch $@
 
-31-install-os-client.done: 26-postdeploy-kolla-ansible.done
+# util #
+
+30-install-os-client.done: 26-kolla-ansible-postdeploy.done
 	scripts/install-os-client.sh
 	touch $@
 
-32-create-initial-resources.done: 31-install-os-client.done
-	scripts/create-initial-resources.sh
+31-init.done: 30-install-os-client.done
+	scripts/init.sh
 	touch $@
 
 ########
@@ -78,32 +86,35 @@ print-%  : ; @echo $* = $($*)
 ping-nodes:
 	scripts/ping-nodes.sh
 
-deploy-kolla-ansible-tags:
-	scripts/kolla-ansible.sh deploy -t $(TAGS)
+kolla-ansible-deploy-tags:
+	scripts/kolla-ansible/kolla-ansible.sh deploy -t $(TAGS)
 
-reconfigure-kolla-ansible-tags:
-	scripts/kolla-ansible.sh reconfigure -t $(TAGS)
+kolla-ansible-reconfigure-tags:
+	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS)
 
-destroy-cephadm:
-	scripts/destroy-cephadm.sh
-	rm -rf 10-install-cephadm.done 11-deploy-cephadm.done
+refresh-done-flags:
+	ls | grep "^[0-9]" | xargs -I % touch %
 
-destroy-loop-devices:
-	scripts/destroy-loop-devices.sh
-	rm -rf 09-configure-loop-devices.done
+cephadm-destroy:
+	scripts/cephadm/destroy.sh
+	rm -f 10-* 11-* 12-*
+
+devices-loop-destroy:
+	scripts/devices/destroy-loop.sh
+	rm -f 03-*
 
 # Get all targets except "clean" and delete their files
 clean:
-	-rm $$(ls | grep ".*\.done" | grep -v 01-configure-network)   # excluding configure network because its a pain to lose connection
+	-rm $$(ls | grep ".*\.done" | grep -v "01-.*")   # excluding configure network because its a pain to lose connection
 
 #TODO: clean things here and make it noice
 clean-all: clean
-	-scripts/kolla-ansible.sh destroy 
+	-scripts/kolla-ansible/kolla-ansible.sh destroy 
 	-docker rm -f $$(docker ps -aq)
 	-docker volume rm -f $$(docker volume ls -q)
 	-ip addr del 10.0.10.100/32 dev openstack_mgmt
 	# why are we using /etc/kolla? and /run/libvirt?
 	-rm -rf workspace /etc/kolla /run/libvirt
 	-ls /sys/class/net | grep -v "eno\|ceph\|neutron\|openstack\|lo\|docker"| xargs -I% ip link delete %
-	-scripts/destroy-cephadm.sh
-	-scripts/destroy-loop-devices.sh
+	-scripts/cephadm/destroy.sh
+	-scripts/devices/destroy-loop.sh
