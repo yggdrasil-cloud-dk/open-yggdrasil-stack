@@ -20,9 +20,9 @@ truncate -s 8G disk-1.img
 truncate -s 8G disk-2.img
 
 # create loop devices
-losetup /dev/loop10 disk-0.img
-losetup /dev/loop11 disk-1.img
-losetup /dev/loop12 disk-2.img
+losetup /dev/loop100 disk-0.img
+losetup /dev/loop101 disk-1.img
+losetup /dev/loop102 disk-2.img
 
 # create pvs
 pvcreate /dev/loop10
@@ -35,8 +35,23 @@ vgcreate vg-1 /dev/loop11
 vgcreate vg-2 /dev/loop12
 
 # create lvms
+# note: lvms will be at path /dev/vg-X/lv-X
 lvcreate -n lv-0 -l 100%FREE vg-0
 lvcreate -n lv-1 -l 100%FREE vg-1
 lvcreate -n lv-2 -l 100%FREE vg-2
 
-# lvms will be at path /dev/vg-X/lv-X
+# make devices persistent
+test -e  /etc/systemd/system/loop-device.service || cat > /etc/systemd/system/loop-device.service << EOF
+[Unit]
+
+[Service]
+Type=oneshot
+ExecStart=-/bin/bash -c 'losetup /dev/loop100 /mnt/disk-0.img'
+ExecStart=-/bin/bash -c 'losetup /dev/loop101 /mnt/disk-1.img'
+ExecStart=-/bin/bash -c 'losetup /dev/loop102 /mnt/disk-2.img'
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl enable loop-device
