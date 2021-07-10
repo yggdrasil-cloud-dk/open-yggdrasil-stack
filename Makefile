@@ -103,14 +103,14 @@ devices-loop-destroy:
 	scripts/devices/destroy-loop.sh
 	rm -f 03-*
 
-# Get all targets except "clean" and delete their files
+# Get all targets with '.done' and delete their files
 clean:
-	-rm $$(ls | grep ".*\.done" | grep -v "01-.*")   # excluding configure network because its a pain to lose connection
+	-rm $$(ls | grep ".*\.done")
 
 #TODO: clean things here and make it noice
 clean-all: clean
 	-scripts/kolla-ansible/kolla-ansible.sh destroy 
-	-docker rm -f $$(docker ps -aq)
+	-docker rm -f $$(docker ps -aq | grep -v ceph)
 	-docker volume rm -f $$(docker volume ls -q)
 	-ip addr del 10.0.10.100/32 dev openstack_mgmt
 	# why are we using /etc/kolla? and /run/libvirt?

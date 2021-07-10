@@ -19,4 +19,3 @@ rm -f cephadm
 
 # install ceph-common
 cephadm install ceph-common
-

@@ -25,14 +25,14 @@ losetup /dev/loop101 disk-1.img
 losetup /dev/loop102 disk-2.img
 
 # create pvs
-pvcreate /dev/loop10
-pvcreate /dev/loop11
-pvcreate /dev/loop12
+pvcreate /dev/loop100
+pvcreate /dev/loop101
+pvcreate /dev/loop102
 
 # create vgs
-vgcreate vg-0 /dev/loop10
-vgcreate vg-1 /dev/loop11
-vgcreate vg-2 /dev/loop12
+vgcreate vg-0 /dev/loop100
+vgcreate vg-1 /dev/loop101
+vgcreate vg-2 /dev/loop102
 
 # create lvms
 # note: lvms will be at path /dev/vg-X/lv-X

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xe
+set -x
 
 # remove lvs
 lvremove -y /dev/vg-0/lv-0  /dev/vg-1/lv-1  /dev/vg-2/lv-2
