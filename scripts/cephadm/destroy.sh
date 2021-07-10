@@ -6,7 +6,7 @@ set -x
 
 # destroy ceph
 #./scripts/cephadm/external/cephadm-purge.sh $(cephadm shell -- bash -c 'ceph fsid' 2>/dev/null)
-./scripts/cephadm/external/cephadm-purge.sh $(docker ps | grep ceph-mon | awk '{print $NF}' | sed 's/ceph-//g;s/-mon.*//g')
+./scripts/cephadm/external/cephadm-purge.sh $(docker ps -a | grep "ceph-.*-mon" | awk '{print $NF}' | sed 's/ceph-//g;s/-mon.*//g')
 
 # remove repo
 cephadm rm-repo
