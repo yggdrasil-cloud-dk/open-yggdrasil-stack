@@ -110,7 +110,7 @@ clean:
 #TODO: clean things here and make it noice
 clean-all: clean
 	-scripts/kolla-ansible/kolla-ansible.sh destroy 
-	-docker rm -f $$(docker ps -aq | grep -v ceph)
+	-docker rm -f $$(docker ps -a --format "{{.Names}}" | grep -v ceph)
 	-docker volume rm -f $$(docker volume ls -q)
 	-ip addr del 10.0.10.100/32 dev openstack_mgmt
 	# why are we using /etc/kolla? and /run/libvirt?
