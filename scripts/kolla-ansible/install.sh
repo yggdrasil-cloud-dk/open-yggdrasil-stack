@@ -11,7 +11,7 @@ cd workspace
 source kolla-venv/bin/activate
 
 # install kolla-ansible
-pip install kolla-ansible
+pip install kolla-ansible==12.*
 
 # create config dir for kolla
 mkdir -p etc/kolla

@@ -21,12 +21,9 @@ docker ps | grep -o "glance_api\|nova_compute\|nova_libvirt\|cinder_volume\|cind
             curl https://download.ceph.com/keys/release.asc --output release.asc
             apt-key add release.asc
             apt update
-            apt list --installed | egrep 'ceph|rbd|rados' | cut -d '/' -f 1 | xargs apt remove -y
-            apt install -y librbd1=15.2.13-1focal python3-cephfs=15.2.13-1focal python3-ceph-argparse=15.2.13-1focal \
-                python3-ceph-common=15.2.13-1focal python3-rados=15.2.13-1focal python3-rbd=15.2.13-1focal python3-rgw=15.2.13-1focal \
-                librados2=15.2.13-1focal libcephfs2=15.2.13-1focal libradosstriper1=15.2.13-1focal librgw2=15.2.13-1focal ceph-common=15.2.13-1focal
+            apt install -y ceph-common
+            touch /tmp/restart_container
         )
     \"
-    docker restart %
+    docker exec -u 0 % test -f /tmp/restart_container && docker exec -u 0 % rm -f /tmp/restart_container && docker restart %
 "
-

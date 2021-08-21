@@ -103,6 +103,9 @@ devices-loop-destroy:
 	scripts/devices/destroy-loop.sh
 	rm -f 03-*
 
+delete-os-resources:
+	scripts/delete-os-resources.sh
+
 # Get all targets with '.done' and delete their files
 clean:
 	-rm $$(ls | grep ".*\.done")
