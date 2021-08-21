@@ -25,5 +25,5 @@ docker ps | grep -o "glance_api\|nova_compute\|nova_libvirt\|cinder_volume\|cind
             touch /tmp/restart_container
         )
     \"
-    docker exec -u 0 % test -f /tmp/restart_container && docker exec -u 0 % rm -f /tmp/restart_container && docker restart %
+    docker exec -u 0 % test -f /tmp/restart_container && docker exec -u 0 % rm -f /tmp/restart_container && docker restart % || true
 "
