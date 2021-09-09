@@ -27,6 +27,7 @@ set_global_config kolla_install_type source
 
 set_global_config network_interface openstack_mgmt
 set_global_config neutron_external_interface neutron_ext
+#set_global_config neutron_external_interface $(ip route | grep "^default" | awk '{print $5}')
 set_global_config kolla_internal_vip_address 10.0.10.100
 
 set_global_config glance_backend_ceph yes
@@ -45,27 +46,8 @@ set_global_config ceph_cinder_user admin
 
 set_global_config enable_cinder_backup no
 
-
-# TODO: Add cinder and cinder backup
-
-
 for service in glance nova cinder/cinder-volume; do
 	mkdir -p /etc/kolla/config/$service/
 	cp /etc/ceph/ceph.client.admin.keyring /etc/kolla/config/$service/
 	cat /etc/ceph/ceph.conf | sed 's/^\t//g' > /etc/kolla/config/$service/ceph.conf
 done
-
-
-# get python path in venv
-PYTHON_PATH=$(realpath -s kolla-venv/bin/python)
-
-# configure ansible
-cat > ansible.cfg << EOF
-[defaults]
-host_key_checking=False
-pipelining=True
-forks=10
-inventory = inventory/$INVENTORY
-force_valid_group_names = ignore
-interpreter_python = $PYTHON_PATH
-EOF

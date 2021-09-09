@@ -19,7 +19,6 @@ network:
   ethernets:
     $interface:
       dhcp4: yes
-
   vlans:
     # openstack management vlan
     openstack_mgmt:

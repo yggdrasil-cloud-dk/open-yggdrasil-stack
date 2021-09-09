@@ -28,3 +28,18 @@ pip install -U pip
 
 # install ansible
 pip install -U 'ansible==2.9.*'
+
+# get python path in venv
+PYTHON_PATH=$(realpath -s kolla-venv/bin/python)
+INVENTORY="${INVENTORY:=all-in-one}"
+
+# configure ansible
+cat > ansible.cfg << EOF
+[defaults]
+host_key_checking=False
+pipelining=True
+forks=10
+inventory = inventory/$INVENTORY
+force_valid_group_names = ignore
+interpreter_python = $PYTHON_PATH
+EOF

@@ -2,8 +2,6 @@
 
 # Based on https://docs.openstack.org/kolla-ansible/latest/user/quickstart.html
 
-INVENTORY="${INVENTORY:=all-in-one}"
-
 set -xe
 
 # source venv
@@ -11,7 +9,8 @@ cd workspace
 source kolla-venv/bin/activate
 
 # install kolla-ansible
-pip install kolla-ansible==12.*
+#pip install kolla-ansible==12.*
+pip install kolla-ansible
 
 # create config dir for kolla
 mkdir -p etc/kolla

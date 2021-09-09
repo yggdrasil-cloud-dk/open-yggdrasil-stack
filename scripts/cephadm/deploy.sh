@@ -19,7 +19,7 @@ osd_pool_default_min size = 1
 EOF
 
 # bootstrap cluster
-cephadm bootstrap --config initial-ceph.conf --allow-overwrite --mon-ip $CEPH_PUBLIC_IP
+cephadm bootstrap --config initial-ceph.conf --allow-overwrite --mon-ip $CEPH_PUBLIC_IP --skip-monitoring-stack
 
 # remove file
 rm initial-ceph.conf
