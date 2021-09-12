@@ -54,7 +54,8 @@ sed -i 's/.*net.ipv4.ip_forward=.*/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
 while (! ping -c 3 8.8.8.8); do sleep 5; done
 
 ip=$(ip -o -f inet addr | grep $interface | awk '{print $4}')
-test -e /opt/check_internet_access.sh || cat > /opt/check_internet_access.sh << EOF
+gw=$(ip route | grep "^default" | grep -o 'via .\+' | cut -d ' ' -f 2)
+test -e /opt/revive_internet_access.sh || cat > /opt/revive_internet_access.sh << EOF
 #!/bin/bash
 
 while true; do
@@ -63,6 +64,8 @@ while true; do
       ip addr flush dev $interface
       ip addr add $ip dev br-ex
       ip link set br-ex up
+      ip route add default via $gw dev br-ex
+      resolvectl dns br-ex 8.8.8.8
     fi
   fi
   sleep 5
@@ -75,7 +78,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=-/bin/bash /opt/check_internet_access.sh
+ExecStart=-/bin/bash /opt/revive_internet_access.sh
 
 [Install]
 WantedBy=multi-user.target
