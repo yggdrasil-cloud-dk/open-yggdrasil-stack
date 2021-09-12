@@ -2,6 +2,10 @@
 
 set -x
 
+# disable and remove service
+systemctl disable loop-device
+rm -f /etc/systemd/system/loop-device.service
+
 # remove lvs
 lvremove -y /dev/vg-0/lv-0  /dev/vg-1/lv-1  /dev/vg-2/lv-2
 
@@ -18,3 +22,7 @@ cd /mnt
 
 # remove disk image files
 rm disk-0.img disk-1.img disk-2.img
+
+# delete network configs
+systemctl disable internet-access-bridge
+rm -f /opt/check_internet_access.sh /etc/systemd/system/internet-access-bridge.service 

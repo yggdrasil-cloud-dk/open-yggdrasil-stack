@@ -9,7 +9,7 @@ apt install -y net-tools
 rm -rf /etc/netplan/01-network-manager-all.yaml
 
 # get interface name - assuming only one interface with internet access / default route
-interface=$(ip route | grep "^default" | awk '{print $5}')
+interface=$(ip route | grep "^default" | grep -o 'dev .\+' | cut -d ' ' -f 2)
 
 # create new network config
 cat > /etc/netplan/01-vlans.yaml << EOF
@@ -35,12 +35,6 @@ network:
       id: 60
       link: $interface
       addresses: [10.0.60.1/24]
-    # neutron external vlan
-    # TODO: might need to change
-    neutron_ext:
-      id: 100
-      link: $interface
-      addresses: [10.0.100.1/24]
 EOF
 
 # netplan apply
@@ -53,4 +47,42 @@ systemctl disable NetworkManager.service
 # enable ip forwarding
 sysctl -w net.ipv4.ip_forward=1
 sed -i 's/.*net.ipv4.ip_forward=.*/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+
+# TODO: find a better way to do this!!
+
+# wait for internet connectivity
+while (! ping -c 3 8.8.8.8); do sleep 5; done
+
+ip=$(ip -o -f inet addr | grep $interface | awk '{print $4}')
+test -e /opt/check_internet_access.sh || cat > /opt/check_internet_access.sh << EOF
+#!/bin/bash
+
+while true; do
+  if (ip a | grep -q br-ex); then
+    if (! ping -c 3 8.8.8.8 > /dev/null 2>&1); then 
+      ip addr flush dev $interface
+      ip addr add $ip dev br-ex
+      ip link set br-ex up
+    fi
+  fi
+  sleep 5
+done
+EOF
+
+test -e /etc/systemd/system/internet-access-bridge.service || cat > /etc/systemd/system/internet-access-bridge.service << EOF
+[Unit]
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=-/bin/bash /opt/check_internet_access.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable internet-access-bridge
+systemctl start internet-access-bridge
+
 

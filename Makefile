@@ -100,7 +100,7 @@ cephadm-destroy:
 	rm -f 10-* 11-* 12-*
 
 devices-loop-destroy:
-	scripts/devices/destroy-loop.sh
+	scripts/devices/destroy.sh
 	rm -f 03-*
 
 delete-os-resources:
@@ -120,4 +120,4 @@ clean-all: clean
 	-rm -rf workspace /etc/kolla /run/libvirt
 	-ls /sys/class/net | grep -v "eno\|ceph\|neutron\|openstack\|lo\|docker"| xargs -I% ip link delete %
 	-scripts/cephadm/destroy.sh
-	-scripts/devices/destroy-loop.sh
+	-scripts/devices/destroy.sh

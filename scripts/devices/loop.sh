@@ -41,7 +41,7 @@ lvcreate -n lv-1 -l 100%FREE vg-1
 lvcreate -n lv-2 -l 100%FREE vg-2
 
 # make devices persistent
-test -e  /etc/systemd/system/loop-device.service || cat > /etc/systemd/system/loop-device.service << EOF
+test -e /etc/systemd/system/loop-device.service || cat > /etc/systemd/system/loop-device.service << EOF
 [Unit]
 
 [Service]
@@ -54,4 +54,5 @@ ExecStart=-/bin/bash -c 'losetup /dev/loop102 /mnt/disk-2.img'
 WantedBy=default.target
 EOF
 
+systemctl daemon-reload
 systemctl enable loop-device

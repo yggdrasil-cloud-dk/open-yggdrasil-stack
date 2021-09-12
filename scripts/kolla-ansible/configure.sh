@@ -26,8 +26,7 @@ set_global_config kolla_base_distro ubuntu
 set_global_config kolla_install_type source
 
 set_global_config network_interface openstack_mgmt
-set_global_config neutron_external_interface neutron_ext
-#set_global_config neutron_external_interface $(ip route | grep "^default" | awk '{print $5}')
+set_global_config neutron_external_interface $(ip route | grep "^default" | grep -o 'dev .\+' | cut -d ' ' -f 2)
 set_global_config kolla_internal_vip_address 10.0.10.100
 
 set_global_config glance_backend_ceph yes
