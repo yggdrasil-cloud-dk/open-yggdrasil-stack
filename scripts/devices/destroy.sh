@@ -2,6 +2,10 @@
 
 set -x
 
+########
+# Loop #
+########
+
 # disable and remove service
 systemctl disable loop-device
 rm -f /etc/systemd/system/loop-device.service
@@ -22,6 +26,10 @@ cd /mnt
 
 # remove disk image files
 rm disk-0.img disk-1.img disk-2.img
+
+###########
+# Network #
+###########
 
 # delete network configs
 systemctl disable internet-access-bridge

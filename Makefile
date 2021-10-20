@@ -121,3 +121,5 @@ clean-all: clean
 	-ls /sys/class/net | grep -v "eno\|ceph\|neutron\|openstack\|lo\|docker"| xargs -I% ip link delete %
 	-scripts/cephadm/destroy.sh
 	-scripts/devices/destroy.sh
+	@echo "\n===============================\n\n"
+	@echo -n "NEED TO REBOOT. REBOOT [y/n]? "; read resp; if [ $$resp = 'y' ]; then echo Rebooting..; sleep 5; reboot; fi
