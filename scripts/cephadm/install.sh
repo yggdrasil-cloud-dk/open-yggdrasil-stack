@@ -9,7 +9,7 @@ curl --silent --remote-name --location https://github.com/ceph/ceph/raw/octopus/
 chmod +x cephadm
 
 # add cephadm repo to apt sources
-./cephadm add-repo --release octopus
+./cephadm add-repo --version 15.2.15
 
 # install ceph adm
 ./cephadm install
