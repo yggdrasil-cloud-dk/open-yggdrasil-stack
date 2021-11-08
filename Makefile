@@ -75,6 +75,10 @@ TAGS =
 	scripts/init.sh
 	touch $@
 
+32-upload-images.done: 31-init.done
+	scripts/upload-images.sh
+	touch $@
+
 ########
 # Util #
 ########
