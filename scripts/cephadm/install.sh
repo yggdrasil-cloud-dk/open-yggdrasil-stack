@@ -19,3 +19,10 @@ rm -f cephadm
 
 # install ceph-common
 cephadm install ceph-common
+
+# remove old key
+rm -f /etc/apt/trusted.gpg.d/ceph.release.gpg
+
+# add key
+wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
+

@@ -7,6 +7,9 @@ TAGS =
 # Setup #
 #########
 
+prepare-ansible:
+	ln -sfr ansible/inventory/hosts /etc/ansible/hosts
+
 # devices #
 
 01-devices-deps.done:

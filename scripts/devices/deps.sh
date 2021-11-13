@@ -3,9 +3,12 @@
 set -xe
 
 # install some packages that may be missing
-apt install -y dnsutils net-tools lvm2 openssh-server bridge-utils
+apt install -y dnsutils net-tools lvm2 openssh-server bridge-utils curl docker.io
+
+# TODO: RUN ONLY ON CONTROLLER
 
 # add user to sudoers
+# TODO: sometimes USERNAME is empty.. so hangs
 grep -q $USERNAME /etc/sudoers || cat >> /etc/sudoers << EOF
 
 $USERNAME ALL=(ALL) NOPASSWD: ALL
@@ -41,5 +44,3 @@ if [[ -f ~/kolla-deploy/workspace/etc/kolla/admin-openrc.sh ]]; then
     source ~/kolla-deploy/workspace/etc/kolla/admin-openrc.sh
 fi
 EOF
-
-. ~/.bashrc

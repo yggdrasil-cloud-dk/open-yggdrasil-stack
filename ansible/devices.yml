@@ -1,0 +1,17 @@
+---
+- name: Set up devices
+  hosts: deployment_nodes
+  tasks:
+    - apt:
+        name:
+          - dnsutils
+          - net-tools
+          - lvm2
+          - openssh-server
+          - bridge-utils
+          - curl
+          - docker.io
+
+    - script: "{{ playbook_dir }}/../scripts/devices/network.sh"
+
+    - script: "{{ playbook_dir }}/../scripts/devices/loop.sh"

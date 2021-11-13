@@ -1,0 +1,9 @@
+skypath1		ansible_connection=local
+skypath2		ansible_host=192.168.142.132
+
+[deployment_controller]
+skypath1
+
+[deployment_nodes]
+skypath1
+skypath2
