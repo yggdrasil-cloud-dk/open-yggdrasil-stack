@@ -34,3 +34,5 @@ rm disk-0.img disk-1.img disk-2.img
 # delete network configs
 systemctl disable internet-access-bridge
 rm -f /opt/revive_internet_access.sh /etc/systemd/system/internet-access-bridge.service 
+
+rm -f /root/loop_devices.done

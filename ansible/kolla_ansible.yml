@@ -1,0 +1,59 @@
+---
+- name: Prepare kolla-ansible
+  hosts: deployment_controller
+  any_errors_fatal: true
+  tasks:
+    - name: Install kolla-ansible dependencies
+      script: "{{ playbook_dir }}/../scripts/kolla-ansible/deps.sh"
+      args:
+        chdir: "{{ playbook_dir }}/.."
+
+    - name: Install kolla-ansible
+      script: "{{ playbook_dir }}/../scripts/kolla-ansible/install.sh"
+      args:
+        chdir: "{{ playbook_dir }}/.."
+
+    - name: Add inventory for nodes
+      copy: 
+        dest: "{{ playbook_dir }}/../workspace/inventory/0{{ hostvars[item].inventory_index }}-{{ item }}"
+        content: |
+          {% if item == inventory_hostname %}
+          {{ item }} ansible_connection=local ansible_python_interpreter={{ playbook_dir }}/../workspace/kolla-venv/bin/python
+          {% else %}
+          {{ item }} ansible_host={{ hostvars[item].ansible_host }}
+          {% endif %}
+
+          [control]
+          {{ item }}
+
+          [network]
+          {{ item }}
+
+          [compute]
+          {{ item }}
+
+          [storage]
+          {{ item }}
+
+          [monitoring]
+          {{ item }}
+
+          {% if item == inventory_hostname %}
+          [deployment]
+          {{ item }}
+          {% endif %}
+      loop: "{{ groups['deployment_nodes'] }}"
+
+    - name: Configure kolla-ansible
+      script: "{{ playbook_dir }}/../scripts/kolla-ansible/configure.sh"
+      args:
+        chdir: "{{ playbook_dir }}/.."
+
+    - name: Run kolla-ansible
+      debug:
+        msg: 
+          - "Run kolla-ansible with:"
+          - ./scripts/kolla-ansible/kolla-ansible.sh bootstrap-servers
+          - ./scripts/kolla-ansible/kolla-ansible.sh prechecks
+          - ./scripts/kolla-ansible/kolla-ansible.sh deploy
+          - ./scripts/kolla-ansible/kolla-ansible.sh post-deploy

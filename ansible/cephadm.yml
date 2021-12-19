@@ -1,0 +1,107 @@
+---
+- name: Deploy cephadm
+  hosts: deployment_controller
+  any_errors_fatal: true
+  tasks:
+    - name: Install cephadm
+      script: "{{ playbook_dir }}/../scripts/cephadm/install.sh"
+      args:
+        creates: /root/cephadm_install.done
+
+    - name: Create ceph directory
+      file:
+        path: /etc/ceph/
+        state: directory
+
+    - name: Add initial-ceph.conf
+      copy: 
+        dest: /etc/ceph/initial-ceph.conf
+        content: |
+          [global]
+          {% if dev %}
+          osd_pool_default_size = 1
+          osd_pool_default_min size = 1
+          {% else %}
+          osd_pool_default_size = 3
+          osd_pool_default_min size = 2
+          {% endif %}
+
+          public_network = {{ ceph_public_ip | ansible.netcommon.ipaddr('network') }}/{{ ceph_public_ip | ansible.netcommon.ipaddr('prefix') }}
+          cluster_network = {{ ceph_cluster_ip | ansible.netcommon.ipaddr('network') }}/{{ ceph_cluster_ip | ansible.netcommon.ipaddr('prefix') }}
+
+    - name: Run cephadm bootstrap
+      command: "cephadm bootstrap --config /etc/ceph/initial-ceph.conf --allow-overwrite --mon-ip {{ ceph_public_ip | ansible.netcommon.ipaddr('address') }} --skip-monitoring-stack"
+      args:
+        creates: /etc/ceph/ceph.client.admin.keyring
+      register: cephadm_bootstrap
+
+    - name: Get cephadm ssh public key
+      command: ceph cephadm get-pub-key
+      register: cephadm_pub_key
+      changed_when: false
+
+    - name: Add cephadm public key
+      authorized_key:
+        user: root
+        key: "{{ cephadm_pub_key.stdout }}"
+        manage_dir: no
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['deployment_nodes'] }}"
+
+    - name: Add hosts
+      command: "ceph orch host add {{ item }}"
+      loop: "{{ groups['deployment_nodes'] }}"
+
+    - name: Add admin label
+      command: "ceph orch host label add {{ item }} _admin"
+      loop: "{{ groups['deployment_nodes'] }}"
+
+    - name: Add mons
+      command: "ceph orch daemon add mon {{ item }}"
+      loop: "{{ groups['deployment_nodes'] }}"
+      when: item != inventory_hostname
+      failed_when: false
+
+    - name: Get ceph status output
+      command: ceph status -f json-pretty
+      register: ceph_status
+
+    - name: Fail if not all mons added
+      fail:
+        msg: There are {{ (ceph_status.stdout | from_json).monmap.num_mons }} mons but expected number of mons is {{ groups['deployment_nodes'] | length }}
+      when: (ceph_status.stdout | from_json).monmap.num_mons != groups['deployment_nodes'] | length
+
+    # run ceph-volume from mon containers
+    - name: Zap osds
+      shell: |
+        docker exec $(docker ps | grep ceph-.*-mon | awk '{print $1}') bash -c " \
+          ceph-volume lvm zap /dev/vg-0/lv-0 && \
+          ceph-volume lvm zap /dev/vg-1/lv-1 && \
+          ceph-volume lvm zap /dev/vg-2/lv-2 \
+        "
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['deployment_nodes'] }}"
+      when: cephadm_bootstrap.changed
+
+    - name: Add osds
+      shell: |
+        ceph orch daemon add osd {{ item }}:/dev/vg-0/lv-0 && \
+        ceph orch daemon add osd {{ item }}:/dev/vg-1/lv-1 && \
+        ceph orch daemon add osd {{ item }}:/dev/vg-2/lv-2
+      loop: "{{ groups['deployment_nodes'] }}"
+
+    - name: Add pools
+      script: "{{ playbook_dir }}/../scripts/cephadm/pools.sh"
+      args:
+        creates: /root/cephadm_pools.done
+      run_once: true
+
+- name: Destroy cephadm cluster
+  hosts: deployment_nodes
+  any_errors_fatal: true
+  tags:
+    - destroy
+    - never
+  tasks:
+    - name: Destroy cephadm
+      script: "{{ playbook_dir }}/../scripts/cephadm/destroy.sh"

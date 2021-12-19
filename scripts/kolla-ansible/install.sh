@@ -21,5 +21,4 @@ cp -r kolla-venv/share/kolla-ansible/etc_examples/kolla/* etc/kolla
 # create inventory directory in workspace
 mkdir -p inventory
 
-# copy inventory files to current dir
-cp kolla-venv/share/kolla-ansible/ansible/inventory/* inventory
+cat kolla-venv/share/kolla-ansible/ansible/inventory/all-in-one | sed -n '/common/,$p' > inventory/99-openstack_groups

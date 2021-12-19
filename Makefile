@@ -10,77 +10,39 @@ TAGS =
 prepare-ansible:
 	ln -sfr ansible/inventory/hosts /etc/ansible/hosts
 
-# devices #
+devices:
+	ansible-playbook ansible/devices.yml
 
-01-devices-deps.done:
-	scripts/devices/deps.sh
-	touch $@
-
-02-devices-network.done: 01-devices-deps.done
-	scripts/devices/network.sh
-	touch $@
-
-03-devices-loop.done: 02-devices-network.done
-	scripts/devices/loop.sh
-	touch $@
-
-# cephadm #
-
-10-cephadm-install.done: 03-devices-loop.done
-	scripts/cephadm/install.sh
-	touch $@
-
-11-cephadm-deploy.done: 10-cephadm-install.done
-	scripts/cephadm/deploy.sh
-	touch $@
-
-12-cephadm-pools.done: 11-cephadm-deploy.done
-	scripts/cephadm/pools.sh
-	touch $@
+cephadm:
+	ansible-playbook ansible/cephadm.yml
 
 # kolla-ansible #
 
-20-kolla-ansible-deps.done: 12-cephadm-pools.done
-	scripts/kolla-ansible/deps.sh
-	touch $@
+kolla-ansible-prepare:
+	ansible-playbook ansible/kolla_ansible.yml
 
-21-kolla-ansible-install.done: 20-kolla-ansible-deps.done
-	scripts/kolla-ansible/install.sh
-	touch $@
-
-22-kolla-ansible-configure.done: 21-kolla-ansible-install.done
-	scripts/kolla-ansible/configure.sh
-	touch $@
-
-23-kolla-ansible-bootstrap.done: 22-kolla-ansible-configure.done
+kolla-ansible-bootstrap:
 	scripts/kolla-ansible/kolla-ansible.sh bootstrap-servers
-	touch $@
 
-24-kolla-ansible-prechecks.done: 23-kolla-ansible-bootstrap.done
+kolla-ansible-prechecks:
 	scripts/kolla-ansible/kolla-ansible.sh prechecks
-	touch $@
 
-25-kolla-ansible-deploy.done: 24-kolla-ansible-prechecks.done
+kolla-ansible-deploy:
 	scripts/kolla-ansible/kolla-ansible.sh deploy
-	touch $@
 
-26-kolla-ansible-postdeploy.done: 25-kolla-ansible-deploy.done
+kolla-ansible-post-deploy:
 	scripts/kolla-ansible/kolla-ansible.sh post-deploy
-	touch $@
 
-# util #
+# openstack #
 
-30-install-os-client.done: 26-kolla-ansible-postdeploy.done
-	scripts/install-os-client.sh
-	touch $@
+os-install-client:
+	scripts/openstack/install-client.sh
 
-31-init.done: 30-install-os-client.done
-	scripts/init.sh
-	touch $@
+os-init-resources:
+	scripts/openstack/init-resources.sh
 
-32-upload-images.done: 31-init.done
-	scripts/upload-images.sh
-	touch $@
+os-upload-images:
+	scripts/openstack/upload-images.sh
 
 ########
 # Util #
@@ -99,34 +61,17 @@ kolla-ansible-deploy-tags:
 kolla-ansible-reconfigure-tags:
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS)
 
-refresh-done-flags:
-	ls | grep "^[0-9]" | xargs -I % touch %
+kolla-ansible-destroy:
+	scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it
 
 cephadm-destroy:
-	scripts/cephadm/destroy.sh
-	rm -f 10-* 11-* 12-*
+	ansible-playbook ansible/cephadm.yml -t destroy
 
-devices-loop-destroy:
-	scripts/devices/destroy.sh
-	rm -f 03-*
+devices-destroy:
+	ansible-playbook ansible/devices.yml -t destroy
 
-delete-os-resources:
-	scripts/delete-os-resources.sh
+os-destroy-resources:
+	scripts/openstack/destroy-resources.sh
 
-# Get all targets with '.done' and delete their files
-clean:
-	-rm $$(ls | grep ".*\.done")
-
-#TODO: clean things here and make it noice
-clean-all: clean
-	-scripts/kolla-ansible/kolla-ansible.sh destroy 
-	-docker rm -f $$(docker ps -a --format "{{.Names}}" | grep -v ceph)
-	-docker volume rm -f $$(docker volume ls -q)
-	-ip addr del 10.0.10.100/32 dev openstack_mgmt
-	# why are we using /etc/kolla? and /run/libvirt?
-	-rm -rf workspace /etc/kolla /run/libvirt
-	-ls /sys/class/net | grep -v "eno\|ceph\|neutron\|openstack\|lo\|docker"| xargs -I% ip link delete %
-	-scripts/cephadm/destroy.sh
-	-scripts/devices/destroy.sh
-	@echo "\n===============================\n\n"
-	@echo -n "NEED TO REBOOT. REBOOT [y/n]? "; read resp; if [ $$resp = 'y' ]; then echo Rebooting..; sleep 5; reboot; fi
+clean: kolla-ansible-destroy cephadm-destroy devices-destroy
+	@echo -e "-----\nPLEASE REBOOT NODES\n-----"

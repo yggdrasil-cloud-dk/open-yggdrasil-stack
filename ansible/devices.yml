@@ -1,8 +1,21 @@
 ---
+# Prereqs:
+# - Ensure passwordless ssh access
+# - Configure interface with static ip
+# - If not dev, configure devices
+
 - name: Set up devices
   hosts: deployment_nodes
+  any_errors_fatal: true
   tasks:
-    - apt:
+    - name: Ensure docker.io is not installed
+      apt:
+        name: docker.io
+        state: absent
+        purge: yes
+
+    - name: Install prereqs
+      apt:
         name:
           - dnsutils
           - net-tools
@@ -10,8 +23,111 @@
           - openssh-server
           - bridge-utils
           - curl
-          - docker.io
+          - ca-certificates
+          - gnupg
+          - lsb-release
+          - net-tools
+          - traceroute
+          - vim
+        update_cache: yes
+        cache_valid_time: 3600
 
-    - script: "{{ playbook_dir }}/../scripts/devices/network.sh"
+    - name: Install docker
+      command: curl -fsSL https://get.docker.com -o /root/get-docker.sh
+      args:
+        creates: /root/get-docker.sh
 
-    - script: "{{ playbook_dir }}/../scripts/devices/loop.sh"
+    - name: Install docker
+      command: sh /root/get-docker.sh
+      args:
+        creates: /usr/bin/docker
+
+    - name: Overwrite docker source
+      copy:
+        dest: /etc/apt/sources.list.d/docker.list
+        content: |
+          deb https://download.docker.com/linux/ubuntu focal stable
+
+    - name: Enable docker service
+      systemd:
+        name: docker.service
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+    - name: Configure hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Configure hosts
+      copy: 
+        dest: /etc/hosts
+        content: |
+          127.0.0.1 localhost
+
+          # openstack mgmt ips
+          {% for host in groups['deployment_nodes'] %}
+          {{ hostvars[host].openstack_mgmt_ip | ansible.netcommon.ipaddr('address') }} {{ host }}
+          {% endfor %}
+
+    - name: Add netplan config file
+      copy: 
+        dest: /etc/netplan/02-vlans.yaml
+        content: |
+          network:
+            version: 2
+            renderer: networkd
+            vlans:
+              # openstack management vlan
+              openstack_mgmt:
+                id: 10
+                link: {{ default_gateway_interface }}
+                addresses: [{{ openstack_mgmt_ip }}]
+              # ceph public vlan
+              ceph_public:
+                id: 50
+                link: {{ default_gateway_interface }}
+                addresses: [{{ ceph_public_ip }}]
+              # ceph cluster vlan
+              ceph_cluster:
+                id: 60
+                link: {{ default_gateway_interface }}
+                addresses: [{{ ceph_cluster_ip }}]
+      register: netplan_config
+
+    - name: netplan apply
+      command: netplan apply
+      when: netplan_config.changed
+
+    - name: Stop and disable NetworkManager
+      systemd:
+        name: NetworkManager.service
+        state: stopped
+        enabled: yes
+
+    - sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+
+    - name: Run internet connectivity script
+      script: "{{ playbook_dir }}/../scripts/devices/revive_internet.sh"
+
+    - name: Configure loop devices
+      script: "{{ playbook_dir }}/../scripts/devices/loop.sh"
+      args:
+        creates: /root/loop_devices.done
+      when: dev
+
+- name: Remove internet connectivity script and destroy loop devices
+  hosts: deployment_nodes
+  any_errors_fatal: true
+  tags:
+    - destroy
+    - never
+  tasks:
+    - name: Destroy devices
+      script: "{{ playbook_dir }}/../scripts/devices/destroy.sh"
+      when: dev

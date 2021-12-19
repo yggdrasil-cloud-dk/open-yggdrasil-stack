@@ -27,11 +27,10 @@ source kolla-venv/bin/activate
 pip install -U pip
 
 # install ansible
-pip install -U 'ansible==2.9.*'
+ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install -U 'ansible==2.10.*'
 
 # get python path in venv
-PYTHON_PATH=$(realpath -s kolla-venv/bin/python)
-INVENTORY="${INVENTORY:=all-in-one}"
+#PYTHON_PATH=$(realpath -s kolla-venv/bin/python)
 
 # configure ansible
 cat > ansible.cfg << EOF
@@ -39,7 +38,7 @@ cat > ansible.cfg << EOF
 host_key_checking=False
 pipelining=True
 forks=10
-inventory = inventory/$INVENTORY
+inventory = inventory
 force_valid_group_names = ignore
-interpreter_python = $PYTHON_PATH
+#interpreter_python = $PYTHON_PATH
 EOF

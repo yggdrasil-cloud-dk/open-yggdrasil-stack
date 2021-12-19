@@ -56,3 +56,5 @@ EOF
 
 systemctl daemon-reload
 systemctl enable loop-device
+
+touch /root/loop_devices.done

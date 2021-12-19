@@ -26,3 +26,5 @@ rm -f /etc/apt/trusted.gpg.d/ceph.release.gpg
 # add key
 wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
 
+touch /root/cephadm_install.done
+

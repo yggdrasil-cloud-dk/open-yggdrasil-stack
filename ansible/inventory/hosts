@@ -1,9 +1,28 @@
-skypath1		ansible_connection=local
-skypath2		ansible_host=192.168.142.132
+---
+all:
 
-[deployment_controller]
-skypath1
+  # hosts and hostvars and all shared vars
+  hosts:
+    skypath01:
+      ansible_connection: local
+      inventory_index: 1
+    skypath02:
+      ansible_host: 192.168.142.4
+      inventory_index: 2
 
-[deployment_nodes]
-skypath1
-skypath2
+  vars:
+    dev: true
+    default_gateway_interface: ens33
+    openstack_mgmt_ip: "10.0.10.{{ inventory_index }}/24"
+    ceph_public_ip: "10.0.50.{{ inventory_index }}/24"
+    ceph_cluster_ip: "10.0.60.{{ inventory_index }}/24"
+
+  # groups and group vars
+  children:
+    deployment_controller:
+      hosts:
+        skypath01:
+    deployment_nodes:
+      hosts:
+        skypath01:
+        skypath02:
