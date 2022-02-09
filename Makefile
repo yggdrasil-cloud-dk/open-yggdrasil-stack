@@ -10,43 +10,49 @@ TAGS =
 prepare-ansible:
 	ln -sfr ansible/inventory/hosts /etc/ansible/hosts
 
-devices:
+devices-configure:
 	ansible-playbook ansible/devices.yml
 
-cephadm:
+cephadm-deploy:
 	ansible-playbook ansible/cephadm.yml
 
 # kolla-ansible #
 
-kolla-ansible-prepare:
+kollaansible-prepare:
 	ansible-playbook ansible/kolla_ansible.yml
 
-kolla-ansible-bootstrap:
+kollaansible-bootstrap:
 	scripts/kolla-ansible/kolla-ansible.sh bootstrap-servers
 
-kolla-ansible-prechecks:
+kollaansible-prechecks:
 	scripts/kolla-ansible/kolla-ansible.sh prechecks
 
-kolla-ansible-deploy:
+kollaansible-deploy:
 	scripts/kolla-ansible/kolla-ansible.sh deploy
 
-kolla-ansible-post-deploy:
+kollaansible-postdeploy:
 	scripts/kolla-ansible/kolla-ansible.sh post-deploy
 
 # openstack #
 
-os-install-client:
+os-client-install:
 	scripts/openstack/install-client.sh
 
-os-init-resources:
+os-resources-init:
 	scripts/openstack/init-resources.sh
 
-os-upload-images:
+os-images-upload:
 	scripts/openstack/upload-images.sh
 
 ########
 # Util #
 ########
+
+all-deploy: prepare-ansible devices-configure cephadm-deploy kollaansible-prepare kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
+
+kollaansible-all-deploy: kollaansible-prepare kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
+
+all-postdeploy: kollaansible-postdeploy os-client-install os-resources-init os-images-upload
 
 # print vars
 print-%  : ; @echo $* = $($*)
@@ -55,13 +61,13 @@ print-%  : ; @echo $* = $($*)
 ping-nodes:
 	scripts/ping-nodes.sh
 
-kolla-ansible-deploy-tags:
+kollaansible-tags-deploy:
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $(TAGS)
 
-kolla-ansible-reconfigure-tags:
+kollaansible-tags-reconfigure:
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS)
 
-kolla-ansible-destroy:
+kollaansible-destroy:
 	scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it
 
 cephadm-destroy:
@@ -70,8 +76,9 @@ cephadm-destroy:
 devices-destroy:
 	ansible-playbook ansible/devices.yml -t destroy
 
-os-destroy-resources:
+os-resources-destroy:
 	scripts/openstack/destroy-resources.sh
 
-clean: kolla-ansible-destroy cephadm-destroy devices-destroy
+clean: kollaansible-destroy cephadm-destroy devices-destroy
+	rm -rf workspace
 	@echo -e "-----\nPLEASE REBOOT NODES\n-----"

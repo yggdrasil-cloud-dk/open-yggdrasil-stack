@@ -4,10 +4,10 @@ all:
   # hosts and hostvars and all shared vars
   hosts:
     skypath01:
-      ansible_connection: local
+      ansible_host: 192.168.57.3
       inventory_index: 1
     skypath02:
-      ansible_host: 192.168.142.4
+      ansible_host: 192.168.57.4
       inventory_index: 2
 
   vars:
@@ -16,6 +16,7 @@ all:
     openstack_mgmt_ip: "10.0.10.{{ inventory_index }}/24"
     ceph_public_ip: "10.0.50.{{ inventory_index }}/24"
     ceph_cluster_ip: "10.0.60.{{ inventory_index }}/24"
+    neutron_external_ip: "10.0.80.{{ inventory_index }}/24"
 
   # groups and group vars
   children:

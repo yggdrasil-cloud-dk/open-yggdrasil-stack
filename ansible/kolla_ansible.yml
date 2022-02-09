@@ -17,11 +17,7 @@
       copy: 
         dest: "{{ playbook_dir }}/../workspace/inventory/0{{ hostvars[item].inventory_index }}-{{ item }}"
         content: |
-          {% if item == inventory_hostname %}
-          {{ item }} ansible_connection=local ansible_python_interpreter={{ playbook_dir }}/../workspace/kolla-venv/bin/python
-          {% else %}
           {{ item }} ansible_host={{ hostvars[item].ansible_host }}
-          {% endif %}
 
           [control]
           {{ item }}
