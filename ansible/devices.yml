@@ -71,7 +71,7 @@
           {% endfor %}
 
     - name: Add netplan config file
-      copy: 
+      copy:
         dest: /etc/netplan/02-vlans.yaml
         content: |
           network:
@@ -93,11 +93,31 @@
                 id: 60
                 link: {{ default_gateway_interface }}
                 addresses: [{{ ceph_cluster_ip }}]
-      register: netplan_config
+      register: netplan_config_1
+
+    - name: Add netplan config file
+      copy:
+        dest: /etc/netplan/03-routes.yaml
+        content: |
+          network:
+            version: 2
+            renderer: networkd
+            ethernets:
+              {{ default_gateway_interface }}:
+                routes:
+                  - to: default
+                    via: {{ gateway_ip }}
+                  - to: {{ openstack_mgmt_ip | ansible.netcommon.ipaddr('network/prefix') }}
+                    via: {{ ansible_host }}
+                  - to: {{ ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}
+                    via: {{ ansible_host }}
+                  - to: {{ ceph_cluster_ip | ansible.netcommon.ipaddr('network/prefix') }}
+                    via: {{ ansible_host }}
+      register: netplan_config_2
 
     - name: netplan apply
       command: netplan apply
-      when: netplan_config.changed
+      when: netplan_config_1.changed or netplan_config_2.changed
 
     - name: Stop and disable NetworkManager
       systemd:
