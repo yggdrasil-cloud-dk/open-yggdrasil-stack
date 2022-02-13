@@ -68,7 +68,8 @@ kollaansible-tags-reconfigure:
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS)
 
 kollaansible-destroy:
-	scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it
+	-scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it
+	@echo -e "-----\nPLEASE REBOOT NODES\n-----"; sleep 5
 
 cephadm-destroy:
 	ansible-playbook ansible/cephadm.yml -t destroy
@@ -80,5 +81,4 @@ os-resources-destroy:
 	scripts/openstack/destroy-resources.sh
 
 clean: kollaansible-destroy cephadm-destroy devices-destroy
-	rm -rf workspace
-	@echo -e "-----\nPLEASE REBOOT NODES\n-----"
+	@rm -rf workspace

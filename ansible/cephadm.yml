@@ -97,7 +97,7 @@
       run_once: true
 
 - name: Destroy cephadm cluster
-  hosts: deployment_nodes
+  hosts: deployment_nodes[0]
   any_errors_fatal: true
   tags:
     - destroy
@@ -105,3 +105,17 @@
   tasks:
     - name: Destroy cephadm
       script: "{{ playbook_dir }}/../scripts/cephadm/destroy.sh"
+
+- name: Destroy cephadm cluster
+  hosts: deployment_nodes
+  tags:
+    - destroy
+    - never
+  tasks:
+    - name: Disable ceph daemons
+      shell:
+        systemctl stop ceph*
+        systemctl disable ceph*
+        rm -rf /etc/systemd/system/ceph*
+        docker rm -f $(docker ps -a | grep ceph | awk '{print $1}')
+      failed_when: false
