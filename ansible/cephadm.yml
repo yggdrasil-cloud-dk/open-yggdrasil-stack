@@ -62,6 +62,9 @@
       when: item != inventory_hostname
       failed_when: false
 
+    - pause:
+        seconds: 10
+
     - name: Get ceph status output
       command: ceph status -f json-pretty
       register: ceph_status
@@ -74,20 +77,21 @@
     # run ceph-volume from mon containers
     - name: Zap osds
       shell: |
-        docker exec $(docker ps | grep ceph-.*-mon | awk '{print $1}') bash -c " \
-          ceph-volume lvm zap /dev/vg-0/lv-0 && \
-          ceph-volume lvm zap /dev/vg-1/lv-1 && \
-          ceph-volume lvm zap /dev/vg-2/lv-2 \
-        "
+        set -e
+        {% for device in ceph_osd_devices -%}
+          docker exec $(docker ps | grep ceph-.*-mon | awk '{print $1}') \
+            bash -c "ceph-volume lvm zap {{ device }}"
+        {% endfor %}
       delegate_to: "{{ item }}"
       loop: "{{ groups['deployment_nodes'] }}"
       when: cephadm_bootstrap.changed
 
     - name: Add osds
       shell: |
-        ceph orch daemon add osd {{ item }}:/dev/vg-0/lv-0 && \
-        ceph orch daemon add osd {{ item }}:/dev/vg-1/lv-1 && \
-        ceph orch daemon add osd {{ item }}:/dev/vg-2/lv-2
+        set -e
+        {% for device in ceph_osd_devices -%}
+          ceph orch daemon add osd {{ item }}:{{ device }}
+        {% endfor %}
       loop: "{{ groups['deployment_nodes'] }}"
 
     - name: Add pools
@@ -114,8 +118,12 @@
   tasks:
     - name: Disable ceph daemons
       shell:
-        systemctl stop ceph*
-        systemctl disable ceph*
-        rm -rf /etc/systemd/system/ceph*
-        docker rm -f $(docker ps -a | grep ceph | awk '{print $1}')
+        systemctl stop ceph*;
+        systemctl disable ceph*;
+        systemctl daemon-reload;
+        rm -rf /etc/systemd/system/ceph*;
+        rm -rf /etc/ceph;
+        rm -rf /var/lib/ceph;
+        rm -rf /var/log/ceph;
+        docker rm -f $(docker ps -a | grep ceph | awk '{print $1}');
       failed_when: false

@@ -2,29 +2,32 @@
 
 # Based on https://docs.ceph.com/en/octopus/cephadm/install/
 
-set -xe
+# set -xe
 
-# download cephadm
-curl --silent --remote-name --location https://github.com/ceph/ceph/raw/octopus/src/cephadm/cephadm
-chmod +x cephadm
+# # download cephadm
+# curl --silent --remote-name --location https://github.com/ceph/ceph/raw/octopus/src/cephadm/cephadm
+# chmod +x cephadm
 
-# add cephadm repo to apt sources
-./cephadm add-repo --version 15.2.15
+# # add cephadm repo to apt sources
+# ./cephadm add-repo --version 15.2.15
 
-# install ceph adm
-./cephadm install
+# # install ceph adm
+# ./cephadm install
 
-# delete downloaded cephadm file
-rm -f cephadm
+# # delete downloaded cephadm file
+# rm -f cephadm
 
-# install ceph-common
-cephadm install ceph-common
+# # install ceph-common
+# cephadm install ceph-common
 
-# remove old key
-rm -f /etc/apt/trusted.gpg.d/ceph.release.gpg
+# # remove old key
+# rm -f /etc/apt/trusted.gpg.d/ceph.release.gpg
 
-# add key
+# # add key
+# wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
+
+# touch /root/cephadm_install.done
+
 wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
 
-touch /root/cephadm_install.done
-
+apt install -y cephadm ceph-common

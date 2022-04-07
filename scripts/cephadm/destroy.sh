@@ -23,12 +23,13 @@ do
 	if [ $host != $bootstrap ]
 		then
 			echo "Purge cluster in $host:"
+			ceph orch host rm $host
 			cephadm_in_host=$(ssh -o StrictHostKeyChecking=no $host ls /var/lib/ceph/$fsid/cephadm*)
 			ssh -o StrictHostKeyChecking=no $host python3 $cephadm_in_host rm-cluster --fsid $fsid --force
 			# Remove ceph target
-			ssh -o StrictHostKeyChecking=no $host systemctl stop ceph.target
-			ssh -o StrictHostKeyChecking=no $host systemctl disable ceph.target
-			ssh -o StrictHostKeyChecking=no $host rm /etc/systemd/system/ceph.target
+			ssh -o StrictHostKeyChecking=no $host bash -c 'systemctl stop ceph*'
+			ssh -o StrictHostKeyChecking=no $host bash -c 'systemctl disable ceph*'
+			ssh -o StrictHostKeyChecking=no $host bash -c 'rm -rf /etc/systemd/system/ceph*'
 			ssh -o StrictHostKeyChecking=no $host systemctl daemon-reload
 			ssh -o StrictHostKeyChecking=no $host systemctl reset-failed
 			# Remove ceph logs

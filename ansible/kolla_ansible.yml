@@ -17,7 +17,7 @@
       copy: 
         dest: "{{ playbook_dir }}/../workspace/inventory/0{{ hostvars[item].inventory_index }}-{{ item }}"
         content: |
-          {{ item }} ansible_host={{ hostvars[item].ansible_host }}
+          {{ item }} ansible_host={{ hostvars[item].ansible_host }} neutron_external_interface={{ default_gateway_interface }}
 
           [control]
           {{ item }}

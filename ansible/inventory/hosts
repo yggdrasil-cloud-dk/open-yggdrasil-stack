@@ -6,14 +6,18 @@ all:
     skypath01:
       ansible_host: 192.168.57.3
       inventory_index: 1
-    skypath02:
-      ansible_host: 192.168.57.4
-      inventory_index: 2
+    #skypath02:
+    #  ansible_host: 192.168.57.4
+    #  inventory_index: 2
 
   vars:
     dev: true
     default_gateway_interface: ens33
     gateway_ip: 192.168.57.2
+    ceph_osd_devices:
+      - /dev/vg-0/lv-0
+      - /dev/vg-1/lv-1
+      - /dev/vg-2/lv-2
     openstack_mgmt_ip: "10.0.10.{{ inventory_index }}/24"
     ceph_public_ip: "10.0.50.{{ inventory_index }}/24"
     ceph_cluster_ip: "10.0.60.{{ inventory_index }}/24"
@@ -27,4 +31,4 @@ all:
     deployment_nodes:
       hosts:
         skypath01:
-        skypath02:
+       # skypath02:

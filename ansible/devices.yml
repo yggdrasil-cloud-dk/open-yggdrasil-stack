@@ -133,7 +133,7 @@
         reload: yes
 
     - name: Run internet connectivity script
-      script: "{{ playbook_dir }}/../scripts/devices/revive_internet.sh"
+      script: "{{ playbook_dir }}/../scripts/devices/revive_internet.sh {{ default_gateway_interface }}"
 
     - name: Configure loop devices
       script: "{{ playbook_dir }}/../scripts/devices/loop.sh"
