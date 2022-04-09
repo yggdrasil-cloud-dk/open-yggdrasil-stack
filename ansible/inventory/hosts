@@ -6,9 +6,9 @@ all:
     skypath01:
       ansible_host: 192.168.57.3
       inventory_index: 1
-    #skypath02:
-    #  ansible_host: 192.168.57.4
-    #  inventory_index: 2
+    skypath02:
+      ansible_host: 192.168.57.4
+      inventory_index: 2
 
   vars:
     dev: true
@@ -31,4 +31,4 @@ all:
     deployment_nodes:
       hosts:
         skypath01:
-       # skypath02:
+        skypath02:

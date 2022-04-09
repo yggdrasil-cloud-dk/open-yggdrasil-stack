@@ -3,10 +3,17 @@
   hosts: deployment_controller
   any_errors_fatal: true
   tasks:
-    - name: Install cephadm
-      script: "{{ playbook_dir }}/../scripts/cephadm/install.sh"
-      args:
-        creates: /root/cephadm_install.done
+    - name: Install cephadm key
+      ansible.builtin.apt_key:
+        url: https://download.ceph.com/keys/release.asc
+
+    - name: Install cephadm and ceph-common
+      apt:
+        pkg: 
+          - cephadm
+          - ceph-common
+      loop: "{{ groups['deployment_nodes'] }}"
+      delegate_to: "{{ item }}"
 
     - name: Create ceph directory
       file:
@@ -49,12 +56,11 @@
       loop: "{{ groups['deployment_nodes'] }}"
 
     - name: Add hosts
-      command: "ceph orch host add {{ item }}"
+      command: "ceph orch host add {{ item }} {{ item }} --labels _admin"
       loop: "{{ groups['deployment_nodes'] }}"
 
-    - name: Add admin label
-      command: "ceph orch host label add {{ item }} _admin"
-      loop: "{{ groups['deployment_nodes'] }}"
+    - name: Apply mons placement
+      command: "ceph orch apply mon --placement='{% for host in groups['deployment_nodes'] %}{{ host }},{% endfor %}'"
 
     - name: Add mons
       command: "ceph orch daemon add mon {{ item }}"
@@ -73,6 +79,36 @@
       fail:
         msg: There are {{ (ceph_status.stdout | from_json).monmap.num_mons }} mons but expected number of mons is {{ groups['deployment_nodes'] | length }}
       when: (ceph_status.stdout | from_json).monmap.num_mons != groups['deployment_nodes'] | length
+
+    - name: Create /etc/ceph directory if it does not exist
+      ansible.builtin.file:
+        path: /etc/ceph/
+        state: directory
+      loop: "{{ groups['deployment_nodes'] }}"
+      delegate_to: "{{ item }}"
+
+      # Note: This is supposed to happen automatically with _admin label
+    - name: Generate new minimal ceph.conf
+      command: ceph config generate-minimal-conf
+      register: ceph_conf
+
+    - name: Write new ceph.conf
+      copy:
+        content: "{{ ceph_conf.stdout }}\n"
+        dest: /etc/ceph/ceph.conf
+      loop: "{{ groups['deployment_nodes'] }}"
+      delegate_to: "{{ item }}"
+
+    - name: Get ceph admin keyring
+      command: ceph auth get client.admin
+      register: ceph_keyring
+
+    - name: Write ceph admin keyring
+      copy:
+        content: "{{ ceph_keyring.stdout }}\n"
+        dest: /etc/ceph/ceph.client.admin.keyring
+      loop: "{{ groups['deployment_nodes'] }}"
+      delegate_to: "{{ item }}"
 
     # run ceph-volume from mon containers
     - name: Zap osds
