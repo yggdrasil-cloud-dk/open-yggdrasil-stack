@@ -21,7 +21,6 @@ all:
     openstack_mgmt_ip: "10.0.10.{{ inventory_index }}/24"
     ceph_public_ip: "10.0.50.{{ inventory_index }}/24"
     ceph_cluster_ip: "10.0.60.{{ inventory_index }}/24"
-    neutron_external_ip: "10.0.80.{{ inventory_index }}/24"
 
   # groups and group vars
   children:

@@ -32,7 +32,7 @@
         update_cache: yes
         cache_valid_time: 3600
 
-    - name: Install docker
+    - name: Download docker install script
       command: curl -fsSL https://get.docker.com -o /root/get-docker.sh
       args:
         creates: /root/get-docker.sh
@@ -47,6 +47,10 @@
         dest: /etc/apt/sources.list.d/docker.list
         content: |
           deb https://download.docker.com/linux/ubuntu focal stable
+
+    - name: Ensure docker apt key is imported
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
 
     - name: Enable docker service
       systemd:
@@ -123,7 +127,8 @@
       systemd:
         name: NetworkManager.service
         state: stopped
-        enabled: yes
+        enabled: no
+      failed_when: false
 
     - sysctl:
         name: net.ipv4.ip_forward
