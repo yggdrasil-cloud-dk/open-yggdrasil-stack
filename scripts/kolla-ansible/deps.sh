@@ -11,10 +11,7 @@ cd workspace
 apt update
 
 # install python and deps
-apt install -y python3-dev libffi-dev gcc libssl-dev
-
-# install venv
-apt install -y python3-venv
+apt install -y python3-dev libffi-dev gcc libssl-dev python3-venv python3-pip
 
 # ensure pyopenssl installed and updated
 pip install -U pyopenssl

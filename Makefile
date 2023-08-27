@@ -8,6 +8,7 @@ TAGS =
 #########
 
 prepare-ansible:
+	mkdir -p /etc/ansible
 	ln -sfr ansible/inventory/hosts /etc/ansible/hosts
 	ln -sfr ansible/ansible.cfg /etc/ansible/ansible.cfg
 
