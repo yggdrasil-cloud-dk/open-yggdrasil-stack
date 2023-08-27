@@ -3,17 +3,15 @@ all:
 
   # hosts and hostvars and all shared vars
   hosts:
-    skypath01:
-      ansible_host: 192.168.57.3
+    os01:
+      ansible_host: 188.165.251.200
       inventory_index: 1
-    skypath02:
-      ansible_host: 192.168.57.4
-      inventory_index: 2
+      ansible_connection: local
 
   vars:
     dev: true
-    default_gateway_interface: ens33
-    gateway_ip: 192.168.57.2
+    default_gateway_interface: eno1
+    gateway_ip: 188.165.251.200
     ceph_osd_devices:
       - /dev/vg-0/lv-0
       - /dev/vg-1/lv-1
@@ -26,8 +24,7 @@ all:
   children:
     deployment_controller:
       hosts:
-        skypath01:
+        os01:
     deployment_nodes:
       hosts:
-        skypath01:
-        skypath02:
+        os01:

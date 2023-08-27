@@ -16,6 +16,9 @@ apt install -y python3-dev libffi-dev gcc libssl-dev
 # install venv
 apt install -y python3-venv
 
+# ensure pyopenssl installed and updated
+pip install -U pyopenssl
+
 # create venv
 # NOTE: adding `--system-site-packages` because it needs python-apt module`
 python3 -m venv --system-site-packages kolla-venv
@@ -27,18 +30,10 @@ source kolla-venv/bin/activate
 pip install -U pip
 
 # install ansible
-ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install -U 'ansible==2.10.*'
+ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install -U --ignore-installed 'ansible>=6,<8'
 
 # get python path in venv
 #PYTHON_PATH=$(realpath -s kolla-venv/bin/python)
 
 # configure ansible
-cat > ansible.cfg << EOF
-[defaults]
-host_key_checking=False
-pipelining=True
-forks=10
-inventory = inventory
-force_valid_group_names = ignore
-#interpreter_python = $PYTHON_PATH
-EOF
+cp /etc/ansible/ansible.cfg ansible.cfg

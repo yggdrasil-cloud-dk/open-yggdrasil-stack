@@ -10,7 +10,10 @@ source kolla-venv/bin/activate
 
 # install kolla-ansible
 #pip install kolla-ansible==12.*
-pip install kolla-ansible
+pip install git+https://opendev.org/openstack/kolla-ansible@stable/2023.1
+
+# install ansible galaxy deps
+kolla-ansible install-deps
 
 # create config dir for kolla
 mkdir -p etc/kolla

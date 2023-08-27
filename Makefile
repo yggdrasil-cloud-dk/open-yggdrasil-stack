@@ -9,6 +9,7 @@ TAGS =
 
 prepare-ansible:
 	ln -sfr ansible/inventory/hosts /etc/ansible/hosts
+	ln -sfr ansible/ansible.cfg /etc/ansible/ansible.cfg
 
 devices-configure:
 	ansible-playbook ansible/devices.yml

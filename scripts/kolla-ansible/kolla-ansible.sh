@@ -10,7 +10,7 @@ source kolla-venv/bin/activate
 
 CONFIG_DIR=$(pwd)/etc/kolla
 
-kolla-ansible --configdir $CONFIG_DIR $@
+kolla-ansible -i ./inventory --configdir $CONFIG_DIR $@
 
 # # updating ceph-related packages in containers
 # # TODO: build new packages in images

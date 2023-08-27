@@ -76,7 +76,7 @@
 
     - name: Add netplan config file
       copy:
-        dest: /etc/netplan/02-vlans.yaml
+        dest: /etc/netplan/60-vlans.yaml
         content: |
           network:
             version: 2
@@ -101,7 +101,7 @@
 
     - name: Add netplan config file
       copy:
-        dest: /etc/netplan/03-routes.yaml
+        dest: /etc/netplan/70-routes.yaml
         content: |
           network:
             version: 2
