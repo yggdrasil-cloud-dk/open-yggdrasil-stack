@@ -7,6 +7,12 @@ TAGS =
 # Setup #
 #########
 
+harden:
+	cp scripts/hardening/ssh.sh /etc/rc.local
+	chmod 755 /etc/rc.local
+	systemctl start rc-local
+	systemctl enable rc-local
+
 prepare-ansible:
 	mkdir -p /etc/ansible
 	ln -sfr ansible/inventory/hosts /etc/ansible/hosts
@@ -50,7 +56,7 @@ os-images-upload:
 # Util #
 ########
 
-all-deploy: prepare-ansible devices-configure cephadm-deploy kollaansible-prepare kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
+all-deploy: harden prepare-ansible devices-configure cephadm-deploy kollaansible-prepare kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
 
 kollaansible-all-deploy: kollaansible-prepare kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
 
@@ -71,7 +77,7 @@ kollaansible-tags-reconfigure:
 
 kollaansible-destroy:
 	-scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it
-	@echo -e "-----\nPLEASE REBOOT NODES\n-----"; sleep 5
+	@bash -c 'echo -e "-----\nPLEASE REBOOT NODES\n-----"; sleep 5'
 
 cephadm-destroy:
 	ansible-playbook ansible/cephadm.yml -t destroy

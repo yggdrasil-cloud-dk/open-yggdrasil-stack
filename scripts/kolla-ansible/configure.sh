@@ -43,10 +43,33 @@ set_global_config cinder_backend_ceph yes
 set_global_config ceph_cinder_keyring ceph.client.admin.keyring
 set_global_config ceph_cinder_user admin
 
+set_global_config neutron_plugin_agent ovn
+
+set_global_config enable_aodh yes
+set_global_config enable_barbican yes
+set_global_config enable_ceilometer yes
+set_global_config enable_cloudkitty yes
+set_global_config enable_designate yes
+set_global_config enable_freezer yes
+set_global_config enable_gnocchi yes
+set_global_config enable_magnum yes
+set_global_config enable_manila yes
+set_global_config enable_manila_backend_generic yes
+set_global_config enable_murano yes
+set_global_config enable_octavia yes
+set_global_config enable_prometheus yes
+set_global_config enable_senlin yes
+set_global_config enable_skyline yes
+set_global_config enable_trove yes
+set_global_config enable_venus yes
+set_global_config enable_vitrage yes
+set_global_config enable_watcher yes
+set_global_config enable_zun yes
+
 set_global_config enable_cinder_backup no
 
 for service in glance nova cinder/cinder-volume; do
-	mkdir -p /etc/kolla/config/$service/
-	cp /etc/ceph/ceph.client.admin.keyring /etc/kolla/config/$service/
-	cat /etc/ceph/ceph.conf | sed 's/^\t//g' > /etc/kolla/config/$service/ceph.conf
+	mkdir -p etc/kolla/config/$service/
+	cp /etc/ceph/ceph.client.admin.keyring etc/kolla/config/$service/
+	cat /etc/ceph/ceph.conf | sed 's/^\t//g' > etc/kolla/config/$service/ceph.conf
 done
