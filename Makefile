@@ -59,9 +59,11 @@ os-images-upload:
 # Util #
 ########
 
-all-deploy: harden prepare-ansible devices-configure cephadm-deploy kollaansible-prepare kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
+infra-up: harden prepare-ansible devices-configure cephadm-deploy
 
-kollaansible-all-deploy: kollaansible-prepare kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
+kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
+
+all-up: infra-up kollaansible-up
 
 all-postdeploy: kollaansible-postdeploy os-client-install os-resources-init os-images-upload
 
