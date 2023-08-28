@@ -29,6 +29,9 @@ cephadm-deploy:
 kollaansible-prepare:
 	ansible-playbook ansible/kolla_ansible.yml
 
+kollaansible-create-certs:
+	scripts/kolla-ansible/kolla-ansible.sh octavia-certificates
+
 kollaansible-bootstrap:
 	scripts/kolla-ansible/kolla-ansible.sh bootstrap-servers
 
