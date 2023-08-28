@@ -19,7 +19,9 @@ kolla-ansible install-deps
 mkdir -p etc/kolla
 
 # copy config files to config dir
-cp -r kolla-venv/share/kolla-ansible/etc_examples/kolla/* etc/kolla
+cp -r kolla-venv/share/kolla-ansible/etc_examples/kolla/globals.yml etc/kolla/globals.yml
+test -f etc/kolla/passwords.yml || cp kolla-venv/share/kolla-ansible/etc_examples/kolla/passwords.yml etc/kolla/passwords.yml
+
 
 # create inventory directory in workspace
 mkdir -p inventory

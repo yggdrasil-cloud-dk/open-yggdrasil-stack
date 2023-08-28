@@ -19,7 +19,17 @@ cd workspace
 source kolla-venv/bin/activate
 
 # generate passwords
-kolla-genpwd -p $CONFIG_DIR/passwords.yml
+PW_FILE=$CONFIG_DIR/passwords.yml
+if [ ! -f "$PW_FILE" ]; then
+	echo "$PW_FILE not found"
+fi
+
+if grep ^[a-z_]*: $PW_FILE | sed 's/.*://g' | xargs | grep -q '[[:alnum:]]'; then
+	echo "password file exists and has passwords"
+else
+	echo "generating passwords.."
+        kolla-genpwd -p $CONFIG_DIR/passwords.yml
+fi
 
 # set global configs
 set_global_config kolla_base_distro ubuntu
@@ -63,11 +73,17 @@ set_global_config enable_senlin yes
 set_global_config enable_skyline yes
 set_global_config enable_trove yes
 set_global_config enable_venus yes
-set_global_config enable_vitrage yes
+#set_global_config enable_vitrage yes
 set_global_config enable_watcher yes
 set_global_config enable_zun yes
 
 set_global_config enable_cinder_backup no
+
+# weird error undefined variable
+set_global_config role_rabbitmq_cluster_port 25674
+
+# another undefined variable for destroy
+set_global_config octavia_provider_drivers "['amphora']"
 
 for service in glance nova cinder/cinder-volume; do
 	mkdir -p etc/kolla/config/$service/
