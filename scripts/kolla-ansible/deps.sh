@@ -29,6 +29,10 @@ pip install -U pip
 # install ansible
 ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install -U --ignore-installed 'ansible>=6,<8'
 
+# install docker python
+pip install docker
+apt install -y python3-docker
+
 # get python path in venv
 #PYTHON_PATH=$(realpath -s kolla-venv/bin/python)
 
