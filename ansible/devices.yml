@@ -137,6 +137,9 @@
         state: present
         reload: yes
 
+    - name: Create cni directory for Zun
+      command: mkdir -p /opt/cni/bin/
+
     - name: Run internet connectivity script
       script: "{{ playbook_dir }}/../scripts/devices/revive_internet.sh {{ default_gateway_interface }}"
 
