@@ -33,4 +33,4 @@ ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install -U --ignore-installed 'ansible>=6,<8'
 #PYTHON_PATH=$(realpath -s kolla-venv/bin/python)
 
 # configure ansible
-cp /etc/ansible/ansible.cfg ansible.cfg
+#ln -sf /etc/ansible/ansible.cfg ./kolla-ansible/ansible

@@ -30,4 +30,4 @@ export EXT_NET_CIDR="$DEFAULT_GW_FIRST_THREE_OCTETS.0/24"
 export EXT_NET_RANGE="start=$DEFAULT_GW_FIRST_THREE_OCTETS.150,end=$DEFAULT_GW_FIRST_THREE_OCTETS.199"
 export EXT_NET_GATEWAY=$DEFAULT_GW_IP
 
-./kolla-venv/share/kolla-ansible/init-runonce
+./kolla-ansible/tools/init-runonce

@@ -9,8 +9,14 @@ cd workspace
 source kolla-venv/bin/activate
 
 # install kolla-ansible
-#pip install kolla-ansible==12.*
-pip install git+https://opendev.org/openstack/kolla-ansible@stable/2023.1
+rm -rf kolla-ansible
+git clone --branch stable/2023.1 https://github.com/openstack/kolla-ansible.git
+
+# apply patch and setup
+cd kolla-ansible
+git apply ../../kolla-ansible.patch
+python3 setup.py develop
+cd ..
 
 # install ansible galaxy deps
 kolla-ansible install-deps
@@ -19,11 +25,21 @@ kolla-ansible install-deps
 mkdir -p etc/kolla
 
 # copy config files to config dir
-cp -r kolla-venv/share/kolla-ansible/etc_examples/kolla/globals.yml etc/kolla/globals.yml
-test -f etc/kolla/passwords.yml || cp kolla-venv/share/kolla-ansible/etc_examples/kolla/passwords.yml etc/kolla/passwords.yml
+cp -r kolla-ansible/etc/kolla/globals.yml etc/kolla/globals.yml
+
+# add section for additional configs
+cat >> etc/kolla/globals.yml <<-EOF
+	
+	######################
+	# Additional Configs #
+	######################
+	EOF
+
+# copy password file if it doesn't exist
+test -f etc/kolla/passwords.yml || cp kolla-ansible/etc/kolla/passwords.yml etc/kolla/passwords.yml
 
 
 # create inventory directory in workspace
 mkdir -p inventory
 
-cat kolla-venv/share/kolla-ansible/ansible/inventory/all-in-one | sed -n '/common/,$p' > inventory/99-openstack_groups
+cat kolla-ansible/ansible/inventory/all-in-one | sed -n '/common/,$p' > inventory/99-openstack_groups

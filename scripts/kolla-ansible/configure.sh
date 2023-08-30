@@ -9,7 +9,11 @@ function set_global_config () {
 	config_key=$1
 	config_value=$2
 	# handles when comments only in beginning of line
-	sed -i "s/#\?\( *$config_key:\).*/\1 $config_value/g" $CONFIG_DIR/globals.yml
+	if grep -q $config_key $CONFIG_DIR/globals.yml; then
+		sed -i "s/#\?\( *$config_key:\).*/\1 $config_value/g" $CONFIG_DIR/globals.yml
+	else
+		sed -i "$ a $config_key: $config_value" $CONFIG_DIR/globals.yml
+	fi
 }
 
 set -xe
@@ -80,7 +84,15 @@ set_global_config enable_zun yes
 set_global_config enable_cinder_backup no
 
 # weird error undefined variable
-set_global_config role_rabbitmq_cluster_port 25674
+#set_global_config role_rabbitmq_cluster_port "'{{ rabbitmq_cluster_port }}'"
+#set_global_config role_rabbitmq_epmd_port "'{{ rabbitmq_epmd_port }}'"
+#set_global_config role_rabbitmq_management_port "'{{ rabbitmq_management_port }}'"
+#set_global_config role_rabbitmq_prometheus_port "'{{ rabbitmq_prometheus_port }}'"
+#set_global_config role_rabbitmq_cluster_port "'{{ outward_rabbitmq_cluster_port }}'"
+#set_global_config role_rabbitmq_epmd_port "'{{ outward_rabbitmq_epmd_port }}'"
+#set_global_config role_rabbitmq_management_port "'{{ outward_rabbitmq_management_port }}'"
+#set_global_config role_rabbitmq_prometheus_port "'{{ outward_rabbitmq_prometheus_port }}'"
+
 
 # another undefined variable for destroy
 set_global_config octavia_provider_drivers "['amphora']"

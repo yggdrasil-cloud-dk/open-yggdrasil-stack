@@ -1,0 +1,16 @@
+diff --git a/ansible/rabbitmq.yml b/ansible/rabbitmq.yml
+index 370600c8e..529044cc2 100644
+--- a/ansible/rabbitmq.yml
++++ b/ansible/rabbitmq.yml
+@@ -112,4 +112,11 @@
+       vars:
+         project_name: outward_rabbitmq
+         role_rabbitmq_cluster_cookie: '{{ outward_rabbitmq_cluster_cookie }}'
++        role_rabbitmq_cluster_port: '{{ outward_rabbitmq_cluster_port }}'
++        role_rabbitmq_epmd_port: '{{ outward_rabbitmq_epmd_port }}'
+         role_rabbitmq_groups: outward-rabbitmq
++        role_rabbitmq_management_port: '{{ outward_rabbitmq_management_port }}'
++        role_rabbitmq_password: '{{ outward_rabbitmq_password }}'
++        role_rabbitmq_port: '{{ outward_rabbitmq_port }}'
++        role_rabbitmq_prometheus_port: '{{ outward_rabbitmq_prometheus_port }}'
++        role_rabbitmq_user: '{{ outward_rabbitmq_user }}'

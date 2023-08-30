@@ -1,5 +1,4 @@
-# TODO: Write status to make_state, do like vagrant hosts file?
-
+SHELL:=/bin/bash
 
 TAGS = 
 
@@ -46,13 +45,13 @@ kollaansible-postdeploy:
 
 # openstack #
 
-os-client-install:
+openstack-client-install:
 	scripts/openstack/install-client.sh
 
-os-resources-init:
+openstack-resources-init:
 	scripts/openstack/init-resources.sh
 
-os-images-upload:
+openstack-images-upload:
 	scripts/openstack/upload-images.sh
 
 ########
@@ -65,7 +64,7 @@ kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-boo
 
 all-up: infra-up kollaansible-up
 
-all-postdeploy: kollaansible-postdeploy os-client-install os-resources-init os-images-upload
+all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload
 
 # print vars
 print-%  : ; @echo $* = $($*)
@@ -82,7 +81,10 @@ kollaansible-tags-reconfigure:
 
 kollaansible-destroy:
 	-scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it
-	@bash -c 'echo -e "-----\nPLEASE REBOOT NODES\n-----"; sleep 5'
+	@echo -e "-----\nPLEASE REBOOT NODES\n-----"; sleep 5
+
+kollaansible-purge: kollaansible-destroy
+	@rm -rf workspace
 
 cephadm-destroy:
 	ansible-playbook ansible/cephadm.yml -t destroy
@@ -90,8 +92,7 @@ cephadm-destroy:
 devices-destroy:
 	ansible-playbook ansible/devices.yml -t destroy
 
-os-resources-destroy:
+openstack-resources-destroy:
 	scripts/openstack/destroy-resources.sh
 
-clean: kollaansible-destroy cephadm-destroy devices-destroy
-	@rm -rf workspace
+clean: kollaansible-purge cephadm-destroy devices-destroy

@@ -3,21 +3,24 @@
 set -xe
 
 #TODO: this shouldn't be here. It needs to be done once when settup up host
-#BACKEND_DEVICE=/dev/sdb
-#
-## format backend device
-#mkfs.ext4 $BACKEND_DEVICE
-#
-## mount backend device
-#mount $BACKEND_DEVICE /mnt
+
+BACKEND_DEVICE=sdb
+if (lsblk | grep -q $BACKEND_DEVICE) && (! mount | grep -q $BACKEND_DEVICE); then
+	
+	## format backend device
+	mkfs.ext4 /dev/$BACKEND_DEVICE
+	
+	## mount backend device
+	mount /dev/$BACKEND_DEVICE /mnt
+fi
 
 # change dir
 cd /mnt
 
 # create image files
-truncate -s 8G disk-0.img
-truncate -s 8G disk-1.img
-truncate -s 8G disk-2.img
+truncate -s 80G disk-0.img
+truncate -s 80G disk-1.img
+truncate -s 80G disk-2.img
 
 # create loop devices
 losetup /dev/loop100 disk-0.img

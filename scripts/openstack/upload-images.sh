@@ -11,10 +11,12 @@ CONFIG_DIR=$(pwd)/etc/kolla
 # source admin rc
 . $CONFIG_DIR/admin-openrc.sh
 
-# windows image (more images: https://tech-latest.com/download-latest-windows-10-iso/)
-wget https://bit.ly/369BBjT -O windows10_x32.iso
+# upload ubuntu image
+$image_urls=(
+	https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
+)
 
-openstack image create --progress --disk-format iso --container-format bare --public \
-    --property os_type=windows --file windows10_x32.iso windows10_x32
-
-rm windows10_x32.iso
+for image_url in $image_urls; do
+	image_name=basename $(image_url)
+	openstack image show $image_name || curl $image_url --output - | openstack image create $image_name
+done

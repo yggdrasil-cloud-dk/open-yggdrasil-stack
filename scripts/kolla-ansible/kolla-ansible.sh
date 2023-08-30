@@ -9,8 +9,11 @@ cd workspace
 source kolla-venv/bin/activate
 
 CONFIG_DIR=$(pwd)/etc/kolla
+INVENTORY=$(pwd)/inventory
 
-kolla-ansible -i ./inventory --configdir $CONFIG_DIR $@
+cd kolla-ansible/ansible/
+
+kolla-ansible -i $INVENTORY --configdir $CONFIG_DIR $@
 
 # # updating ceph-related packages in containers
 # # TODO: build new packages in images
