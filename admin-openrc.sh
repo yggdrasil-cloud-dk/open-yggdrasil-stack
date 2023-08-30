@@ -1,0 +1,1 @@
+workspace/etc/kolla/admin-openrc.sh
