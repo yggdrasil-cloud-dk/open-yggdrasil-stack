@@ -1,8 +1,8 @@
 diff --git a/ansible/rabbitmq.yml b/ansible/rabbitmq.yml
-index 370600c8e..529044cc2 100644
+index 370600c8e..460dcdd4c 100644
 --- a/ansible/rabbitmq.yml
 +++ b/ansible/rabbitmq.yml
-@@ -112,4 +112,11 @@
+@@ -112,4 +112,29 @@
        vars:
          project_name: outward_rabbitmq
          role_rabbitmq_cluster_cookie: '{{ outward_rabbitmq_cluster_cookie }}'
@@ -14,3 +14,21 @@ index 370600c8e..529044cc2 100644
 +        role_rabbitmq_port: '{{ outward_rabbitmq_port }}'
 +        role_rabbitmq_prometheus_port: '{{ outward_rabbitmq_prometheus_port }}'
 +        role_rabbitmq_user: '{{ outward_rabbitmq_user }}'
++
++# restart rabbitmq again
++- name: Restart rabbitmq services
++  gather_facts: false
++  hosts:
++    - rabbitmq_restart
++    - '&enable_rabbitmq_True'
++  # Restart in batches
++  serial: "33%"
++  tags:
++    - rabbitmq
++  tasks:
++    - import_role:
++        name: rabbitmq
++        tasks_from: restart_services.yml
++      vars:
++        role_rabbitmq_cluster_cookie: '{{ rabbitmq_cluster_cookie }}'
++        role_rabbitmq_groups: rabbitmq
