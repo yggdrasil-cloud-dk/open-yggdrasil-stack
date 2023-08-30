@@ -25,6 +25,9 @@ cephadm-deploy:
 
 # kolla-ansible #
 
+images-prepare:
+	ansible-playbook ansible/prepare_images.yml -v
+
 kollaansible-prepare:
 	ansible-playbook ansible/kolla_ansible.yml
 
@@ -60,7 +63,7 @@ openstack-images-upload:
 
 infra-up: harden prepare-ansible devices-configure cephadm-deploy
 
-kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
+kollaansible-up: images-prepare kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
 
 all-up: infra-up kollaansible-up
 

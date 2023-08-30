@@ -1,0 +1,131 @@
+---
+- name: Set up devices
+  hosts: deployment_nodes
+  gather_facts: false
+  tasks:
+    - name: Set images fact
+      set_fact:
+        images:
+          - image: quay.io/openstack.kolla/horizon:2023.1-ubuntu-jammy
+            custom_cmds: |
+              apt update
+              apt-get -y install python3-dev default-libmysqlclient-dev build-essential pkg-config
+              . /var/lib/kolla/venv/bin/activate
+              pip install mysqlclient
+          - image: quay.io/openstack.kolla/neutron-server:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/neutron-metadata-agent:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/ceilometer-compute:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/ceilometer-notification:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/designate-backend-bind9:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/zun-compute:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/ceilometer-central:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/designate-worker:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/designate-sink:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/zun-cni-daemon:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/freezer-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/designate-producer:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/designate-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/designate-mdns:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/designate-central:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/freezer-scheduler:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/zun-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/zun-wsproxy:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/kuryr-libnetwork:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/murano-engine:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/murano-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/cloudkitty-processor:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/cloudkitty-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/manila-share:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/venus-manager:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/venus-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/octavia-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/octavia-driver-agent:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/manila-data:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/manila-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/manila-scheduler:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/octavia-housekeeping:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/octavia-worker:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/octavia-health-manager:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/barbican-keystone-listener:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/barbican-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/barbican-worker:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/trove-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/trove-taskmanager:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/skyline-console:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/trove-conductor:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/aodh-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/aodh-notifier:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/aodh-evaluator:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/aodh-listener:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/heat-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/heat-api-cfn:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/heat-engine:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/senlin-conductor:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/senlin-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/senlin-health-manager:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/senlin-engine:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/skyline-apiserver:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/watcher-applier:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/watcher-engine:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/watcher-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/magnum-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/magnum-conductor:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/prometheus-libvirt-exporter:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/kolla-toolbox:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/mariadb-server:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/ovn-sb-db-server:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/ovn-controller:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/ovn-northd:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/ovn-nb-db-server:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/mariadb-clustercheck:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/openvswitch-db-server:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/prometheus-cadvisor:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/prometheus-mysqld-exporter:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/openvswitch-vswitchd:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/prometheus-openstack-exporter:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/prometheus-v2-server:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/prometheus-haproxy-exporter:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/prometheus-blackbox-exporter:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/prometheus-memcached-exporter:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/prometheus-node-exporter:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/prometheus-alertmanager:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/fluentd:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/influxdb:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/haproxy:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/rabbitmq:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/memcached:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/keepalived:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/cron:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/glance-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/nova-compute:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/cinder-volume:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/cinder-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/cinder-scheduler:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/nova-novncproxy:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/placement-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/nova-conductor:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/nova-ssh:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/nova-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/nova-scheduler:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/keystone-ssh:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/keystone-fernet:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/keystone:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/nova-libvirt:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/gnocchi-api:2023.1-ubuntu-jammy
+          - image: quay.io/openstack.kolla/gnocchi-metricd:2023.1-ubuntu-jammy
+
+    - name: Pull images
+      command: "docker pull {{ item.image }}"
+      register: docker_pull
+      changed_when: ("Image is up to date" not in docker_pull.stdout)
+      loop: "{{ images[:0] }}"
+
+    - name: Customize images
+      shell: |
+        set -xe
+        docker run --network host --name tmp_build {{ item.image }} bash -c "set -xe; {{ item.custom_cmds }}" || (docker rm -f tmp_build; exit 1)
+        docker commit tmp_build {{ item.image }}
+        docker rm -f tmp_buld
+      loop: "{{ images }}"
+      when: item.custom_cmds is defined and item.custom_cmds | length > 0
+ 
