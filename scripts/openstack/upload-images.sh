@@ -12,11 +12,13 @@ CONFIG_DIR=$(pwd)/etc/kolla
 . $CONFIG_DIR/admin-openrc.sh
 
 # upload ubuntu image
-$image_urls=(
+image_urls=(
 	https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
+	https://dl.fedoraproject.org/pub/alt/atomic/stable/Fedora-Atomic-27-20180419.0/CloudImages/x86_64/images/Fedora-Atomic-27-20180419.0.x86_64.qcow2
 )
 
-for image_url in $image_urls; do
-	image_name=basename $(image_url)
-	openstack image show $image_name || curl $image_url --output - | openstack image create $image_name
+for image_url in ${image_urls[@]}; do
+	image_name=$(echo $(basename $image_url) | grep -o ".*\." | head -c -2)
+	image_type=qcow2
+	openstack image show $image_name || curl $image_url --output - | openstack image create $image_name --disk-format qcow2
 done
