@@ -3,7 +3,7 @@ all:
 
   # hosts and hostvars and all shared vars
   hosts:
-    lxc-os01:
+    os01:
       ansible_host: "{{ lookup('ansible.builtin.pipe', 'hostname -i') }}"
       inventory_index: 1
       ansible_connection: local
@@ -24,7 +24,7 @@ all:
   children:
     deployment_controller:
       hosts:
-        lxc-os01:
+        os01:
     deployment_nodes:
       hosts:
-        lxc-os01:
+        os01:

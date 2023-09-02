@@ -70,9 +70,9 @@
           127.0.0.1 localhost
 
           # openstack mgmt ips
-          {% for host in groups['deployment_nodes'] %}
-          {{ hostvars[host].openstack_mgmt_ip | ansible.netcommon.ipaddr('address') }} {{ host }}
-          {% endfor %}
+          # {% for host in groups['deployment_nodes'] %}
+          # {{ hostvars[host].openstack_mgmt_ip | ansible.netcommon.ipaddr('address') }} {{ host }}
+          # {% endfor %}
 
     - name: Add netplan config file
       copy:
@@ -136,6 +136,9 @@
         sysctl_set: yes
         state: present
         reload: yes
+
+    - name: Run internet connectivity script
+      script: "{{ playbook_dir }}/../scripts/devices/veth_pair.sh"
 
     - name: Create cni directory for Zun
       command: mkdir -p /opt/cni/bin/

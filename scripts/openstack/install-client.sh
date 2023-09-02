@@ -12,4 +12,4 @@ source kolla-venv/bin/activate
 pip install -U python-openstackclient -c https://releases.openstack.org/constraints/upper/2023.1
 
 # install cryptography version because of annoying warning
-pip install -U cryptography==3.3
+#pip install -U cryptography==3.3
