@@ -73,8 +73,10 @@ set_global_config enable_manila_backend_generic yes
 set_global_config enable_murano yes
 set_global_config enable_octavia yes
 set_global_config enable_prometheus yes
+set_global_config enable_sahara yes
 set_global_config enable_senlin yes
 set_global_config enable_skyline yes
+set_global_config enable_solum yes
 set_global_config enable_trove yes
 set_global_config enable_venus yes
 #set_global_config enable_vitrage yes
@@ -83,19 +85,8 @@ set_global_config enable_zun yes
 
 set_global_config enable_cinder_backup no
 
-# weird error undefined variable
-#set_global_config role_rabbitmq_cluster_port "'{{ rabbitmq_cluster_port }}'"
-#set_global_config role_rabbitmq_epmd_port "'{{ rabbitmq_epmd_port }}'"
-#set_global_config role_rabbitmq_management_port "'{{ rabbitmq_management_port }}'"
-#set_global_config role_rabbitmq_prometheus_port "'{{ rabbitmq_prometheus_port }}'"
-#set_global_config role_rabbitmq_cluster_port "'{{ outward_rabbitmq_cluster_port }}'"
-#set_global_config role_rabbitmq_epmd_port "'{{ outward_rabbitmq_epmd_port }}'"
-#set_global_config role_rabbitmq_management_port "'{{ outward_rabbitmq_management_port }}'"
-#set_global_config role_rabbitmq_prometheus_port "'{{ outward_rabbitmq_prometheus_port }}'"
-
-
-# another undefined variable for destroy
-set_global_config octavia_provider_drivers "['amphora']"
+# undefined variable error
+set_global_config octavia_provider_drivers amphora
 
 for service in glance nova cinder/cinder-volume; do
 	mkdir -p etc/kolla/config/$service/

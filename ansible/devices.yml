@@ -52,10 +52,21 @@
       ansible.builtin.apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
 
+    - name: Enable docker api over tcp
+      shell: |
+        mkdir -p /etc/systemd/system/docker.service.d
+        cat > /etc/systemd/system/docker.service.d/override.conf <<EOF
+        [Service]
+        ExecStart=
+        ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375 --containerd=/run/containerd/containerd.sock
+        EOF
+     args:
+       creates: /etc/systemd/system/docker.service.d/override.conf
+
     - name: Enable docker service
       systemd:
         name: docker.service
-        state: started
+        state: restarted
         enabled: yes
         daemon_reload: yes
 
@@ -137,7 +148,7 @@
         state: present
         reload: yes
 
-    - name: Run internet connectivity script
+    - name: Run script to setup veth pair
       script: "{{ playbook_dir }}/../scripts/devices/veth_pair.sh"
 
     - name: Create cni directory for Zun
