@@ -3,15 +3,15 @@ all:
 
   # hosts and hostvars and all shared vars
   hosts:
-    os01:
-      ansible_host: 188.165.251.200
+    lxc-os01:
+      ansible_host: "{{ lookup('ansible.builtin.pipe', 'hostname -i') }}"
       inventory_index: 1
       ansible_connection: local
 
   vars:
     dev: true
-    default_gateway_interface: eno1
-    gateway_ip: 188.165.251.200
+    default_gateway_interface: "{{ lookup('ansible.builtin.pipe', 'ip route | grep \"^default\" | head -n 1 | grep -o \"dev .*\" | cut -d \" \" -f 2') }}"
+    gateway_ip: "{{ lookup('ansible.builtin.pipe', 'ip route | grep \"^default\" | head -n 1 | grep -o \"via .*\" | cut -d \" \" -f 2') }}"
     ceph_osd_devices:
       - /dev/vg-0/lv-0
       - /dev/vg-1/lv-1
@@ -24,7 +24,7 @@ all:
   children:
     deployment_controller:
       hosts:
-        os01:
+        lxc-os01:
     deployment_nodes:
       hosts:
-        os01:
+        lxc-os01:
