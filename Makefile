@@ -9,7 +9,7 @@ TAGS =
 harden:
 	cp scripts/hardening/ssh.sh /etc/rc.local
 	chmod 755 /etc/rc.local
-	systemctl start rc-local
+	systemctl restart rc-local
 	systemctl enable rc-local
 
 prepare-ansible:
