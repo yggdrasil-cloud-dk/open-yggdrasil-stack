@@ -60,8 +60,8 @@
         ExecStart=
         ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375 --containerd=/run/containerd/containerd.sock
         EOF
-     args:
-       creates: /etc/systemd/system/docker.service.d/override.conf
+      args:
+        creates: /etc/systemd/system/docker.service.d/override.conf
 
     - name: Enable docker service
       systemd:
