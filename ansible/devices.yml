@@ -62,6 +62,7 @@
         EOF
       args:
         creates: /etc/systemd/system/docker.service.d/override.conf
+      register: reconfigure_docker
 
     - name: Enable docker service
       systemd:
@@ -69,6 +70,7 @@
         state: restarted
         enabled: yes
         daemon_reload: yes
+      when: reconfigure_docker.changed
 
     - name: Configure hostname
       hostname:
