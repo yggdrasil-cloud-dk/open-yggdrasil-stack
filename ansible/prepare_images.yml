@@ -28,6 +28,9 @@
           - image: quay.io/openstack.kolla/designate-mdns:2023.1-ubuntu-jammy
           - image: quay.io/openstack.kolla/designate-central:2023.1-ubuntu-jammy
           - image: quay.io/openstack.kolla/freezer-scheduler:2023.1-ubuntu-jammy
+            custom_cmds: |
+              mkdir -p /etc/freezer/scheduler
+              chown freezer:freezer /etc/freezer/scheduler
           - image: quay.io/openstack.kolla/zun-api:2023.1-ubuntu-jammy
           - image: quay.io/openstack.kolla/zun-wsproxy:2023.1-ubuntu-jammy
           - image: quay.io/openstack.kolla/kuryr-libnetwork:2023.1-ubuntu-jammy
