@@ -31,5 +31,3 @@ for image_url in ${image_urls[@]}; do
 	image_type=qcow2
 	openstack image show $image_name || curl $image_url --output - | $pipe_cmd | openstack image create $image_name --disk-format qcow2
 done
-
-openstack image set --property os_distro=fedora-coreos $(openstack image list -f value -c Name | grep fedora-coreos)

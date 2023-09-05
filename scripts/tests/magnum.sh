@@ -1,0 +1,30 @@
+#!/bin/bash
+
+openstack flavor show c1 || openstack flavor create --id c1 --ram 256 --disk 1 --vcpus 1 --property hw_rng:allowed=True cirros256
+openstack flavor show d1 ||openstack flavor create --id d1 --ram 512 --disk 5 --vcpus 1 --property hw_rng:allowed=True ds512M
+openstack flavor show d2 ||openstack flavor create --id d2 --ram 1024 --disk 10 --vcpus 1 --property hw_rng:allowed=True ds1G
+openstack flavor show d3 ||openstack flavor create --id d3 --ram 2048 --disk 10 --vcpus 2 --property hw_rng:allowed=True ds2G
+openstack flavor show d4 ||openstack flavor create --id d4 --ram 4096 --disk 20 --vcpus 4 --property hw_rng:allowed=True ds4G
+
+openstack image set --property os_distro=fedora-coreos $(openstack image list -f value -c Name | grep fedora-coreos)
+
+ls ~/.ssh/id_rsa || ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
+
+openstack keypair show testkey || openstack keypair create --public-key ~/.ssh/id_rsa.pub testkey
+openstack network set --name public public1
+
+openstack coe cluster template create k8s-cluster-template \
+    --image fedora-coreos-35.20220116.3.0-openstack.x86_64 \
+    --keypair testkey \
+    --external-network public \
+    --dns-nameserver 8.8.8.8 \
+    --flavor ds1G \
+    --master-flavor ds2G \
+    --docker-volume-size 5 \
+    --network-driver flannel \
+    --docker-storage-driver overlay2 \
+    --coe kubernetes
+
+openstack coe cluster create k8s-cluster \
+    --cluster-template k8s-cluster-template \
+     --node-count 1
