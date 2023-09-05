@@ -59,3 +59,20 @@ index a4b46e96f..d7a721ba8 100644
  - name: Check custom event_pipeline.yaml exists
    stat:
      path: "{{ node_custom_config }}/ceilometer/event_pipeline.yaml"
+diff --git a/ansible/roles/ceilometer/templates/ceilometer-notification.json.j2 b/ansible/roles/ceilometer/templates/ceilometer-notification.json.j2
+index a7b2492a5..5d98640e7 100644
+--- a/ansible/roles/ceilometer/templates/ceilometer-notification.json.j2
++++ b/ansible/roles/ceilometer/templates/ceilometer-notification.json.j2
+@@ -7,12 +7,6 @@
+             "owner": "ceilometer",
+             "perm": "0600"
+         },
+-        {
+-            "source": "{{ container_config_directory }}/event_definitions.yaml",
+-            "dest": "/etc/ceilometer/event_definitions.yaml",
+-            "owner": "ceilometer",
+-            "perm": "0600"
+-        },
+         {
+             "source": "{{ container_config_directory }}/event_pipeline.yaml",
+             "dest": "/etc/ceilometer/event_pipeline.yaml",

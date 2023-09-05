@@ -126,9 +126,10 @@
     - name: Customize images
       shell: |
         set -xe
-        docker run --network host --name tmp_build {{ item.image }} bash -c "set -xe; {{ item.custom_cmds }}" || (docker rm -f tmp_build; exit 1)
+        docker rm -f tmp_build || true
+        docker run --network host -u root --name tmp_build {{ item.image }} bash -c "set -xe; {{ item.custom_cmds }}" || (docker rm -f tmp_build; exit 1)
         docker commit -c 'ENTRYPOINT ["dumb-init", "--"]' -c 'CMD ["kolla_start"]' tmp_build {{ item.image }}
-        docker rm -f tmp_buld
+        docker rm -f tmp_buld || true
       loop: "{{ images }}"
       when: item.custom_cmds is defined and item.custom_cmds | length > 0
  

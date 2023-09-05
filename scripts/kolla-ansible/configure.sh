@@ -86,7 +86,7 @@ set_global_config enable_zun yes
 set_global_config enable_cinder_backup no
 
 # undefined variable error
-set_global_config octavia_provider_drivers amphora
+#set_global_config octavia_provider_drivers amphora
 
 for service in glance nova cinder/cinder-volume; do
 	mkdir -p etc/kolla/config/$service/
