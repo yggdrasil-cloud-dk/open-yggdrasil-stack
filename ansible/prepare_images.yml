@@ -73,6 +73,9 @@
           - image: quay.io/openstack.kolla/watcher-api:2023.1-ubuntu-jammy
           - image: quay.io/openstack.kolla/magnum-api:2023.1-ubuntu-jammy
           - image: quay.io/openstack.kolla/magnum-conductor:2023.1-ubuntu-jammy
+            custom_cmds: |
+              sed -i 's/\[Service\]/StartLimitIntervalSec=500\nStartLimitBurst=5\n[Service]\nRestart=on-failure\nRestartSec=5s/g' \
+              /var/lib/kolla/venv/lib/python3.10/site-packages/magnum/drivers/common/templates/kubernetes/fragments/configure-etcd.sh
           - image: quay.io/openstack.kolla/prometheus-libvirt-exporter:2023.1-ubuntu-jammy
           - image: quay.io/openstack.kolla/kolla-toolbox:2023.1-ubuntu-jammy
           - image: quay.io/openstack.kolla/mariadb-server:2023.1-ubuntu-jammy

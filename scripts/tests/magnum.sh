@@ -13,7 +13,7 @@ ls ~/.ssh/id_rsa || ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
 openstack keypair show testkey || openstack keypair create --public-key ~/.ssh/id_rsa.pub testkey
 openstack network set --name public public1
 
-openstack coe cluster template create k8s-cluster-template \
+openstack coe cluster template show k8s-cluster-template || openstack coe cluster template create k8s-cluster-template \
     --image fedora-coreos-35.20220116.3.0-openstack.x86_64 \
     --keypair testkey \
     --external-network public \
