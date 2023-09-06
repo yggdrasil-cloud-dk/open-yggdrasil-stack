@@ -6,6 +6,7 @@ TAGS =
 # Setup #
 #########
 
+# TODO: run in ansible so it runs on all nodes
 harden:
 	cp scripts/hardening/ssh.sh /etc/rc.local
 	chmod 755 /etc/rc.local
@@ -25,7 +26,7 @@ cephadm-deploy:
 
 # kolla-ansible #
 
-images-prepare:
+kollaansible-images:
 	ansible-playbook ansible/prepare_images.yml -v
 
 kollaansible-prepare:
@@ -63,7 +64,7 @@ openstack-images-upload:
 
 infra-up: harden prepare-ansible devices-configure cephadm-deploy
 
-kollaansible-up: images-prepare kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
+kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
 
 all-up: infra-up kollaansible-up
 
