@@ -38,7 +38,6 @@ cat >> etc/kolla/globals.yml <<-EOF
 # copy password file if it doesn't exist
 test -f etc/kolla/passwords.yml || cp kolla-ansible/etc/kolla/passwords.yml etc/kolla/passwords.yml
 
-
 # create inventory directory in workspace
 mkdir -p inventory
 

@@ -8,6 +8,7 @@ apt update
 apt install -y git make ansible bash-completion
 ansible-galaxy collection install ansible.netcommon:2.5.1
 echo "set -g history-limit 10000" >> ~/.tmux.conf
+echo "set paste" >> ~/.vimrc
 cd ~
 GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git clone git@bitbucket.org:mgindi/kolla-deploy.git
 cd kolla-deploy

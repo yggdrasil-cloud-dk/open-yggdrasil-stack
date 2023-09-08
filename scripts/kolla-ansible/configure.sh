@@ -57,6 +57,8 @@ set_global_config cinder_backend_ceph yes
 set_global_config ceph_cinder_keyring ceph.client.admin.keyring
 set_global_config ceph_cinder_user admin
 
+set_global_config enable_ceph_rgw yes
+
 set_global_config neutron_plugin_agent ovn
 
 set_global_config enable_aodh yes
@@ -85,8 +87,6 @@ set_global_config enable_zun yes
 
 set_global_config enable_cinder_backup no
 
-# undefined variable error
-#set_global_config octavia_provider_drivers amphora
 
 for service in glance nova cinder/cinder-volume; do
 	mkdir -p etc/kolla/config/$service/
