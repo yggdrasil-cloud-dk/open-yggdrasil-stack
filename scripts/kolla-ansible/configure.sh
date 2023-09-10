@@ -68,6 +68,7 @@ set_global_config enable_cloudkitty yes
 set_global_config enable_designate yes
 set_global_config enable_freezer yes
 set_global_config enable_gnocchi yes
+set_global_config enable_grafana yes
 set_global_config enable_kuryr yes
 set_global_config enable_magnum yes
 set_global_config enable_manila yes
