@@ -88,6 +88,7 @@ set_global_config enable_zun yes
 
 set_global_config enable_cinder_backup no
 
+set_global_config octavia_provider_drivers '"amphora:Amphora provider, ovn:OVN provider"'
 
 for service in glance nova cinder/cinder-volume; do
 	mkdir -p etc/kolla/config/$service/
