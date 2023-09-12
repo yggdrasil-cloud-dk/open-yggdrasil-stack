@@ -120,10 +120,20 @@
           - image: quay.io/openstack.kolla/gnocchi-api:2023.1-ubuntu-jammy
           - image: quay.io/openstack.kolla/gnocchi-metricd:2023.1-ubuntu-jammy
 
-    - name: Pull images
-      command: "docker pull {{ item.image }}"
+
+    - name: Pull latest ubuntu image as reference
+      command: docker pull ubuntu:latest
       register: docker_pull
       changed_when: ("Image is up to date" not in docker_pull.stdout)
+
+    # pull images only if doesn't exist or older than ubuntu:latest
+    - name: Pull images
+      shell: |
+        set -xe
+        docker inspect {{ item.image }} 2>/dev/null 1>&2 || docker pull {{ item.image }}
+        test -z $(docker images {{ item.image }} --filter since=ubuntu:latest --format {% raw %}"{{ .ID }}"{% endraw %}) && docker pull {{ item.image }} || exit 0
+      register: docker_pull
+      changed_when: ("Downloaded newer image" in docker_pull.stdout)
       loop: "{{ images }}"
 
     - name: Customize images

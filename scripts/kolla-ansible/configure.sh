@@ -90,6 +90,8 @@ set_global_config enable_cinder_backup no
 
 set_global_config octavia_provider_drivers '"amphora:Amphora provider, ovn:OVN provider"'
 
+set_global_config ceph_rgw_hosts "[ { 'host': '$(hostname)', 'port': 6780 } ]"
+
 for service in glance nova cinder/cinder-volume; do
 	mkdir -p etc/kolla/config/$service/
 	cp /etc/ceph/ceph.client.admin.keyring etc/kolla/config/$service/

@@ -132,7 +132,7 @@
 
     - name: Add rgw
       shell: |
-        ceph orch apply rgw foo
+        ceph orch apply rgw foo --port 6780 --placement '1'
 
     - name: Add pools
       script: "{{ playbook_dir }}/../scripts/cephadm/pools.sh"
