@@ -1,0 +1,21 @@
+diff --git a/diskimage-create/diskimage-create.sh b/diskimage-create/diskimage-create.sh
+index cb09165..5c00883 100755
+--- a/diskimage-create/diskimage-create.sh
++++ b/diskimage-create/diskimage-create.sh
+@@ -478,11 +478,11 @@ if [ -z "$PLUGIN" -o "$PLUGIN" = "vanilla" ]; then
+ 
+     export DIB_SPARK_VERSION
+ 
+-    if [ "$DIB_SPARK_VERSION" = "1.6.0" ]; then
+-        export SPARK_HADOOP_DL=hadoop2.6
+-    else
+-        export SPARK_HADOOP_DL=hadoop2.7
+-    fi
++   # if [ "$DIB_SPARK_VERSION" = "1.6.0" ]; then
++   #     export SPARK_HADOOP_DL=hadoop2.6
++   # else
++   #     export SPARK_HADOOP_DL=hadoop2.7
++   # fi
+ 
+     ubuntu_elements_sequence="hadoop oozie mysql hive $JAVA_ELEMENT swift_hadoop spark s3_hadoop"
+     fedora_elements_sequence="hadoop oozie mysql disable-firewall hive $JAVA_ELEMENT swift_hadoop spark s3_hadoop"

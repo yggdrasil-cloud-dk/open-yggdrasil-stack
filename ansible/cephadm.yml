@@ -130,9 +130,23 @@
         {% endfor %}
       loop: "{{ groups['deployment_nodes'] }}"
 
+    - name: Create rgw config file
+      copy:
+        dest: /tmp/rgw.yml
+        content: |
+          service_type: rgw
+          service_id: foo
+          placement:
+            label: _admin
+            count_per_host: 1
+          networks:
+          - {{ ceph_public_ip | ansible.netcommon.ipaddr('network') }}/{{ ceph_public_ip | ansible.netcommon.ipaddr('prefix') }}
+          spec:
+            rgw_frontend_port: 6780
+
     - name: Add rgw
       shell: |
-        ceph orch apply rgw foo --port 6780 --placement '1'
+        ceph orch apply -i /tmp/rgw.yml
 
     - name: Add pools
       script: "{{ playbook_dir }}/../scripts/cephadm/pools.sh"

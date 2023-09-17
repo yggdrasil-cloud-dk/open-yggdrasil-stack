@@ -53,3 +53,6 @@ workspace
 
 # ignore .done files
 *.done
+
+# sahara repo
+sahara-images/sahara-image-elements

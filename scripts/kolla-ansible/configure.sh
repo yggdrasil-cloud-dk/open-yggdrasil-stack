@@ -57,6 +57,10 @@ set_global_config cinder_backend_ceph yes
 set_global_config ceph_cinder_keyring ceph.client.admin.keyring
 set_global_config ceph_cinder_user admin
 
+set_global_config enable_cinder_backup yes
+set_global_config ceph_cinder_backup_keyring ceph.client.admin.keyring
+set_global_config ceph_cinder_backup_user admin
+
 set_global_config enable_ceph_rgw yes
 
 set_global_config neutron_plugin_agent ovn
@@ -86,13 +90,11 @@ set_global_config enable_venus yes
 set_global_config enable_watcher yes
 set_global_config enable_zun yes
 
-set_global_config enable_cinder_backup no
-
 set_global_config octavia_provider_drivers '"amphora:Amphora provider, ovn:OVN provider"'
 
-set_global_config ceph_rgw_hosts "[ { 'host': '$(hostname)', 'port': 6780 } ]"
+set_global_config ceph_rgw_hosts "[ { 'host': '$(hostname)', 'ip': '$(ip --json address show ceph_public | jq -r .[0].addr_info[0].local)', 'port': 6780 } ]"
 
-for service in glance nova cinder/cinder-volume; do
+for service in glance nova cinder/cinder-volume cinder/cinder-backup; do
 	mkdir -p etc/kolla/config/$service/
 	cp /etc/ceph/ceph.client.admin.keyring etc/kolla/config/$service/
 	cat /etc/ceph/ceph.conf | sed 's/^\t//g' > etc/kolla/config/$service/ceph.conf
