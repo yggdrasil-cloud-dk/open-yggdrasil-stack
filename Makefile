@@ -47,10 +47,17 @@ kollaansible-deploy:
 kollaansible-postdeploy:
 	scripts/kolla-ansible/kolla-ansible.sh post-deploy
 
-kollaansible-lma:
+kollaansible-lma: 
 	scripts/lma/custom-exporter.sh
-	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t prometheus
+	scripts/lma/ceph.sh
 	scripts/lma/grafana/import.sh
+	scripts/lma/prometheus-alerts/copy-rules.sh
+	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t prometheus
+
+# TODO REMOVE
+prometheus-alerts:
+	scripts/lma/prometheus-alerts/copy-rules.sh
+	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t prometheus
 
 # openstack #
 

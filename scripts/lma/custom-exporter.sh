@@ -6,7 +6,7 @@ cd custom_exporter
 
 ./docker_build.sh
 
-docker ps | grep -q ce1 || ./docker_run.sh
+docker ps | grep -q custom_exporter || ./docker_run.sh
 
 cd ..
 
@@ -15,7 +15,7 @@ scrape_configs:
   - job_name: custom
     static_configs:
       - targets:
-        - 'os01:8080'
+        - '$(ip --json address show openstack_mgmt | jq -r .[0].addr_info[0].local):8080'
 EOF
 
-ps | grep -q docker.sh || (./scripts/lma/custom_metrics/docker.sh &)
+pstree | grep -q docker.sh || (./scripts/lma/custom_metrics/docker.sh &)

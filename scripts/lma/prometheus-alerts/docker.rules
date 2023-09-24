@@ -1,0 +1,787 @@
+groups:
+- name: Docker
+  rules:
+  - alert: DockerContainerDown-prometheus_server
+    expr: docker_container_prometheus_server_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container prometheus_server is down or unhealthy
+  - alert: DockerContainerDown-skyline_console
+    expr: docker_container_skyline_console_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container skyline_console is down or unhealthy
+  - alert: DockerContainerDown-skyline_apiserver
+    expr: docker_container_skyline_apiserver_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container skyline_apiserver is down or unhealthy
+  - alert: DockerContainerDown-venus_manager
+    expr: docker_container_venus_manager_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container venus_manager is down or unhealthy
+  - alert: DockerContainerDown-venus_api
+    expr: docker_container_venus_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container venus_api is down or unhealthy
+  - alert: DockerContainerDown-zun_cni_daemon
+    expr: docker_container_zun_cni_daemon_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container zun_cni_daemon is down or unhealthy
+  - alert: DockerContainerDown-zun_compute
+    expr: docker_container_zun_compute_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container zun_compute is down or unhealthy
+  - alert: DockerContainerDown-zun_wsproxy
+    expr: docker_container_zun_wsproxy_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container zun_wsproxy is down or unhealthy
+  - alert: DockerContainerDown-zun_api
+    expr: docker_container_zun_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container zun_api is down or unhealthy
+  - alert: DockerContainerDown-octavia_worker
+    expr: docker_container_octavia_worker_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container octavia_worker is down or unhealthy
+  - alert: DockerContainerDown-octavia_housekeeping
+    expr: docker_container_octavia_housekeeping_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container octavia_housekeeping is down or unhealthy
+  - alert: DockerContainerDown-octavia_health_manager
+    expr: docker_container_octavia_health_manager_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container octavia_health_manager is down or unhealthy
+  - alert: DockerContainerDown-octavia_driver_agent
+    expr: docker_container_octavia_driver_agent_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container octavia_driver_agent is down or unhealthy
+  - alert: DockerContainerDown-octavia_api
+    expr: docker_container_octavia_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container octavia_api is down or unhealthy
+  - alert: DockerContainerDown-senlin_health_manager
+    expr: docker_container_senlin_health_manager_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container senlin_health_manager is down or unhealthy
+  - alert: DockerContainerDown-senlin_engine
+    expr: docker_container_senlin_engine_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container senlin_engine is down or unhealthy
+  - alert: DockerContainerDown-senlin_conductor
+    expr: docker_container_senlin_conductor_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container senlin_conductor is down or unhealthy
+  - alert: DockerContainerDown-senlin_api
+    expr: docker_container_senlin_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container senlin_api is down or unhealthy
+  - alert: DockerContainerDown-freezer_scheduler
+    expr: docker_container_freezer_scheduler_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container freezer_scheduler is down or unhealthy
+  - alert: DockerContainerDown-freezer_api
+    expr: docker_container_freezer_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container freezer_api is down or unhealthy
+  - alert: DockerContainerDown-cloudkitty_processor
+    expr: docker_container_cloudkitty_processor_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container cloudkitty_processor is down or unhealthy
+  - alert: DockerContainerDown-cloudkitty_api
+    expr: docker_container_cloudkitty_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container cloudkitty_api is down or unhealthy
+  - alert: DockerContainerDown-grafana
+    expr: docker_container_grafana_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container grafana is down or unhealthy
+  - alert: DockerContainerDown-watcher_api
+    expr: docker_container_watcher_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container watcher_api is down or unhealthy
+  - alert: DockerContainerDown-watcher_engine
+    expr: docker_container_watcher_engine_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container watcher_engine is down or unhealthy
+  - alert: DockerContainerDown-watcher_applier
+    expr: docker_container_watcher_applier_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container watcher_applier is down or unhealthy
+  - alert: DockerContainerDown-trove_taskmanager
+    expr: docker_container_trove_taskmanager_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container trove_taskmanager is down or unhealthy
+  - alert: DockerContainerDown-trove_conductor
+    expr: docker_container_trove_conductor_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container trove_conductor is down or unhealthy
+  - alert: DockerContainerDown-trove_api
+    expr: docker_container_trove_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container trove_api is down or unhealthy
+  - alert: DockerContainerDown-designate_sink
+    expr: docker_container_designate_sink_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container designate_sink is down or unhealthy
+  - alert: DockerContainerDown-designate_worker
+    expr: docker_container_designate_worker_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container designate_worker is down or unhealthy
+  - alert: DockerContainerDown-designate_mdns
+    expr: docker_container_designate_mdns_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container designate_mdns is down or unhealthy
+  - alert: DockerContainerDown-designate_producer
+    expr: docker_container_designate_producer_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container designate_producer is down or unhealthy
+  - alert: DockerContainerDown-designate_central
+    expr: docker_container_designate_central_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container designate_central is down or unhealthy
+  - alert: DockerContainerDown-designate_api
+    expr: docker_container_designate_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container designate_api is down or unhealthy
+  - alert: DockerContainerDown-designate_backend_bind9
+    expr: docker_container_designate_backend_bind9_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container designate_backend_bind9 is down or unhealthy
+  - alert: DockerContainerDown-barbican_worker
+    expr: docker_container_barbican_worker_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container barbican_worker is down or unhealthy
+  - alert: DockerContainerDown-barbican_keystone_listener
+    expr: docker_container_barbican_keystone_listener_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container barbican_keystone_listener is down or unhealthy
+  - alert: DockerContainerDown-barbican_api
+    expr: docker_container_barbican_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container barbican_api is down or unhealthy
+  - alert: DockerContainerDown-aodh_notifier
+    expr: docker_container_aodh_notifier_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container aodh_notifier is down or unhealthy
+  - alert: DockerContainerDown-aodh_listener
+    expr: docker_container_aodh_listener_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container aodh_listener is down or unhealthy
+  - alert: DockerContainerDown-aodh_evaluator
+    expr: docker_container_aodh_evaluator_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container aodh_evaluator is down or unhealthy
+  - alert: DockerContainerDown-aodh_api
+    expr: docker_container_aodh_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container aodh_api is down or unhealthy
+  - alert: DockerContainerDown-ceilometer_compute
+    expr: docker_container_ceilometer_compute_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container ceilometer_compute is down or unhealthy
+  - alert: DockerContainerDown-ceilometer_central
+    expr: docker_container_ceilometer_central_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container ceilometer_central is down or unhealthy
+  - alert: DockerContainerDown-ceilometer_notification
+    expr: docker_container_ceilometer_notification_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container ceilometer_notification is down or unhealthy
+  - alert: DockerContainerDown-gnocchi_metricd
+    expr: docker_container_gnocchi_metricd_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container gnocchi_metricd is down or unhealthy
+  - alert: DockerContainerDown-gnocchi_api
+    expr: docker_container_gnocchi_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container gnocchi_api is down or unhealthy
+  - alert: DockerContainerDown-manila_share
+    expr: docker_container_manila_share_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container manila_share is down or unhealthy
+  - alert: DockerContainerDown-manila_scheduler
+    expr: docker_container_manila_scheduler_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container manila_scheduler is down or unhealthy
+  - alert: DockerContainerDown-manila_data
+    expr: docker_container_manila_data_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container manila_data is down or unhealthy
+  - alert: DockerContainerDown-manila_api
+    expr: docker_container_manila_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container manila_api is down or unhealthy
+  - alert: DockerContainerDown-sahara_engine
+    expr: docker_container_sahara_engine_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container sahara_engine is down or unhealthy
+  - alert: DockerContainerDown-sahara_api
+    expr: docker_container_sahara_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container sahara_api is down or unhealthy
+  - alert: DockerContainerDown-magnum_conductor
+    expr: docker_container_magnum_conductor_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container magnum_conductor is down or unhealthy
+  - alert: DockerContainerDown-magnum_api
+    expr: docker_container_magnum_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container magnum_api is down or unhealthy
+  - alert: DockerContainerDown-solum_conductor
+    expr: docker_container_solum_conductor_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container solum_conductor is down or unhealthy
+  - alert: DockerContainerDown-solum_deployer
+    expr: docker_container_solum_deployer_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container solum_deployer is down or unhealthy
+  - alert: DockerContainerDown-solum_worker
+    expr: docker_container_solum_worker_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container solum_worker is down or unhealthy
+  - alert: DockerContainerDown-solum_api
+    expr: docker_container_solum_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container solum_api is down or unhealthy
+  - alert: DockerContainerDown-murano_engine
+    expr: docker_container_murano_engine_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container murano_engine is down or unhealthy
+  - alert: DockerContainerDown-murano_api
+    expr: docker_container_murano_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container murano_api is down or unhealthy
+  - alert: DockerContainerDown-horizon
+    expr: docker_container_horizon_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container horizon is down or unhealthy
+  - alert: DockerContainerDown-heat_engine
+    expr: docker_container_heat_engine_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container heat_engine is down or unhealthy
+  - alert: DockerContainerDown-heat_api_cfn
+    expr: docker_container_heat_api_cfn_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container heat_api_cfn is down or unhealthy
+  - alert: DockerContainerDown-heat_api
+    expr: docker_container_heat_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container heat_api is down or unhealthy
+  - alert: DockerContainerDown-kuryr
+    expr: docker_container_kuryr_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container kuryr is down or unhealthy
+  - alert: DockerContainerDown-neutron_ovn_metadata_agent
+    expr: docker_container_neutron_ovn_metadata_agent_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container neutron_ovn_metadata_agent is down or unhealthy
+  - alert: DockerContainerDown-neutron_server
+    expr: docker_container_neutron_server_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container neutron_server is down or unhealthy
+  - alert: DockerContainerDown-ovn_northd
+    expr: docker_container_ovn_northd_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container ovn_northd is down or unhealthy
+  - alert: DockerContainerDown-ovn_sb_db
+    expr: docker_container_ovn_sb_db_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container ovn_sb_db is down or unhealthy
+  - alert: DockerContainerDown-ovn_nb_db
+    expr: docker_container_ovn_nb_db_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container ovn_nb_db is down or unhealthy
+  - alert: DockerContainerDown-ovn_controller
+    expr: docker_container_ovn_controller_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container ovn_controller is down or unhealthy
+  - alert: DockerContainerDown-openvswitch_vswitchd
+    expr: docker_container_openvswitch_vswitchd_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container openvswitch_vswitchd is down or unhealthy
+  - alert: DockerContainerDown-openvswitch_db
+    expr: docker_container_openvswitch_db_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container openvswitch_db is down or unhealthy
+  - alert: DockerContainerDown-ce1
+    expr: docker_container_ce1_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container ce1 is down or unhealthy
+  - alert: DockerContainerDown-nova_compute
+    expr: docker_container_nova_compute_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container nova_compute is down or unhealthy
+  - alert: DockerContainerDown-nova_libvirt
+    expr: docker_container_nova_libvirt_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container nova_libvirt is down or unhealthy
+  - alert: DockerContainerDown-nova_ssh
+    expr: docker_container_nova_ssh_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container nova_ssh is down or unhealthy
+  - alert: DockerContainerDown-nova_novncproxy
+    expr: docker_container_nova_novncproxy_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container nova_novncproxy is down or unhealthy
+  - alert: DockerContainerDown-nova_conductor
+    expr: docker_container_nova_conductor_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container nova_conductor is down or unhealthy
+  - alert: DockerContainerDown-nova_api
+    expr: docker_container_nova_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container nova_api is down or unhealthy
+  - alert: DockerContainerDown-nova_scheduler
+    expr: docker_container_nova_scheduler_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container nova_scheduler is down or unhealthy
+  - alert: DockerContainerDown-placement_api
+    expr: docker_container_placement_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container placement_api is down or unhealthy
+  - alert: DockerContainerDown-cinder_backup
+    expr: docker_container_cinder_backup_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container cinder_backup is down or unhealthy
+  - alert: DockerContainerDown-cinder_volume
+    expr: docker_container_cinder_volume_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container cinder_volume is down or unhealthy
+  - alert: DockerContainerDown-cinder_scheduler
+    expr: docker_container_cinder_scheduler_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container cinder_scheduler is down or unhealthy
+  - alert: DockerContainerDown-cinder_api
+    expr: docker_container_cinder_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container cinder_api is down or unhealthy
+  - alert: DockerContainerDown-glance_api
+    expr: docker_container_glance_api_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container glance_api is down or unhealthy
+  - alert: DockerContainerDown-keystone
+    expr: docker_container_keystone_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container keystone is down or unhealthy
+  - alert: DockerContainerDown-keystone_fernet
+    expr: docker_container_keystone_fernet_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container keystone_fernet is down or unhealthy
+  - alert: DockerContainerDown-keystone_ssh
+    expr: docker_container_keystone_ssh_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container keystone_ssh is down or unhealthy
+  - alert: DockerContainerDown-outward_rabbitmq
+    expr: docker_container_outward_rabbitmq_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container outward_rabbitmq is down or unhealthy
+  - alert: DockerContainerDown-rabbitmq
+    expr: docker_container_rabbitmq_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container rabbitmq is down or unhealthy
+  - alert: DockerContainerDown-prometheus_libvirt_exporter
+    expr: docker_container_prometheus_libvirt_exporter_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container prometheus_libvirt_exporter is down or unhealthy
+  - alert: DockerContainerDown-prometheus_blackbox_exporter
+    expr: docker_container_prometheus_blackbox_exporter_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container prometheus_blackbox_exporter is down or unhealthy
+  - alert: DockerContainerDown-prometheus_openstack_exporter
+    expr: docker_container_prometheus_openstack_exporter_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container prometheus_openstack_exporter is down or unhealthy
+  - alert: DockerContainerDown-prometheus_alertmanager
+    expr: docker_container_prometheus_alertmanager_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container prometheus_alertmanager is down or unhealthy
+  - alert: DockerContainerDown-prometheus_cadvisor
+    expr: docker_container_prometheus_cadvisor_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container prometheus_cadvisor is down or unhealthy
+  - alert: DockerContainerDown-prometheus_memcached_exporter
+    expr: docker_container_prometheus_memcached_exporter_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container prometheus_memcached_exporter is down or unhealthy
+  - alert: DockerContainerDown-prometheus_haproxy_exporter
+    expr: docker_container_prometheus_haproxy_exporter_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container prometheus_haproxy_exporter is down or unhealthy
+  - alert: DockerContainerDown-prometheus_mysqld_exporter
+    expr: docker_container_prometheus_mysqld_exporter_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container prometheus_mysqld_exporter is down or unhealthy
+  - alert: DockerContainerDown-prometheus_node_exporter
+    expr: docker_container_prometheus_node_exporter_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container prometheus_node_exporter is down or unhealthy
+  - alert: DockerContainerDown-memcached
+    expr: docker_container_memcached_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container memcached is down or unhealthy
+  - alert: DockerContainerDown-mariadb
+    expr: docker_container_mariadb_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container mariadb is down or unhealthy
+  - alert: DockerContainerDown-mariadb_clustercheck
+    expr: docker_container_mariadb_clustercheck_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container mariadb_clustercheck is down or unhealthy
+  - alert: DockerContainerDown-influxdb
+    expr: docker_container_influxdb_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container influxdb is down or unhealthy
+  - alert: DockerContainerDown-keepalived
+    expr: docker_container_keepalived_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container keepalived is down or unhealthy
+  - alert: DockerContainerDown-haproxy
+    expr: docker_container_haproxy_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container haproxy is down or unhealthy
+  - alert: DockerContainerDown-cron
+    expr: docker_container_cron_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container cron is down or unhealthy
+  - alert: DockerContainerDown-kolla_toolbox
+    expr: docker_container_kolla_toolbox_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container kolla_toolbox is down or unhealthy
+  - alert: DockerContainerDown-fluentd
+    expr: docker_container_fluentd_healthy == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Check if docker container fluentd is down or unhealthy
