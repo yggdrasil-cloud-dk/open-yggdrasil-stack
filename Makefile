@@ -50,7 +50,8 @@ kollaansible-postdeploy:
 kollaansible-lma:
 	scripts/lma/custom-exporter.sh
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t prometheus
-        
+	scripts/lma/grafana/import.sh
+
 # openstack #
 
 openstack-client-install:
@@ -68,7 +69,7 @@ openstack-images-upload:
 
 infra-up: harden prepare-ansible devices-configure cephadm-deploy
 
-kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy
+kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 
 all-up: infra-up kollaansible-up
 
