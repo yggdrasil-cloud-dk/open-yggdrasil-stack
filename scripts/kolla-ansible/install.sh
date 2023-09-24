@@ -23,6 +23,7 @@ kolla-ansible install-deps
 
 # create config dir for kolla
 mkdir -p etc/kolla
+mkdir -p etc/kolla/config/prometheus/prometheus.yml.d
 mkdir -p /etc/kolla/haproxy/services.d
 
 # copy config files to config dir

@@ -47,6 +47,10 @@ kollaansible-deploy:
 kollaansible-postdeploy:
 	scripts/kolla-ansible/kolla-ansible.sh post-deploy
 
+kollaansible-lma:
+	scripts/lma/custom-exporter.sh
+	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t prometheus
+        
 # openstack #
 
 openstack-client-install:
