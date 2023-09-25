@@ -9,9 +9,7 @@ cd workspace
 source kolla-venv/bin/activate
 source etc/kolla/admin-openrc.sh
 
-rm -rf tempest
-git clone https://opendev.org/openstack/tempest
-pip install tempest/
+pip install git+https://opendev.org/openstack/tempest
 
 rm -rf tempest-workspace
 tempest workspace remove --name tempest-workspace || true
@@ -19,17 +17,23 @@ mkdir -p tempest-workspace
 cd tempest-workspace
 tempest init
 
-mkdir -p /etc/tempest/
-cat > /etc/tempest/tempest.conf <<EOF
-[auth]
-admin_username = $OS_USERNAME
-admin_password = $OS_PASSWORD
-admin_project_name = $OS_PROJECT_NAME
-admin_domain_name = $OS_PROJECT_DOMAIN_NAME
+#curl -s https://docs.openstack.org/tempest/latest/_static/tempest.conf.sample -o /etc/tempest/tempest.conf
 
-[identity]
-auth_version = $OS_IDENTITY_API_VERSION
-uri_v3 = $OS_AUTH_URL
-EOF
+function add_to_tempest_conf {
+  section=$1
+  config=$2
+  file=./etc/tempest.conf
+
+  grep -q "^\[$section\]$" $file || echo -e "\n[$section]" | tee -a $file
+  sed -i "/\[$section\]/a $config" $file
+}
+
+add_to_tempest_conf auth "admin_username = $OS_USERNAME"
+add_to_tempest_conf auth "admin_password = $OS_PASSWORD"
+add_to_tempest_conf auth "admin_project_name = $OS_PROJECT_NAME"
+add_to_tempest_conf auth "admin_domain_name = $OS_PROJECT_DOMAIN_NAME"
+
+add_to_tempest_conf identity "auth_version = v$OS_IDENTITY_API_VERSION"
+add_to_tempest_conf identity "uri_v3 = $OS_AUTH_URL/v3"
 
 tempest run
