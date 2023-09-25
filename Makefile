@@ -70,6 +70,9 @@ openstack-resources-init:
 openstack-images-upload:
 	scripts/openstack/upload-images.sh
 
+symlink-etc-kolla:
+	ln -sfr workspace/etc/kolla/* /etc/kolla/
+
 ########
 # Util #
 ########
@@ -80,7 +83,7 @@ kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-ce
 
 all-up: infra-up kollaansible-up
 
-all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload
+all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload symlink-etc-kolla
 
 # print vars
 print-%  : ; @echo $* = $($*)
