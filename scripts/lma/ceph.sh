@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ceph mgr module enable prometheus
+#ceph mgr module enable prometheus
 
 cat > workspace/etc/kolla/config/prometheus/prometheus.yml.d/ceph.yml <<EOF
 scrape_configs:

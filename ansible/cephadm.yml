@@ -145,8 +145,10 @@
             rgw_frontend_port: 6780
 
     - name: Add rgw
-      shell: |
-        ceph orch apply -i /tmp/rgw.yml
+      command: ceph orch apply -i /tmp/rgw.yml
+
+    - name: Enable ceph-exporter
+      command: ceph mgr module enable prometheus
 
     - name: Add pools
       script: "{{ playbook_dir }}/../scripts/cephadm/pools.sh"

@@ -1,6 +1,4 @@
 {
-  "dashboard":
-{
   "annotations": {
     "list": [
       {
@@ -1973,5 +1971,4 @@
   "title": "OpenStack Dashboard",
   "uid": "YZCsB1Qmz",
   "weekStart": ""
-}
 }
