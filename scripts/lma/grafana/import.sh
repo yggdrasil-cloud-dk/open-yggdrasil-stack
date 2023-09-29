@@ -15,7 +15,12 @@ for jsonfile_no_dashboard_key in $(find $dir -iname "*.json"); do
   cat $jsonfile_no_dashboard_key >> $dashboard_jsonfile
   echo "}" >> $dashboard_jsonfile
 
-  sed -i '/^  "version"/d; /^  "id"/d' $dashboard_jsonfile
+  sed -i '
+  /^  "id"/d
+  /^  "__inputs": \[/, /^  \],/d
+  /^  "__requires": \[/, /^  \],/d
+  ' \
+  $dashboard_jsonfile
 
   dashboard_id=$(cat $dashboard_jsonfile | jq -r .dashboard.uid)
   

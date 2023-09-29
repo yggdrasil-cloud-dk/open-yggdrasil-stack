@@ -20,6 +20,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 9701,
   "graphTooltip": 0,
+  "id": 18,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -1057,27 +1058,33 @@
         "uid": "PBFA97CFB590B2093"
       },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 0,
         "y": 26
       },
-      "id": 2,
+      "hiddenSeries": false,
+      "id": 10,
       "legend": {
         "avg": true,
         "current": true,
         "max": true,
         "min": true,
         "show": true,
-        "total": true,
+        "total": false,
         "values": true
       },
       "lines": true,
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "10.1.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1091,11 +1098,10 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(openstack_nova_memory_used_bytes)/ 1024 / 1024 / 1024 / 1024",
+          "expr": "avg(openstack_identity_projects)",
           "format": "time_series",
-          "hide": false,
           "intervalFactor": 1,
-          "legendFormat": "memory in use",
+          "legendFormat": "projects",
           "refId": "A"
         },
         {
@@ -1103,16 +1109,27 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(openstack_nova_memory_available_bytes) / 1024 / 1024 / 1024 / 1024",
+          "expr": "avg(openstack_identity_users)",
           "format": "time_series",
-          "instant": false,
           "intervalFactor": 1,
-          "legendFormat": "memory available",
+          "legendFormat": "users",
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "avg(openstack_identity_groups)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "groups",
+          "refId": "C"
         }
       ],
       "thresholds": [],
-      "title": "Overall memory usage (TiB)",
+      "timeRegions": [],
+      "title": "Keystone stats",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1127,13 +1144,11 @@
       "yaxes": [
         {
           "format": "short",
-          "label": "Memory in TiB",
           "logBase": 1,
           "show": true
         },
         {
           "format": "short",
-          "label": "Time",
           "logBase": 1,
           "show": true
         }
@@ -1152,199 +1167,14 @@
         "uid": "PBFA97CFB590B2093"
       },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 12,
         "y": 26
       },
-      "id": 4,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "max": true,
-        "min": true,
-        "rightSide": false,
-        "show": true,
-        "total": true,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "sum(openstack_nova_vcpus_used)",
-          "format": "time_series",
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "used vcpu cores",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "sum(openstack_nova_vcpus)",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "legendFormat": "total vcpu cores",
-          "refId": "B"
-        }
-      ],
-      "thresholds": [],
-      "title": "Overall CPU cores usage",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": "cores",
-          "logBase": 1,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": "time",
-          "logBase": 1,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "fill": 1,
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 35
-      },
-      "id": 6,
-      "legend": {
-        "avg": true,
-        "current": true,
-        "max": true,
-        "min": true,
-        "show": true,
-        "total": true,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "sum(openstack_nova_local_storage_used_bytes)/1024/1024/1024/1024/1024",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "legendFormat": "local storage used",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "sum(openstack_nova_local_storage_available_bytes)/1024/1024/1024/1024/1024",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "legendFormat": "local storage available",
-          "refId": "B"
-        }
-      ],
-      "thresholds": [],
-      "title": "Local Storage",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "fill": 1,
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 35
-      },
+      "hiddenSeries": false,
       "id": 30,
       "legend": {
         "avg": true,
@@ -1359,7 +1189,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "10.1.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1414,6 +1248,7 @@
         }
       ],
       "thresholds": [],
+      "timeRegions": [],
       "title": "Neutron Stats",
       "tooltip": {
         "shared": true,
@@ -1452,15 +1287,17 @@
         "uid": "PBFA97CFB590B2093"
       },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 44
+        "y": 35
       },
-      "id": 10,
+      "hiddenSeries": false,
+      "id": 32,
       "legend": {
-        "avg": true,
+        "avg": false,
         "current": true,
         "max": true,
         "min": true,
@@ -1472,7 +1309,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "10.1.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1486,10 +1327,11 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "avg(openstack_identity_projects)",
+          "expr": "avg(openstack_cinder_volumes)",
           "format": "time_series",
+          "hide": false,
           "intervalFactor": 1,
-          "legendFormat": "projects",
+          "legendFormat": "volumes",
           "refId": "A"
         },
         {
@@ -1497,26 +1339,16 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "avg(openstack_identity_users)",
+          "expr": "avg(openstack_cinder_snapshots)",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "users",
+          "legendFormat": "snapshots",
           "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "avg(openstack_identity_groups)",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "legendFormat": "groups",
-          "refId": "C"
         }
       ],
       "thresholds": [],
-      "title": "Keystone stats",
+      "timeRegions": [],
+      "title": "Cinder volumes/snapshots",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1554,12 +1386,14 @@
         "uid": "PBFA97CFB590B2093"
       },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 44
+        "y": 35
       },
+      "hiddenSeries": false,
       "id": 8,
       "legend": {
         "avg": true,
@@ -1575,7 +1409,11 @@
       "linewidth": 4,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "10.1.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1608,6 +1446,7 @@
         }
       ],
       "thresholds": [],
+      "timeRegions": [],
       "title": "Virtual Machines",
       "tooltip": {
         "shared": true,
@@ -1647,104 +1486,14 @@
         "uid": "PBFA97CFB590B2093"
       },
       "fill": 1,
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 53
-      },
-      "id": 32,
-      "legend": {
-        "avg": false,
-        "current": true,
-        "max": true,
-        "min": true,
-        "show": true,
-        "total": false,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "avg(openstack_cinder_volumes)",
-          "format": "time_series",
-          "hide": false,
-          "intervalFactor": 1,
-          "legendFormat": "volumes",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "avg(openstack_cinder_snapshots)",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "legendFormat": "snapshots",
-          "refId": "B"
-        }
-      ],
-      "thresholds": [],
-      "title": "Cinder volumes/snapshots",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 53
+        "y": 44
       },
+      "hiddenSeries": false,
       "id": 34,
       "legend": {
         "avg": false,
@@ -1759,7 +1508,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "10.1.2",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1781,6 +1534,7 @@
         }
       ],
       "thresholds": [],
+      "timeRegions": [],
       "title": "Glance Images",
       "tooltip": {
         "shared": true,
@@ -1821,10 +1575,9 @@
     "list": [
       {
         "current": {
-          "isNone": true,
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "kolla_logging",
+          "value": "kolla_logging"
         },
         "datasource": {
           "type": "prometheus",
@@ -1970,5 +1723,6 @@
   "timezone": "",
   "title": "OpenStack Dashboard",
   "uid": "YZCsB1Qmz",
+  "version": 2,
   "weekStart": ""
 }
