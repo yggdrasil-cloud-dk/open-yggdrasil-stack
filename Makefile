@@ -105,7 +105,7 @@ kollaansible-tags-reconfigure:
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS)
 
 kollaansible-destroy:
-	-scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it
+	scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it
 	@echo -e "-----\nPLEASE REBOOT NODES\n-----"; sleep 5
 
 kollaansible-purge: kollaansible-destroy
