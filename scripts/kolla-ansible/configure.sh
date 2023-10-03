@@ -99,6 +99,9 @@ set_global_config ceph_rgw_hosts "[ { 'host': '$(hostname)', 'ip': '$(ip --json 
 
 set_global_config nova_console spice
 
+set_global_config openstack_service_workers '"1"'
+set_global_config openstack_service_rpc_workers '"1"'
+
 for service in glance nova cinder/cinder-volume cinder/cinder-backup; do
 	mkdir -p etc/kolla/config/$service/
 	cp /etc/ceph/ceph.client.admin.keyring etc/kolla/config/$service/
