@@ -96,7 +96,7 @@ kollaansible-tags-deploy:
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $(TAGS)
 
 # Set single tag
-kollaansible-startfrom-tag-deploy:
+kollaansible-fromtag-deploy:
 	all_tags=$$(grep "^        tags:" workspace/kolla-ansible/ansible/site.yml | sed 's/        tags: //g; s/ }//g; s/,.*//g; s/\[//g' | xargs | sed 's/ /,/g') && \
 	remaining_tags=$$(echo $$all_tags | grep -o $(TAGS).*) && \
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $$remaining_tags

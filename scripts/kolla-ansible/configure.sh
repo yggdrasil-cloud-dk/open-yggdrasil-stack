@@ -78,7 +78,9 @@ set_global_config enable_kuryr yes
 set_global_config enable_magnum yes
 set_global_config enable_manila yes
 set_global_config enable_manila_backend_generic yes
+set_global_config enable_mistral yes
 set_global_config enable_murano yes
+set_global_config enable_neutron_vpnaas yes
 set_global_config enable_octavia yes
 set_global_config enable_prometheus yes
 set_global_config enable_sahara yes
@@ -94,6 +96,8 @@ set_global_config enable_zun yes
 set_global_config octavia_provider_drivers '"amphora:Amphora provider, ovn:OVN provider"'
 
 set_global_config ceph_rgw_hosts "[ { 'host': '$(hostname)', 'ip': '$(ip --json address show ceph_public | jq -r .[0].addr_info[0].local)', 'port': 6780 } ]"
+
+set_global_config nova_console spice
 
 for service in glance nova cinder/cinder-volume cinder/cinder-backup; do
 	mkdir -p etc/kolla/config/$service/
