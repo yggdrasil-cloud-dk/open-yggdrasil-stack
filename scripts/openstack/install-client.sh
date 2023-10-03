@@ -10,10 +10,16 @@ source kolla-venv/bin/activate
 
 # install openstack clients
 pip install -U -c https://releases.openstack.org/constraints/upper/2023.1 \
- python-openstackclient \
- python-heatclient \
- python-troveclient \
- python-magnumclient \
- python-cloudkittyclient \
- gnocchiclient \
- aodhclient
+  python-openstackclient \
+  python-heatclient \
+  python-troveclient \
+  python-magnumclient \
+  python-cloudkittyclient \
+  gnocchiclient \
+  aodhclient \
+  python-neutronclient \
+  python-designateclient \
+  python-muranoclient \
+  python-manilaclient \
+  python-solumclient \
+  python-zunclient
