@@ -68,7 +68,7 @@ set_global_config neutron_plugin_agent ovn
 set_global_config enable_aodh yes
 set_global_config enable_barbican yes
 set_global_config enable_ceilometer yes
-set_global_config enable_central_logging yes
+#set_global_config enable_central_logging yes  # takes lots of resources
 set_global_config enable_cloudkitty yes
 set_global_config enable_designate yes
 set_global_config enable_freezer yes
