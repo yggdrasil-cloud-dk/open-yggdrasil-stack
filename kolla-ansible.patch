@@ -76,3 +76,18 @@ index a7b2492a5..5d98640e7 100644
          {
              "source": "{{ container_config_directory }}/event_pipeline.yaml",
              "dest": "/etc/ceilometer/event_pipeline.yaml",
+diff --git a/ansible/roles/murano/tasks/import_library_packages.yml b/ansible/roles/murano/tasks/import_library_packages.yml
+index 4b9df1cbe..c02888714 100644
+--- a/ansible/roles/murano/tasks/import_library_packages.yml
++++ b/ansible/roles/murano/tasks/import_library_packages.yml
+@@ -12,6 +12,10 @@
+   delay: 6
+   delegate_to: "{{ groups['murano-api'][0] }}"
+ 
++- name: Waiting an extra few seconds for Murano to be ready
++  pause:
++    seconds: 7
++
+ - name: Checking if Murano core and applications library packages exist
+   become: true
+   command: >
