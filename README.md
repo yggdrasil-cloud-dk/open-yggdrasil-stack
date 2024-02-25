@@ -12,6 +12,7 @@ grep -q os01 ~/.ssh/config || cat >> ~/.ssh/config <<EOF
 Host os01
     Hostname 188.165.251.200
 	User ubuntu
+	ForwardAgent yes
 EOF
 grep -q os02 ~/.ssh/config || cat >> ~/.ssh/config <<EOF
 
@@ -19,6 +20,7 @@ grep -q os02 ~/.ssh/config || cat >> ~/.ssh/config <<EOF
 Host os02
     Hostname 138.201.130.112
 	User root
+	ForwardAgent yes
 EOF
 ```
 
