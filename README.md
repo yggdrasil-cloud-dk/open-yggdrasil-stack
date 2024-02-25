@@ -34,9 +34,14 @@ git clone git@bitbucket.org:mgindi/kolla-deploy.git && cd kolla-deploy
 ./setup_remote_os_server.sh os02
 ```
 
+5. Connect to remote server
+```
+ssh os02
+```
+
 ### On Remote Server: ###
 
-5. Run
+6. Setup prerequisites
 ```
 bash -s <<EOF
 set -xe
