@@ -9,18 +9,18 @@
 grep -q os01 ~/.ssh/config || cat >> ~/.ssh/config <<EOF
 
 # ovh
-Host os01
+Host os01-ovh
     Hostname 188.165.251.200
-	User root
-	ForwardAgent yes
+    User root
+    ForwardAgent yes
 EOF
 grep -q os02 ~/.ssh/config || cat >> ~/.ssh/config <<EOF
 
 # hetzner
-Host os02
+Host os01-hetzner
     Hostname 138.201.130.112
-	User root
-	ForwardAgent yes
+    User root
+    ForwardAgent yes
 EOF
 ```
 
