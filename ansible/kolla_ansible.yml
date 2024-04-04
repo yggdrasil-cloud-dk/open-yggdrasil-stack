@@ -7,13 +7,13 @@
       script: "{{ playbook_dir }}/../scripts/kolla-ansible/deps.sh"
       args:
         chdir: "{{ playbook_dir }}/.."
-        creates: "{{ playbook_dir }}/../workspace/kolla-venv/"
  
     - name: Install kolla-ansible
       script: "{{ playbook_dir }}/../scripts/kolla-ansible/install.sh"
       args:
         chdir: "{{ playbook_dir }}/.."
-        creates: "{{ playbook_dir }}/../workspace/kolla-ansible/"
+      environment:
+        OPENSTACK_RELEASE: "{{ openstack_release }}"
 
     - name: Add inventory for nodes
       copy: 

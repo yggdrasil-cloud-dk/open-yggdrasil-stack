@@ -26,14 +26,10 @@ source kolla-venv/bin/activate
 PW_FILE=$CONFIG_DIR/passwords.yml
 if [ ! -f "$PW_FILE" ]; then
 	echo "$PW_FILE not found"
+	exit 1
 fi
 
-if grep ^[a-z_]*: $PW_FILE | sed 's/.*://g' | xargs | grep -q '[[:alnum:]]'; then
-	echo "password file exists and has passwords"
-else
-	echo "generating passwords.."
-        kolla-genpwd -p $CONFIG_DIR/passwords.yml
-fi
+kolla-genpwd -p $PW_FILE
 
 # set global configs
 set_global_config kolla_base_distro ubuntu
@@ -45,20 +41,20 @@ set_global_config kolla_internal_vip_address 10.0.10.100
 
 set_global_config glance_backend_ceph yes
 set_global_config glance_backend_file no
-set_global_config ceph_glance_keyring ceph.client.admin.keyring
+set_global_config ceph_glance_keyring client.admin.keyring
 set_global_config ceph_glance_user admin
 
 set_global_config nova_backend_ceph yes
-set_global_config ceph_nova_keyring ceph.client.admin.keyring
+set_global_config ceph_nova_keyring client.admin.keyring
 set_global_config ceph_nova_user admin
 
 set_global_config enable_cinder yes
 set_global_config cinder_backend_ceph yes
-set_global_config ceph_cinder_keyring ceph.client.admin.keyring
+set_global_config ceph_cinder_keyring client.admin.keyring
 set_global_config ceph_cinder_user admin
 
 set_global_config enable_cinder_backup yes
-set_global_config ceph_cinder_backup_keyring ceph.client.admin.keyring
+set_global_config ceph_cinder_backup_keyring client.admin.keyring
 set_global_config ceph_cinder_backup_user admin
 
 set_global_config enable_ceph_rgw yes
@@ -107,3 +103,11 @@ for service in glance nova cinder/cinder-volume cinder/cinder-backup; do
 	cp /etc/ceph/ceph.client.admin.keyring etc/kolla/config/$service/
 	cat /etc/ceph/ceph.conf | sed 's/^\t//g' > etc/kolla/config/$service/ceph.conf
 done
+
+# magnum
+mkdir -p etc/kolla/config/magnum/
+cat >  etc/kolla/config/magnum/magnum-conductor.conf <<EOF
+[trust]
+cluster_user_trust = True
+EOF
+

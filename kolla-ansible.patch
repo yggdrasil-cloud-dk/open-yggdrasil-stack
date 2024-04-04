@@ -1,3 +1,16 @@
+diff --git a/ansible/group_vars/all.yml b/ansible/group_vars/all.yml
+index dfafe0548..0bfab6aae 100644
+--- a/ansible/group_vars/all.yml
++++ b/ansible/group_vars/all.yml
+@@ -505,7 +505,7 @@ murano_internal_fqdn: "{{ kolla_internal_fqdn }}"
+ murano_external_fqdn: "{{ kolla_external_fqdn }}"
+ murano_api_port: "8082"
+ murano_api_public_port: "{{ haproxy_single_external_frontend_public_port if haproxy_single_external_frontend | bool else murano_api_port }}"
+-murano_api_listen_port: "{{ murano_api_listen_port }}"
++murano_api_listen_port: "{{ murano_api_port }}"
+ 
+ neutron_internal_fqdn: "{{ kolla_internal_fqdn }}"
+ neutron_external_fqdn: "{{ kolla_external_fqdn }}"
 diff --git a/ansible/rabbitmq.yml b/ansible/rabbitmq.yml
 index 370600c8e..460dcdd4c 100644
 --- a/ansible/rabbitmq.yml
@@ -33,7 +46,7 @@ index 370600c8e..460dcdd4c 100644
 +        role_rabbitmq_cluster_cookie: '{{ rabbitmq_cluster_cookie }}'
 +        role_rabbitmq_groups: rabbitmq
 diff --git a/ansible/roles/ceilometer/tasks/config.yml b/ansible/roles/ceilometer/tasks/config.yml
-index a4b46e96f..d7a721ba8 100644
+index 2835ec4be..78ced4659 100644
 --- a/ansible/roles/ceilometer/tasks/config.yml
 +++ b/ansible/roles/ceilometer/tasks/config.yml
 @@ -236,22 +236,6 @@
@@ -56,9 +69,9 @@ index a4b46e96f..d7a721ba8 100644
 -  notify:
 -    - Restart ceilometer-notification container
 -
- - name: Check custom event_pipeline.yaml exists
-   stat:
-     path: "{{ node_custom_config }}/ceilometer/event_pipeline.yaml"
+ - name: Copying over event_pipeline.yaml
+   vars:
+     service: "{{ ceilometer_services['ceilometer-notification'] }}"
 diff --git a/ansible/roles/ceilometer/templates/ceilometer-notification.json.j2 b/ansible/roles/ceilometer/templates/ceilometer-notification.json.j2
 index a7b2492a5..5d98640e7 100644
 --- a/ansible/roles/ceilometer/templates/ceilometer-notification.json.j2
@@ -91,3 +104,16 @@ index 4b9df1cbe..c02888714 100644
  - name: Checking if Murano core and applications library packages exist
    become: true
    command: >
+diff --git a/ansible/roles/murano/templates/murano.conf.j2 b/ansible/roles/murano/templates/murano.conf.j2
+index fbebb12f9..0c40cac42 100644
+--- a/ansible/roles/murano/templates/murano.conf.j2
++++ b/ansible/roles/murano/templates/murano.conf.j2
+@@ -84,7 +84,7 @@ policy_file = {{ murano_policy_file }}
+ 
+ {% if service_name == 'murano-engine' %}
+ [rabbitmq]
+-host = {{ rabbitmq_external_fqdn }}
++host = {{ outward_rabbitmq_external_fqdn }}
+ port = {{ outward_rabbitmq_port }}
+ login = {{ murano_agent_rabbitmq_user }}
+ password = {{ murano_agent_rabbitmq_password }}

@@ -8,7 +8,8 @@ TAGS =
 
 # TODO: run in ansible so it runs on all nodes
 harden:
-	cp scripts/hardening/ssh.sh /etc/rc.local
+	echo -e "#!/bin/sh\nset -xe" > /etc/rc.local
+	realpath scripts/hardening/* >> /etc/rc.local
 	chmod 755 /etc/rc.local
 	systemctl restart rc-local
 	systemctl enable rc-local
@@ -27,10 +28,10 @@ cephadm-deploy:
 # kolla-ansible #
 
 kollaansible-images:
-	ansible-playbook ansible/prepare_images.yml -v
+	#ansible-playbook ansible/prepare_images.yml -v
 
 kollaansible-prepare:
-	ansible-playbook ansible/kolla_ansible.yml
+	ansible-playbook ansible/kolla_ansible.yml -v
 
 kollaansible-create-certs:
 	scripts/kolla-ansible/kolla-ansible.sh octavia-certificates
@@ -44,6 +45,9 @@ kollaansible-prechecks:
 kollaansible-deploy:
 	scripts/kolla-ansible/kolla-ansible.sh deploy
 
+kollaansible-upgrade-cloud:
+	scripts/kolla-ansible/kolla-ansible.sh upgrade
+
 kollaansible-postdeploy:
 	scripts/kolla-ansible/kolla-ansible.sh post-deploy
 
@@ -54,7 +58,6 @@ kollaansible-lma:
 	scripts/lma/prometheus-alerts/copy-rules.sh
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t prometheus
 
-# TODO REMOVE
 prometheus-alerts:
 	scripts/lma/prometheus-alerts/copy-rules.sh
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t prometheus
@@ -62,7 +65,7 @@ prometheus-alerts:
 # openstack #
 
 openstack-client-install:
-	scripts/openstack/install-client.sh
+	ansible-playbook ansible/client.yml -v
 
 openstack-resources-init:
 	scripts/openstack/init-resources.sh
@@ -81,9 +84,16 @@ infra-up: harden prepare-ansible devices-configure cephadm-deploy
 
 kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 
+kollaansible-upgrade: kollaansible-images kollaansible-prepare kollaansible-upgrade-cloud kollaansible-lma
+
 all-up: infra-up kollaansible-up
 
+all-upgrade: kollaansible-upgrade
+
 all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload symlink-etc-kolla
+
+all-test:
+	scripts/tests/magnum.sh
 
 # print vars
 print-%  : ; @echo $* = $($*)

@@ -14,8 +14,8 @@ CONFIG_DIR=$(pwd)/etc/kolla
 # upload ubuntu image
 image_urls=(
 	https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
-	https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/35.20220116.3.0/x86_64/fedora-coreos-35.20220116.3.0-openstack.x86_64.qcow2.xz
-	https://tarballs.opendev.org/openstack/trove/images/trove-zed-guest-ubuntu-focal.qcow2
+	https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/39.20240309.3.0/x86_64/fedora-coreos-39.20240309.3.0-openstack.x86_64.qcow2.xz
+	https://tarballs.opendev.org/openstack/trove/images/trove-master-guest-ubuntu-jammy.qcow2
 )
 
 for image_url in ${image_urls[@]}; do

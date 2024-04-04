@@ -10,6 +10,7 @@ all:
 
   vars:
     dev: true
+    openstack_release: 2023.2
     default_gateway_interface: "{{ lookup('ansible.builtin.pipe', 'ip route | grep \"^default\" | head -n 1 | grep -o \"dev .*\" | cut -d \" \" -f 2') }}"
     gateway_ip: "{{ lookup('ansible.builtin.pipe', 'ip route | grep \"^default\" | head -n 1 | grep -o \"via .*\" | cut -d \" \" -f 2') }}"
     ceph_osd_devices:

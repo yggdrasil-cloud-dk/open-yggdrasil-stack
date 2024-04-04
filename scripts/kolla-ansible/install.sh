@@ -10,11 +10,11 @@ source kolla-venv/bin/activate
 
 # install kolla-ansible
 rm -rf kolla-ansible
-git clone --branch stable/2023.1 https://github.com/openstack/kolla-ansible.git
+git clone --branch stable/$OPENSTACK_RELEASE https://github.com/openstack/kolla-ansible.git
 
 # apply patch and setup
 cd kolla-ansible
-git apply ../../kolla-ansible.patch
+git apply --reject --whitespace=fix ../../kolla-ansible.patch
 python3 setup.py develop
 cd ..
 
@@ -37,8 +37,14 @@ cat >> etc/kolla/globals.yml <<-EOF
 	######################
 	EOF
 
-# copy password file if it doesn't exist
-test -f etc/kolla/passwords.yml || cp kolla-ansible/etc/kolla/passwords.yml etc/kolla/passwords.yml
+date_suffix=$(date +"%Y%m%dT%H%M")
+
+# add entries to passwords file
+touch etc/kolla/passwords.yml
+cp etc/kolla/passwords.yml etc/kolla/passwords.yml.bk_$date_suffix
+cat kolla-ansible/etc/kolla/passwords.yml | grep -v "^#\|^---" | xargs -I% bash -c "grep -q % etc/kolla/passwords.yml || (echo % | tee -a etc/kolla/passwords.yml)"
+
+if [[ -z $(diff etc/kolla/passwords.yml etc/kolla/passwords.yml.bk_$date_suffix) ]]; then rm etc/kolla/passwords.yml.bk_$date_suffix; fi
 
 # create inventory directory in workspace
 mkdir -p inventory
