@@ -9,7 +9,7 @@ function set_global_config () {
 	config_key=$1
 	config_value=$2
 	# handles when comments only in beginning of line
-	if grep -q $config_key $CONFIG_DIR/globals.yml; then
+	if grep -q "#\? *$config_key:" $CONFIG_DIR/globals.yml; then
 		sed -i "s/#\?\( *$config_key:\).*/\1 $config_value/g" $CONFIG_DIR/globals.yml
 	else
 		sed -i "$ a $config_key: $config_value" $CONFIG_DIR/globals.yml
@@ -66,7 +66,7 @@ set_global_config enable_barbican yes
 set_global_config enable_ceilometer yes
 #set_global_config enable_central_logging yes  # takes lots of resources
 set_global_config enable_cloudkitty yes
-set_global_config enable_designate yes
+set_global_config enable_designate yes  # broken in 2023.2 for some reason?
 set_global_config enable_freezer yes
 set_global_config enable_gnocchi yes
 set_global_config enable_grafana yes
@@ -74,8 +74,9 @@ set_global_config enable_kuryr yes
 set_global_config enable_magnum yes
 set_global_config enable_manila yes
 set_global_config enable_manila_backend_generic yes
+set_global_config enable_masakari yes
 set_global_config enable_mistral yes
-set_global_config enable_murano yes
+#set_global_config enable_murano yes  # broken in 2023.2 for some reason
 set_global_config enable_neutron_vpnaas yes
 set_global_config enable_octavia yes
 set_global_config enable_prometheus yes
@@ -83,11 +84,12 @@ set_global_config enable_sahara yes
 set_global_config enable_senlin yes
 set_global_config enable_skyline yes
 set_global_config enable_solum yes
+set_global_config enable_tacker yes
 set_global_config enable_trove yes
 set_global_config enable_venus yes
 #set_global_config enable_vitrage yes
 set_global_config enable_watcher yes
-set_global_config enable_zun yes
+#set_global_config enable_zun yes  # not supported in 2023.2
 
 set_global_config octavia_provider_drivers '"amphora:Amphora provider, ovn:OVN provider"'
 
@@ -109,5 +111,11 @@ mkdir -p etc/kolla/config/magnum/
 cat >  etc/kolla/config/magnum/magnum-conductor.conf <<EOF
 [trust]
 cluster_user_trust = True
+EOF
+
+mkdir -p etc/kolla/config/trove/
+cat >  etc/kolla/config/trove/trove-taskmanager.conf <<EOF
+[DEFAULT]
+nova_keypair = testkey
 EOF
 

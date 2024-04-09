@@ -42,7 +42,7 @@ openstack coe cluster template show k8s-cluster-template || openstack coe cluste
     --network-driver flannel \
     --docker-storage-driver overlay2 \
     --coe kubernetes \
-    --labels container_runtime=containerd,kube_tag=v1.25.12-rancher1
+    --labels container_runtime=containerd,kube_tag=v1.25.9-rancher2
 
 openstack coe cluster create k8s-cluster \
     --cluster-template k8s-cluster-template \

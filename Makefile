@@ -84,7 +84,7 @@ infra-up: harden prepare-ansible devices-configure cephadm-deploy
 
 kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 
-kollaansible-upgrade: kollaansible-images kollaansible-prepare kollaansible-upgrade-cloud kollaansible-lma
+kollaansible-upgrade: kollaansible-images kollaansible-prepare kollaansible-prechecks kollaansible-upgrade-cloud kollaansible-lma
 
 all-up: infra-up kollaansible-up
 
@@ -102,16 +102,16 @@ print-%  : ; @echo $* = $($*)
 ping-nodes:
 	scripts/ping-nodes.sh
 
-kollaansible-tags-deploy:
+kollaansible-tags-deploy: kollaansible-prepare
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $(TAGS)
 
 # Set single tag
-kollaansible-fromtag-deploy:
+kollaansible-fromtag-deploy: kollaansible-prepare
 	all_tags=$$(grep "^        tags:" workspace/kolla-ansible/ansible/site.yml | sed 's/        tags: //g; s/ }//g; s/,.*//g; s/\[//g' | xargs | sed 's/ /,/g') && \
 	remaining_tags=$$(echo $$all_tags | grep -o $(TAGS).*) && \
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $$remaining_tags
 
-kollaansible-tags-reconfigure:
+kollaansible-tags-reconfigure: kollaansible-prepare
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS)
 
 kollaansible-destroy:
