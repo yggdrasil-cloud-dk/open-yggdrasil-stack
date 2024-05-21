@@ -36,8 +36,8 @@ set_global_config kolla_base_distro ubuntu
 set_global_config kolla_install_type source
 
 set_global_config network_interface openstack_mgmt
-set_global_config neutron_external_interface veth1
-set_global_config kolla_internal_vip_address 10.0.10.100
+set_global_config neutron_external_interface neutron_ext
+set_global_config kolla_internal_vip_address 10.38.1.131
 
 set_global_config glance_backend_ceph yes
 set_global_config glance_backend_file no
@@ -60,6 +60,11 @@ set_global_config ceph_cinder_backup_user admin
 set_global_config enable_ceph_rgw yes
 
 set_global_config neutron_plugin_agent ovn
+set_global_config neutron_ovn_dhcp_agent yes
+
+set_global_config designate_dnssec_validation no
+set_global_config designate_recursion yes
+set_global_config designate_forwarders_addresses '"10.30.54.14; 10.30.54.15"'
 
 set_global_config enable_aodh yes
 set_global_config enable_barbican yes
@@ -80,6 +85,7 @@ set_global_config enable_mistral yes
 set_global_config enable_neutron_vpnaas yes
 set_global_config enable_octavia yes
 set_global_config enable_prometheus yes
+set_global_config enable_redis yes
 set_global_config enable_sahara yes
 set_global_config enable_senlin yes
 set_global_config enable_skyline yes
@@ -95,7 +101,7 @@ set_global_config octavia_provider_drivers '"amphora:Amphora provider, ovn:OVN p
 
 set_global_config ceph_rgw_hosts "[ { 'host': '$(hostname)', 'ip': '$(ip --json address show ceph_public | jq -r .[0].addr_info[0].local)', 'port': 6780 } ]"
 
-set_global_config nova_console spice
+set_global_config nova_console novnc
 
 set_global_config openstack_service_workers '"1"'
 set_global_config openstack_service_rpc_workers '"1"'
@@ -113,9 +119,51 @@ cat >  etc/kolla/config/magnum/magnum-conductor.conf <<EOF
 cluster_user_trust = True
 EOF
 
+# trove
+cat >  etc/kolla/config/trove.conf <<EOF
+[oslo_messaging_rabbit]
+rabbit_quorum_queue = false
+rabbit_ha_queues = true
+EOF
 mkdir -p etc/kolla/config/trove/
 cat >  etc/kolla/config/trove/trove-taskmanager.conf <<EOF
 [DEFAULT]
 nova_keypair = testkey
 EOF
 
+# designate
+mkdir -p etc/kolla/config/designate/
+cat > etc/kolla/config/designate/named.conf <<EOF
+#jinja2: trim_blocks: False
+include "/etc/rndc.key";
+options {
+        listen-on port {{ designate_bind_port }} { {{ 'api' | kolla_address }}; };
+        {% if api_interface != dns_interface %}
+        listen-on port {{ designate_bind_port }} { {{ 'dns' | kolla_address }}; };
+        {% endif %}
+        directory       "/var/lib/named";
+        allow-new-zones yes;
+        dnssec-validation {{ designate_dnssec_validation }};
+        auth-nxdomain no;
+        request-ixfr no;
+        recursion {{ designate_recursion }};
+        allow-query-cache { any; };
+
+        {% if designate_forwarders_addresses %}
+        forwarders { {{ designate_forwarders_addresses }}; };
+        {% endif %}
+        minimal-responses yes;
+        allow-notify { {% for host in groups['designate-worker'] %}{{ 'api' | kolla_address(host) }};{% endfor %} };
+};
+
+controls {
+        inet {{ 'api' | kolla_address }} port {{ designate_rndc_port }} allow { {% for host in groups['designate-worker'] %}{{ 'api' | kolla_address(host) }}; {% endfor %} } keys { "rndc-key"; };
+};
+EOF
+
+# neutron
+mkdir -p etc/kolla/config/neutron/
+cat > etc/kolla/config/neutron/dhcp_agent.ini <<EOF
+[DEFAULT]
+dnsmasq_dns_servers = {{ 'api' | kolla_address }}
+EOF

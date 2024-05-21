@@ -39,12 +39,21 @@ cat >> etc/kolla/globals.yml <<-EOF
 
 date_suffix=$(date +"%Y%m%dT%H%M")
 
-# add entries to passwords file
-touch etc/kolla/passwords.yml
-cp etc/kolla/passwords.yml etc/kolla/passwords.yml.bk_$date_suffix
-cat kolla-ansible/etc/kolla/passwords.yml | grep -v "^#\|^---" | xargs -I% bash -c "grep -q % etc/kolla/passwords.yml || (echo % | tee -a etc/kolla/passwords.yml)"
+PW_FILE=etc/kolla/passwords.yml
+PW_FILE_BK=$PW_FILE.bk_$date_suffix
 
-if [[ -z $(diff etc/kolla/passwords.yml etc/kolla/passwords.yml.bk_$date_suffix) ]]; then rm etc/kolla/passwords.yml.bk_$date_suffix; fi
+if [ -f "$PW_FILE" ]; then
+	mv $PW_FILE $PW_FILE_BK
+fi
+cp kolla-ansible/etc/kolla/passwords.yml $PW_FILE
+kolla-genpwd -p $PW_FILE
+if [ -f "$PW_FILE_BK" ]; then
+	kolla-mergepwd --old $PW_FILE_BK --new $PW_FILE --final $PW_FILE
+        if [[ -z $(diff $PW_FILE $PW_FILE_BK) ]] || [[ ! -s $PW_FILE_BK ]]; then 
+		rm $PW_FILE_BK
+	fi
+fi
+
 
 # create inventory directory in workspace
 mkdir -p inventory

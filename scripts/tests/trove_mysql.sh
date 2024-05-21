@@ -14,8 +14,10 @@ CONFIG_DIR=$(pwd)/etc/kolla
 ls ~/.ssh/id_rsa || ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
 openstack keypair show testkey --user trove || openstack keypair create --user trove --public-key ~/.ssh/id_rsa.pub testkey
 
-openstack image set --name trove-guest-ubuntu-focal --private  \
-    --tag trove --tag mysql $(openstack image list -f value -c Name | grep trove)
+image_name=$(openstack image list -f value -c Name | grep trove)
+
+openstack image set --private  \
+    --tag trove --tag mysql $image_name
 
 openstack datastore version show --datastore mysql 5.7.29 || openstack datastore version create 5.7.29 mysql mysql "" \
     --image-tags trove,mysql \

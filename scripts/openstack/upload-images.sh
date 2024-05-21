@@ -11,11 +11,19 @@ CONFIG_DIR=$(pwd)/etc/kolla
 # source admin rc
 . $CONFIG_DIR/admin-openrc.sh
 
+# TODO: Add windows image
+# needs to be done manually for now due to EULA signature at
+# https://cloudbase.it/windows-cloud-images/#download
+
+
 # upload ubuntu image
 image_urls=(
 	https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
 	https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/39.20240309.3.0/x86_64/fedora-coreos-39.20240309.3.0-openstack.x86_64.qcow2.xz
 	https://tarballs.opendev.org/openstack/trove/images/trove-master-guest-ubuntu-jammy.qcow2
+#	https://tarballs.opendev.org/openstack/trove/images/trove-zed-guest-ubuntu-focal.qcow2
+	http://localhost:8888/windows_server_2012_r2_standard_eval_kvm_20170321.qcow2.gz
+	
 )
 
 for image_url in ${image_urls[@]}; do
@@ -27,7 +35,11 @@ for image_url in ${image_urls[@]}; do
 		# removing file extension again - (probably .qcow2 or .img)
 		image_name=$(echo $image_name | grep -o ".*\." | head -c -2)
 		pipe_cmd="xz -d -"
-
+	elif [[ "$image_url" == *".gz" ]]; then
+		echo Image detected to be gz compressed. Will decompress.
+		# removing file extension again - (probably .qcow2 or .img)
+		image_name=$(echo $image_name | grep -o ".*\." | head -c -2)
+		pipe_cmd="gunzip -cd"
 	fi
 	image_type=qcow2
 	openstack image show $image_name || curl $image_url --output - | $pipe_cmd | openstack image create $image_name --disk-format qcow2

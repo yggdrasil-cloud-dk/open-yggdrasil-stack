@@ -28,7 +28,7 @@ cephadm-deploy:
 # kolla-ansible #
 
 kollaansible-images:
-	#ansible-playbook ansible/prepare_images.yml -v
+	ansible-playbook ansible/prepare_images.yml -v
 
 kollaansible-prepare:
 	ansible-playbook ansible/kolla_ansible.yml -v
@@ -102,6 +102,9 @@ print-%  : ; @echo $* = $($*)
 ping-nodes:
 	scripts/ping-nodes.sh
 
+print-tags:
+	@grep "^        tags:" workspace/kolla-ansible/ansible/site.yml | sed 's/        tags: //g; s/ }//g; s/,.*//g; s/\[//g' | xargs | sed 's/ /,/g'
+
 kollaansible-tags-deploy: kollaansible-prepare
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $(TAGS)
 
@@ -112,7 +115,7 @@ kollaansible-fromtag-deploy: kollaansible-prepare
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $$remaining_tags
 
 kollaansible-tags-reconfigure: kollaansible-prepare
-	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS)
+	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS) -v
 
 kollaansible-destroy:
 	scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it

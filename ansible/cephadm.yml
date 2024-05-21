@@ -25,8 +25,8 @@
         dest: /etc/ceph/initial-ceph.conf
         content: |
           [global]
-          {% if dev %}
-          osd_pool_default_size = 1
+          {% if (groups['deployment_nodes'] | length) < 3 %}
+          osd_pool_default_size = {{ groups['deployment_nodes'] | length }}
           osd_pool_default_min size = 1
           {% else %}
           osd_pool_default_size = 3
@@ -116,7 +116,7 @@
         set -e
         {% for device in ceph_osd_devices -%}
           docker exec $(docker ps | grep ceph-.*-mon | awk '{print $1}') \
-            bash -c "ceph-volume lvm zap {{ device }}"
+            bash -c "ceph-volume lvm zap {{ device }} --destroy"
         {% endfor %}
       delegate_to: "{{ item }}"
       loop: "{{ groups['deployment_nodes'] }}"

@@ -153,6 +153,7 @@
 
     - name: Run script to setup veth pair
       script: "{{ playbook_dir }}/../scripts/devices/veth_pair.sh"
+      when: dev
 
     - name: Create cni directory for Zun
       command: mkdir -p /opt/cni/bin/

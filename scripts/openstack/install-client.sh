@@ -22,4 +22,5 @@ pip install -U -c https://releases.openstack.org/constraints/upper/$OPENSTACK_RE
   python-muranoclient \
   python-manilaclient \
   python-solumclient \
-  python-zunclient
+  python-zunclient \
+  python-barbicanclient

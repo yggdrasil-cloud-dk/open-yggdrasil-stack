@@ -31,6 +31,8 @@ openstack keypair show testkey || openstack keypair create --public-key ~/.ssh/i
 
 openstack network show public || (openstack network show public1 && openstack network set --name public public1)
 
+sleep 3
+
 openstack coe cluster template show k8s-cluster-template || openstack coe cluster template create k8s-cluster-template \
     --image $fedora_image \
     --keypair testkey \
@@ -39,10 +41,11 @@ openstack coe cluster template show k8s-cluster-template || openstack coe cluste
     --flavor ds1G \
     --master-flavor ds2G \
     --docker-volume-size 5 \
+    --volume-driver cinder \
     --network-driver flannel \
     --docker-storage-driver overlay2 \
     --coe kubernetes \
-    --labels container_runtime=containerd,kube_tag=v1.25.9-rancher2
+    --labels container_runtime=containerd,kube_tag=v1.25.9-rancher2,cloud_provider_enabled=true
 
 openstack coe cluster create k8s-cluster \
     --cluster-template k8s-cluster-template \

@@ -7,16 +7,19 @@ all:
       ansible_host: "{{ lookup('ansible.builtin.pipe', 'hostname -I | cut -d \" \" -f 1') }}"
       inventory_index: 1
       ansible_connection: local
+      ceph_public_ip: 10.38.1.114/28
+      ceph_cluster_ip: 10.38.1.162/28
 
   vars:
-    dev: true
+    dev: false
     openstack_release: 2023.2
     default_gateway_interface: "{{ lookup('ansible.builtin.pipe', 'ip route | grep \"^default\" | head -n 1 | grep -o \"dev .*\" | cut -d \" \" -f 2') }}"
     gateway_ip: "{{ lookup('ansible.builtin.pipe', 'ip route | grep \"^default\" | head -n 1 | grep -o \"via .*\" | cut -d \" \" -f 2') }}"
     ceph_osd_devices:
-      - /dev/vg-0/lv-0
-      - /dev/vg-1/lv-1
-      - /dev/vg-2/lv-2
+      - /dev/sda
+      - /dev/sdb
+      - /dev/sdc
+      - /dev/sdd
     openstack_mgmt_ip: "10.0.10.{{ inventory_index }}/24"
     ceph_public_ip: "10.0.50.{{ inventory_index }}/24"
     ceph_cluster_ip: "10.0.60.{{ inventory_index }}/24"
