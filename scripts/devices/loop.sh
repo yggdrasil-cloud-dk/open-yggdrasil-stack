@@ -18,9 +18,9 @@ fi
 cd /mnt
 
 # create image files
-truncate -s 80G disk-0.img
-truncate -s 80G disk-1.img
-truncate -s 80G disk-2.img
+truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-2.img
+truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-1.img
+truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-0.img
 
 # create loop devices
 losetup /dev/loop100 disk-0.img

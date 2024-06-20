@@ -25,17 +25,17 @@ all:
       network:
         version: 2
         renderer: networkd
-        ethernets:
-          ens3:
-            routes:
-              - to: default
-                via: "{{ network_gateway_ip }}"
-              - to: "{{ network_openstack_mgmt_ip | ansible.netcommon.ipaddr('network/prefix') }}"
-                via: "{{ ansible_host }}"
-              - to: "{{ network_ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}"
-                via: "{{ ansible_host }}"
-              - to: "{{ network_ceph_cluster_ip | ansible.netcommon.ipaddr('network/prefix') }}"
-                via: "{{ ansible_host }}"
+        # ethernets:
+        #   ens3:
+        #     routes:
+        #       - to: default
+        #         via: "{{ network_gateway_ip }}"
+        #       - to: "{{ network_openstack_mgmt_ip | ansible.netcommon.ipaddr('network/prefix') }}"
+        #         via: "{{ ansible_host }}"
+        #       - to: "{{ network_ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}"
+        #         via: "{{ ansible_host }}"
+        #       - to: "{{ network_ceph_cluster_ip | ansible.netcommon.ipaddr('network/prefix') }}"
+        #         via: "{{ ansible_host }}"
         vlans:
           # openstack management vlan
           openstack_mgmt:
@@ -58,6 +58,7 @@ all:
 
   
     storage_create_loop_devices: "{{ development_environment }}"
+    storage_loop_device_size_gb: 60
     storage_ceph_osd_devices:
       - /dev/vg-0/lv-0
       - /dev/vg-1/lv-1
