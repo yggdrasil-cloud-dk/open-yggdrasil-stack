@@ -23,9 +23,9 @@ DEFAULT_NETMASK=$(ifconfig $DEFAULT_IF | grep -o "netmask .\+" | cut -d ' ' -f 2
 #fi
 
 
-export EXT_NET_CIDR=10.38.3.0/24
-export EXT_NET_RANGE="start=10.38.3.101,end=10.38.3.200"
-export EXT_NET_GATEWAY=10.38.3.1
+export EXT_NET_CIDR=$EXT_NET_CIDR
+export EXT_NET_RANGE=$EXT_NET_RANGE
+export EXT_NET_GATEWAY=$EXT_NET_GATEWAY
 
 export KOLLA_CONFIG_PATH=$CONFIG_DIR
 export ENABLE_EXT_NET=0

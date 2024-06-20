@@ -22030,8 +22030,8 @@
       {
         "current": {
           "selected": false,
-          "text": "10.38.0.134",
-          "value": "10.38.0.134"
+          "text": "10.38.1.131",
+          "value": "10.38.1.131"
         },
         "datasource": {
           "type": "prometheus",

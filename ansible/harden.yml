@@ -1,0 +1,35 @@
+---
+- name: Harden nodes
+  hosts: deployment_nodes
+  any_errors_fatal: true
+  tasks:
+    - name: Find hardening files
+      find:
+        paths: "{{ playbook_dir }}/../scripts/hardening"
+      register: find_in_path
+
+    - name: Set fact for hardening files
+      set_fact:
+        hardening_files: "{{ (hardening_files | default([])) + [ item.path ] }}"
+      loop: "{{ find_in_path.files }}"
+
+    - name: Generate rc.local files with all hardening scripts
+      copy:
+        dest: /etc/rc.local
+        mode: 0755
+        content: |
+          #!/bin/sh
+
+          set -xe
+          
+          # node hardening
+          {% for file in hardening_files %}
+          {{ file }}
+          {% endfor %}
+
+    - name: Enable docker service
+      systemd:
+        name: rc-local
+        state: restarted
+        enabled: yes
+        daemon_reload: yes

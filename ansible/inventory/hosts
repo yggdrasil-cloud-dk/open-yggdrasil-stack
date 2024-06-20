@@ -3,26 +3,83 @@ all:
 
   # hosts and hostvars and all shared vars
   hosts:
+  
     os01:
       ansible_host: "{{ lookup('ansible.builtin.pipe', 'hostname -I | cut -d \" \" -f 1') }}"
       inventory_index: 1
       ansible_connection: local
-      ceph_public_ip: 10.38.1.114/28
-      ceph_cluster_ip: 10.38.1.162/28
 
   vars:
-    dev: false
+    
+    development_environment: true
+    network_create_veth_pair: "{{ development_environment }}"
+    network_veth_pair_gateway: 192.168.1.1/24
+
+    network_openstack_mgmt_ip: "10.0.10.{{ inventory_index }}/24"
+    network_ceph_public_ip: "10.0.50.{{ inventory_index }}/24"
+    network_ceph_cluster_ip: "10.0.60.{{ inventory_index }}/24"
+
+    network_gateway_ip: "{{ lookup('ansible.builtin.pipe', 'ip route | grep \"^default\" | head -n 1 | grep -o \"via .*\" | cut -d \" \" -f 2') }}"
+
+    network_netplan_overrides_file:
+      network:
+        version: 2
+        renderer: networkd
+        ethernets:
+          ens3:
+            routes:
+              - to: default
+                via: "{{ network_gateway_ip }}"
+              - to: "{{ network_openstack_mgmt_ip | ansible.netcommon.ipaddr('network/prefix') }}"
+                via: "{{ ansible_host }}"
+              - to: "{{ network_ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}"
+                via: "{{ ansible_host }}"
+              - to: "{{ network_ceph_cluster_ip | ansible.netcommon.ipaddr('network/prefix') }}"
+                via: "{{ ansible_host }}"
+        vlans:
+          # openstack management vlan
+          openstack_mgmt:
+            id: 10
+            link: ens3
+            addresses: 
+              - "{{ network_openstack_mgmt_ip }}"
+          # ceph public vlan
+          ceph_public:
+            id: 50
+            link: ens3
+            addresses:
+              - "{{ network_ceph_public_ip }}"
+          # ceph cluster vlan
+          ceph_cluster:
+            id: 60
+            link: ens3
+            addresses:
+              - "{{ network_ceph_cluster_ip }}"
+
+  
+    storage_create_loop_devices: "{{ development_environment }}"
+    storage_ceph_osd_devices:
+      - /dev/vg-0/lv-0
+      - /dev/vg-1/lv-1
+      - /dev/vg-2/lv-2
+    
     openstack_release: 2023.2
-    default_gateway_interface: "{{ lookup('ansible.builtin.pipe', 'ip route | grep \"^default\" | head -n 1 | grep -o \"dev .*\" | cut -d \" \" -f 2') }}"
-    gateway_ip: "{{ lookup('ansible.builtin.pipe', 'ip route | grep \"^default\" | head -n 1 | grep -o \"via .*\" | cut -d \" \" -f 2') }}"
-    ceph_osd_devices:
-      - /dev/sda
-      - /dev/sdb
-      - /dev/sdc
-      - /dev/sdd
-    openstack_mgmt_ip: "10.0.10.{{ inventory_index }}/24"
-    ceph_public_ip: "10.0.50.{{ inventory_index }}/24"
-    ceph_cluster_ip: "10.0.60.{{ inventory_index }}/24"
+    openstack_network_interface: openstack_mgmt
+    openstack_neutron_external_interface: veth1
+    openstack_kolla_internal_vip_address: 10.0.10.100
+    openstack_designate_forwarders_first_address: 8.8.8.8
+    openstack_designate_forwarders_second_address: 8.8.4.4
+    openstack_ceph_rgw_hosts: 
+      - host: "{{ lookup('ansible.builtin.pipe', 'hostname') }}"
+        ip: "{{ lookup('ansible.builtin.pipe', 'ip --json address show ceph_public | jq -r .[0].addr_info[0].local') }}"
+        port: 6780
+    openstack_worker_count: 1
+
+    openstack_public_network:
+      cidr: 192.168.1.0/24
+      gateway_ip: 192.168.1.1
+      allocation_start: 192.168.1.100
+      allocation_end: 192.168.1.200
 
   # groups and group vars
   children:

@@ -25,18 +25,18 @@ test $(echo "$fedora_image" | wc -l) -eq 1
 
 openstack image set --property os_distro=fedora-coreos $fedora_image
 
-ls ~/.ssh/id_rsa || ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
+ls ~/.ssh/id_rsa.pub || ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
 
 openstack keypair show testkey || openstack keypair create --public-key ~/.ssh/id_rsa.pub testkey
 
-openstack network show public || (openstack network show public1 && openstack network set --name public public1)
+#openstack network show public || (openstack network show public1 && openstack network set --name public public1)
 
 sleep 3
 
 openstack coe cluster template show k8s-cluster-template || openstack coe cluster template create k8s-cluster-template \
     --image $fedora_image \
     --keypair testkey \
-    --external-network public \
+    --external-network public1 \
     --dns-nameserver 8.8.8.8 \
     --flavor ds1G \
     --master-flavor ds2G \

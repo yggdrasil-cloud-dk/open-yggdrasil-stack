@@ -8,11 +8,7 @@ TAGS =
 
 # TODO: run in ansible so it runs on all nodes
 harden:
-	echo -e "#!/bin/sh\nset -xe" > /etc/rc.local
-	realpath scripts/hardening/* >> /etc/rc.local
-	chmod 755 /etc/rc.local
-	systemctl restart rc-local
-	systemctl enable rc-local
+	ansible-playbook ansible/harden.yml
 
 prepare-ansible:
 	mkdir -p /etc/ansible
@@ -68,7 +64,8 @@ openstack-client-install:
 	ansible-playbook ansible/client.yml -v
 
 openstack-resources-init:
-	scripts/openstack/init-resources.sh
+	ansible-playbook ansible/init_resources.yml -v
+	#scripts/openstack/init-resources.sh
 
 openstack-images-upload:
 	scripts/openstack/upload-images.sh
@@ -116,6 +113,9 @@ kollaansible-fromtag-deploy: kollaansible-prepare
 
 kollaansible-tags-reconfigure: kollaansible-prepare
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS) -v
+
+kollaansible-reconfigure: kollaansible-prepare
+	scripts/kolla-ansible/kolla-ansible.sh reconfigure -v
 
 kollaansible-destroy:
 	scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it

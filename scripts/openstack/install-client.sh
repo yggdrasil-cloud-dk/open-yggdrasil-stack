@@ -4,6 +4,9 @@
 
 set -xe
 
+
+OPENSTACK_RELEASE="${OPENSTACK_RELEASE:-2023.2}"
+
 # source venv
 cd workspace
 source kolla-venv/bin/activate
@@ -23,4 +26,5 @@ pip install -U -c https://releases.openstack.org/constraints/upper/$OPENSTACK_RE
   python-manilaclient \
   python-solumclient \
   python-zunclient \
+  python-octaviaclient \
   python-barbicanclient

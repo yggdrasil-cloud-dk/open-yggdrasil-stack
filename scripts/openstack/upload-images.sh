@@ -15,14 +15,16 @@ CONFIG_DIR=$(pwd)/etc/kolla
 # needs to be done manually for now due to EULA signature at
 # https://cloudbase.it/windows-cloud-images/#download
 
+bash -c "cd ../images; python3 -m http.server 8888" & 
+HTTP_PID=$!
 
 # upload ubuntu image
 image_urls=(
 	https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
 	https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/39.20240309.3.0/x86_64/fedora-coreos-39.20240309.3.0-openstack.x86_64.qcow2.xz
 	https://tarballs.opendev.org/openstack/trove/images/trove-master-guest-ubuntu-jammy.qcow2
-#	https://tarballs.opendev.org/openstack/trove/images/trove-zed-guest-ubuntu-focal.qcow2
 	http://localhost:8888/windows_server_2012_r2_standard_eval_kvm_20170321.qcow2.gz
+	https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
 	
 )
 
@@ -42,5 +44,7 @@ for image_url in ${image_urls[@]}; do
 		pipe_cmd="gunzip -cd"
 	fi
 	image_type=qcow2
-	openstack image show $image_name || curl $image_url --output - | $pipe_cmd | openstack image create $image_name --disk-format qcow2
+	openstack image show $image_name || (curl $image_url --output - || exit 1) | $pipe_cmd | openstack image create $image_name --disk-format qcow2
 done
+
+trap "kill $HTTP_PID" EXIT 

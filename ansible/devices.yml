@@ -77,65 +77,37 @@
       hostname:
         name: "{{ inventory_hostname }}"
 
-    - name: Configure hosts
-      copy: 
-        dest: /etc/hosts
-        content: |
-          127.0.0.1 localhost
+    # - name: Add entry in /etc/hosts
+    #   blockinfile:
+    #       state: present
+    #       dest: /etc/hosts
+    #       content: |
+    #         {% for host in groups.all %}
+    #         {{ host }}
+    #         {% endfor %}
 
-          # openstack mgmt ips
-          # {% for host in groups['deployment_nodes'] %}
-          # {{ hostvars[host].openstack_mgmt_ip | ansible.netcommon.ipaddr('address') }} {{ host }}
-          # {% endfor %}
+    # - name: Configure hosts
+    #   copy: 
+    #     dest: /etc/hosts
+    #     content: |
+    #       127.0.0.1 localhost
 
-    - name: Add netplan config file
+    #       # openstack mgmt ips
+    #       # {% for host in groups['deployment_nodes'] %}
+    #       # {{ hostvars[host].network_openstack_mgmt_ip | ansible.netcommon.ipaddr('address') }} {{ host }}
+    #       # {% endfor %}
+
+    - name: Add netplan overrides file
       copy:
-        dest: /etc/netplan/60-vlans.yaml
-        content: |
-          network:
-            version: 2
-            renderer: networkd
-            vlans:
-              # openstack management vlan
-              openstack_mgmt:
-                id: 10
-                link: {{ default_gateway_interface }}
-                addresses: [{{ openstack_mgmt_ip }}]
-              # ceph public vlan
-              ceph_public:
-                id: 50
-                link: {{ default_gateway_interface }}
-                addresses: [{{ ceph_public_ip }}]
-              # ceph cluster vlan
-              ceph_cluster:
-                id: 60
-                link: {{ default_gateway_interface }}
-                addresses: [{{ ceph_cluster_ip }}]
-      register: netplan_config_1
-
-    - name: Add netplan config file
-      copy:
-        dest: /etc/netplan/70-routes.yaml
-        content: |
-          network:
-            version: 2
-            renderer: networkd
-            ethernets:
-              {{ default_gateway_interface }}:
-                routes:
-                  - to: default
-                    via: {{ gateway_ip }}
-                  - to: {{ openstack_mgmt_ip | ansible.netcommon.ipaddr('network/prefix') }}
-                    via: {{ ansible_host }}
-                  - to: {{ ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}
-                    via: {{ ansible_host }}
-                  - to: {{ ceph_cluster_ip | ansible.netcommon.ipaddr('network/prefix') }}
-                    via: {{ ansible_host }}
-      register: netplan_config_2
+        dest: /etc/netplan/55-overrides.yaml
+        mode: 0700
+        content: "{{ network_netplan_overrides_file | to_nice_yaml }}"
+      when: network_netplan_overrides_file | length > 0
+      register: netplan_config_0
 
     - name: netplan apply
       command: netplan apply
-      when: netplan_config_1.changed or netplan_config_2.changed
+      when: netplan_config_0.changed | default(false)
 
     - name: Stop and disable NetworkManager
       systemd:
@@ -153,19 +125,21 @@
 
     - name: Run script to setup veth pair
       script: "{{ playbook_dir }}/../scripts/devices/veth_pair.sh"
-      when: dev
+      environment:
+        NETWORK_VETH_PAIR_GATEWAY: "{{ network_veth_pair_gateway }}"
+      when: network_create_veth_pair
 
     - name: Create cni directory for Zun
       command: mkdir -p /opt/cni/bin/
 
-    - name: Run internet connectivity script
-      script: "{{ playbook_dir }}/../scripts/devices/revive_internet.sh {{ default_gateway_interface }}"
+    #- name: Run internet connectivity script
+    #  script: "{{ playbook_dir }}/../scripts/devices/revive_internet.sh {{ network_default_gateway_interface }}"
 
     - name: Configure loop devices
       script: "{{ playbook_dir }}/../scripts/devices/loop.sh"
       args:
         creates: /root/loop_devices.done
-      when: dev
+      when: storage_create_loop_devices
 
 - name: Remove internet connectivity script and destroy loop devices
   hosts: deployment_nodes
@@ -176,4 +150,4 @@
   tasks:
     - name: Destroy devices
       script: "{{ playbook_dir }}/../scripts/devices/destroy.sh"
-      when: dev
+      when: storage_create_loop_devices

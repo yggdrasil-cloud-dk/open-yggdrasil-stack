@@ -31,13 +31,14 @@ fi
 
 kolla-genpwd -p $PW_FILE
 
+
 # set global configs
 set_global_config kolla_base_distro ubuntu
 set_global_config kolla_install_type source
 
-set_global_config network_interface openstack_mgmt
-set_global_config neutron_external_interface neutron_ext
-set_global_config kolla_internal_vip_address 10.38.1.131
+set_global_config network_interface $OPENSTACK_NETWORK_INTERFACE
+set_global_config neutron_external_interface $OPENSTACK_NEUTRON_EXTERNAL_INTERFACE
+set_global_config kolla_internal_vip_address $OPENSTACK_KOLLA_INTERNAL_VIP_ADDRESS
 
 set_global_config glance_backend_ceph yes
 set_global_config glance_backend_file no
@@ -60,16 +61,16 @@ set_global_config ceph_cinder_backup_user admin
 set_global_config enable_ceph_rgw yes
 
 set_global_config neutron_plugin_agent ovn
-set_global_config neutron_ovn_dhcp_agent yes
+#set_global_config neutron_ovn_dhcp_agent yes
 
 set_global_config designate_dnssec_validation no
 set_global_config designate_recursion yes
-set_global_config designate_forwarders_addresses '"10.30.54.14; 10.30.54.15"'
+set_global_config designate_forwarders_addresses "\"$OPENSTACK_DESIGNATE_FORWARDERS_FIRST_ADDRESS; $OPENSTACK_DESIGNATE_FORWARDERS_SECOND_ADDRESS\""
 
 set_global_config enable_aodh yes
 set_global_config enable_barbican yes
 set_global_config enable_ceilometer yes
-#set_global_config enable_central_logging yes  # takes lots of resources
+set_global_config enable_central_logging yes  # takes lots of resources
 set_global_config enable_cloudkitty yes
 set_global_config enable_designate yes  # broken in 2023.2 for some reason?
 set_global_config enable_freezer yes
@@ -99,12 +100,12 @@ set_global_config enable_watcher yes
 
 set_global_config octavia_provider_drivers '"amphora:Amphora provider, ovn:OVN provider"'
 
-set_global_config ceph_rgw_hosts "[ { 'host': '$(hostname)', 'ip': '$(ip --json address show ceph_public | jq -r .[0].addr_info[0].local)', 'port': 6780 } ]"
+set_global_config ceph_rgw_hosts "$OPENSTACK_CEPH_RGW_HOSTS"
 
 set_global_config nova_console novnc
 
-set_global_config openstack_service_workers '"1"'
-set_global_config openstack_service_rpc_workers '"1"'
+set_global_config openstack_service_workers "$OPENSTACK_WORKER_COUNT"
+set_global_config openstack_service_rpc_workers "$OPENSTACK_WORKER_COUNT"
 
 for service in glance nova cinder/cinder-volume cinder/cinder-backup; do
 	mkdir -p etc/kolla/config/$service/
@@ -166,4 +167,27 @@ mkdir -p etc/kolla/config/neutron/
 cat > etc/kolla/config/neutron/dhcp_agent.ini <<EOF
 [DEFAULT]
 dnsmasq_dns_servers = {{ 'api' | kolla_address }}
+EOF
+
+# glance
+config_dir=etc/kolla/config/glance
+mkdir -p $config_dir
+cat > $config_dir/glance-api.conf <<EOF
+[DEFAULT]
+show_image_direct_url = true
+EOF
+
+# nova
+config_dir=etc/kolla/config/nova
+mkdir -p $config_dir
+cat > $config_dir/nova-compute.conf <<EOF
+[glance]
+enable_rbd_download = true
+rbd_user = {{ ceph_glance_user }}
+rbd_pool = {{ ceph_glance_pool_name }}
+rbd_ceph_conf = /etc/ceph/ceph.conf
+rbd_connect_timeout = 5
+
+[libvirt]
+cpu_mode = host-passthrough
 EOF

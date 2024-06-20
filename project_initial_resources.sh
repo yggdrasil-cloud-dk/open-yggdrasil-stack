@@ -52,7 +52,7 @@ create_network_and_subnet $network $subnet_cidr $subnet_range
 
 router=$PROJECT.internal
 openstack router show $router || openstack router create $router --project $PROJECT
-openstack router set --external-gateway public $router
+openstack router set --external-gateway public1 $router
 attached_subnet_ids=$(openstack router show $router -f value -c interfaces_info | sed "s/'/\"/g" | jq -r .[].subnet_id)
 
 for subnet_name in $PROJECT.app $PROJECT.db $PROJECT.auth $PROJECT.msg $PROJECT.mgmt; do
@@ -139,7 +139,7 @@ openstack server list --project $PROJECT | grep -q $vm_name || (
     --network $PROJECT.mgmt \
     $vm_name -f value -c id --user-data /tmp/user_data.sh) && \
   openstack user delete $user && \
-  fip=$(openstack floating ip create public --project $PROJECT -f value -c floating_ip_address) && \
+  fip=$(openstack floating ip create public1 --project $PROJECT -f value -c floating_ip_address) && \
   openstack server add floating ip $vm_id $fip
 )
 

@@ -1,0 +1,14 @@
+---
+- name: Init openstack resources and public network
+  hosts: deployment_controller
+  any_errors_fatal: true
+  tasks:
+    - name: Install openstack client
+      script: "{{ playbook_dir }}/../scripts/openstack/init-resources.sh"
+      args:
+        chdir: "{{ playbook_dir }}/.."
+      environment:
+        EXT_NET_CIDR: "{{ openstack_public_network.cidr }}"
+        EXT_NET_GATEWAY: "{{ openstack_public_network.gateway_ip }}"
+        EXT_NET_RANGE: "start={{ openstack_public_network.allocation_start }},end={{ openstack_public_network.allocation_end }}"
+       
