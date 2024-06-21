@@ -16,6 +16,8 @@ image_name=$(openstack image list -f value -c Name | grep trove)
 openstack image set --private  \
     --tag trove --tag db2 --tag postgres --tag mysql $image_name
 
+openstack keypair show --user trove testkey || openstack keypair create --public-key ~/.ssh/id_rsa.pub --user trove testkey
+
 openstack datastore version show --datastore db2 11.5.0.0 || openstack datastore version create 11.5.0.0 db2 db2 "" \
     --image-tags trove,db2 \
     --active --default
