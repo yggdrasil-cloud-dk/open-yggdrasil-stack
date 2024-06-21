@@ -47,6 +47,8 @@ openstack coe cluster template show k8s-cluster-template || openstack coe cluste
     --coe kubernetes \
     --labels container_runtime=containerd,kube_tag=v1.25.9-rancher2,cloud_provider_enabled=true
 
+sleep 5
+
 openstack coe cluster create k8s-cluster \
     --cluster-template k8s-cluster-template \
      --node-count 1

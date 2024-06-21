@@ -3,7 +3,7 @@
   hosts: deployment_controller
   any_errors_fatal: true
   tasks:
-    - name: Install openstack client
+    - name: Initial openstack resources
       script: "{{ playbook_dir }}/../scripts/openstack/init-resources.sh"
       args:
         chdir: "{{ playbook_dir }}/.."
