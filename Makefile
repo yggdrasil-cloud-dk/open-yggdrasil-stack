@@ -47,11 +47,8 @@ kollaansible-upgrade-cloud:
 kollaansible-postdeploy:
 	scripts/kolla-ansible/kolla-ansible.sh post-deploy
 
-kollaansible-lma: 
-	scripts/lma/custom-exporter.sh
-	scripts/lma/ceph.sh
-	scripts/lma/grafana/import.sh
-	scripts/lma/prometheus-alerts/copy-rules.sh
+kollaansible-lma:
+	ansible-playbook ansible/lma.yml -v
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t prometheus
 
 prometheus-alerts:
@@ -79,7 +76,8 @@ symlink-etc-kolla:
 
 infra-up: harden prepare-ansible devices-configure cephadm-deploy
 
-kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
+#kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
+kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 
 kollaansible-upgrade: kollaansible-images kollaansible-prepare kollaansible-prechecks kollaansible-upgrade-cloud kollaansible-lma
 

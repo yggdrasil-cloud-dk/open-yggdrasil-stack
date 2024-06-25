@@ -24,6 +24,6 @@ for jsonfile_no_dashboard_key in $(find $dir -iname "*.json"); do
 
   dashboard_id=$(cat $dashboard_jsonfile | jq -r .dashboard.uid)
   
-  curl -fs http://admin:$admin_pass@10.38.1.131:3000/api/dashboards/uid/$dashboard_id -o /dev/null || curl http://admin:$admin_pass@10.38.1.131:3000/api/dashboards/import -X POST -H "Content-Type: application/json" -d @$dashboard_jsonfile
+  curl -fs http://admin:$admin_pass@$IP:3000/api/dashboards/uid/$dashboard_id -o /dev/null || curl http://admin:$admin_pass@$IP:3000/api/dashboards/import -X POST -H "Content-Type: application/json" -d @$dashboard_jsonfile
   
 done
