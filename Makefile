@@ -70,6 +70,18 @@ openstack-images-upload:
 symlink-etc-kolla:
 	ln -sfr workspace/etc/kolla/* /etc/kolla/
 
+openstack-octavia:
+	ansible-playbook ansible/octavia.yml -v
+
+openstack-magnum:
+	scripts/tests/magnum.sh
+
+openstack-manila:
+	scripts/tests/manila.sh
+
+openstack-trove-postgres:
+	scripts/tests/trove_postgres.sh
+
 ########
 # Util #
 ########
@@ -85,10 +97,10 @@ all-up: infra-up kollaansible-up
 
 all-upgrade: kollaansible-upgrade
 
-all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload symlink-etc-kolla
+openstack-services: openstack-octavia openstack-magnum  openstack-manila openstack-trove-postgres
 
-all-test:
-	scripts/tests/magnum.sh
+all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload symlink-etc-kolla  openstack-services
+
 
 # print vars
 print-%  : ; @echo $* = $($*)
