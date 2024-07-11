@@ -71,7 +71,7 @@
 
         [Service]
         Type=oneshot
-        ExecStart=/bin/bash -c 'ip r | grep -q ^10.1.0.0/24 || ip r add 10.1.0.0/24 via {{ openstack_octavia_mgmt_router_external_gateway_ip }}'
+        ExecStart=/bin/bash -c 'ip r | grep -q ^{{ openstack_amphora_subnet_cidr }} || ip r add {{ openstack_amphora_subnet_cidr }} via {{ openstack_octavia_mgmt_router_external_gateway_ip }}'
 
         [Install]
         WantedBy=default.target
