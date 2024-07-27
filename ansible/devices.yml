@@ -137,8 +137,6 @@
 
     - name: Configure loop devices
       script: "{{ playbook_dir }}/../scripts/devices/loop.sh"
-      args:
-        creates: /root/loop_devices.done
       environment:
         LOOP_DEVICE_SIZE_GB: "{{ storage_loop_device_size_gb }}"
       when: storage_create_loop_devices

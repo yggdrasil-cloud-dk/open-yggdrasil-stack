@@ -1,10 +1,10 @@
 #!/bin/bash
 
-set -xe
+set -x
 
 #TODO: this shouldn't be here. It needs to be done once when settup up host
 
-BACKEND_DEVICE=sdb
+BACKEND_DEVICE=vdb
 if (lsblk | grep -q $BACKEND_DEVICE) && (! mount | grep -q $BACKEND_DEVICE); then
 	
 	## format backend device
@@ -18,14 +18,14 @@ fi
 cd /mnt
 
 # create image files
-truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-2.img
-truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-1.img
-truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-0.img
+ls disk-2.img || truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-2.img
+ls disk-1.img || truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-1.img
+ls disk-0.img || truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-0.img
 
 # create loop devices
-losetup /dev/loop100 disk-0.img
-losetup /dev/loop101 disk-1.img
-losetup /dev/loop102 disk-2.img
+lsblk | grep -q loop100 || losetup /dev/loop100 disk-0.img
+lsblk | grep -q loop101 || losetup /dev/loop101 disk-1.img
+lsblk | grep -q loop102 || losetup /dev/loop102 disk-2.img
 
 # create pvs
 pvcreate /dev/loop100
@@ -61,3 +61,5 @@ systemctl daemon-reload
 systemctl enable loop-device
 
 touch /root/loop_devices.done
+
+exit 0
