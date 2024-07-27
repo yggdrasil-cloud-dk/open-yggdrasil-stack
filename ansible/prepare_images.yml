@@ -12,30 +12,10 @@
               apt-get -y install python3-dev default-libmysqlclient-dev build-essential pkg-config
               . /var/lib/kolla/venv/bin/activate
               pip install mysqlclient
-          - image: quay.io/openstack.kolla/neutron-server:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/neutron-metadata-agent:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/ceilometer-compute:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/ceilometer-notification:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/designate-backend-bind9:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/zun-compute:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/ceilometer-central:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/designate-worker:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/designate-sink:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/zun-cni-daemon:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/freezer-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/designate-producer:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/designate-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/designate-mdns:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/designate-central:{{ openstack_release }}-ubuntu-jammy
           - image: quay.io/openstack.kolla/freezer-scheduler:{{ openstack_release }}-ubuntu-jammy
             custom_cmds: |
               mkdir -p /etc/freezer/scheduler
               chown freezer:freezer /etc/freezer/scheduler
-          - image: quay.io/openstack.kolla/zun-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/zun-wsproxy:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/kuryr-libnetwork:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/murano-engine:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/murano-api:{{ openstack_release }}-ubuntu-jammy
           - image: quay.io/openstack.kolla/cloudkitty-processor:{{ openstack_release }}-ubuntu-jammy
             custom_cmds: |
               cat > /etc/cloudkitty/metrics.yml <<EOF
@@ -137,88 +117,14 @@
                     aggregation_method: mean
                     resource_type: ceph_account
               EOF
-          - image: quay.io/openstack.kolla/cloudkitty-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/manila-share:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/venus-manager:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/venus-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/octavia-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/octavia-driver-agent:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/manila-data:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/manila-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/manila-scheduler:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/octavia-housekeeping:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/octavia-worker:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/octavia-health-manager:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/barbican-keystone-listener:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/barbican-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/barbican-worker:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/trove-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/trove-taskmanager:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/skyline-console:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/trove-conductor:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/aodh-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/aodh-notifier:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/aodh-evaluator:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/aodh-listener:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/heat-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/heat-api-cfn:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/heat-engine:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/senlin-conductor:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/senlin-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/senlin-health-manager:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/senlin-engine:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/skyline-apiserver:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/watcher-applier:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/watcher-engine:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/watcher-api:{{ openstack_release }}-ubuntu-jammy
           - image: quay.io/openstack.kolla/magnum-api:{{ openstack_release }}-ubuntu-jammy
+            custom_cmds: |
+              pip uninstall -y magnum-cluster-api
           - image: quay.io/openstack.kolla/magnum-conductor:{{ openstack_release }}-ubuntu-jammy
             custom_cmds: |
               sed -i 's/\[Service\]/StartLimitIntervalSec=500\nStartLimitBurst=5\n[Service]\nRestart=on-failure\nRestartSec=5s/g' \
               /var/lib/kolla/venv/lib/python3.10/site-packages/magnum/drivers/common/templates/kubernetes/fragments/configure-etcd.sh
-          - image: quay.io/openstack.kolla/prometheus-libvirt-exporter:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/kolla-toolbox:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/mariadb-server:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/ovn-sb-db-server:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/ovn-controller:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/ovn-northd:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/ovn-nb-db-server:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/mariadb-clustercheck:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/openvswitch-db-server:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/prometheus-cadvisor:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/prometheus-mysqld-exporter:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/openvswitch-vswitchd:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/prometheus-openstack-exporter:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/prometheus-v2-server:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/prometheus-haproxy-exporter:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/prometheus-blackbox-exporter:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/prometheus-memcached-exporter:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/prometheus-node-exporter:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/prometheus-alertmanager:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/fluentd:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/influxdb:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/haproxy:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/rabbitmq:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/memcached:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/keepalived:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/cron:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/glance-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/nova-compute:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/cinder-volume:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/cinder-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/cinder-scheduler:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/nova-novncproxy:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/placement-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/nova-conductor:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/nova-ssh:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/nova-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/nova-scheduler:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/keystone-ssh:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/keystone-fernet:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/keystone:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/nova-libvirt:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/gnocchi-api:{{ openstack_release }}-ubuntu-jammy
-          - image: quay.io/openstack.kolla/gnocchi-metricd:{{ openstack_release }}-ubuntu-jammy
+              pip uninstall -y magnum-cluster-api
 
 
     - name: Pull latest ubuntu image as reference
