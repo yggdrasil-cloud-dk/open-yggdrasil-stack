@@ -7,7 +7,8 @@ CONFIG_DIR=etc/kolla
 # just sets `<key>: <value>` in globals.yml
 function set_global_config () {
 	config_key=$1
-	config_value=$2
+	config_value=$(echo "$2" | sed 's/\//\\\//g')  # escape any slash in value (e.g for a cidr)
+
 	# handles when comments only in beginning of line
 	if grep -q "#\? *$config_key:" $CONFIG_DIR/globals.yml; then
 		sed -i "s/#\?\( *$config_key:\).*/\1 $config_value/g" $CONFIG_DIR/globals.yml
