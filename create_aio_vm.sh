@@ -11,8 +11,6 @@ create_network_and_subnet () {
 	openstack subnet show $network || openstack subnet create $network --dns-nameserver 10.38.1.130  --allocation-pool ${subnet_range} --network $network --subnet-range ${subnet_cidr}
 }
 
-
-# app 
 network=aio_net
 subnet_cidr=192.168.100.0/24
 subnet_range="start=192.168.100.101,end=192.168.100.254"
@@ -39,41 +37,41 @@ openstack security group rule create $nsg --protocol icmp || true  # TODO: remov
 openstack security group rule create $nsg --protocol tcp || true  # TODO: remove
 openstack security group rule create $nsg --protocol udp || true  # TODO: remove
 
+# Flavor
 
-# aio
+openstack flavor show aio || openstack flavor create aio --private --ram 65536 --disk 300 --vcpus 16 
+
+# Volume
+
+openstack volume show aio-ceph || openstack volume create aio-ceph --size 300 
+
+# User-data
 
 cat > /tmp/user_data.sh <<EOF
 #!/bin/bash
 
 set -x
 
+# enable password ssh
 sed 's/.*PasswordAuthentication no/PasswordAuthentication yes/' -i /etc/ssh/sshd_config
 rm -rf /etc/ssh/sshd_config.d/*
-
 systemctl restart sshd
 
+# change password
 echo "ubuntu:ubuntu" | chpasswd
+
 EOF
 
-vm_name=$PROJECT.jump
-openstack server list --project $PROJECT | grep -q $vm_name || (
-  user=${PROJECT}.bot && \
-  password=$(echo $RANDOM | sha1sum | head -c 16) && \
-  openstack user create --password $password $user && \
-  openstack role add --user $user --project $PROJECT member && \
-  (openstack --os-username $user --os-password $password --os-project-name $PROJECT security group rule create default \
-  --protocol tcp || true) && \
-  (openstack --os-username $user --os-password $password --os-project-name $PROJECT security group rule create default \
-  --protocol udp || true) && \
-  vm_id=$(openstack --os-username $user --os-password $password --os-project-name $PROJECT server create \
+vm_name=aio
+openstack server show $vm_name || \
+openstack server create \
     --image jammy-server-cloudimg-amd64 \
-    --flavor m1.small \
-    --network $PROJECT.mgmt \
-    $vm_name -f value -c id --user-data /tmp/user_data.sh) && \
-  openstack user delete $user && \
-  fip=$(openstack floating ip create public --project $PROJECT -f value -c floating_ip_address) && \
-  openstack server add floating ip $vm_id $fip
-)
-
+    --flavor aio \
+    --network $network \
+    --user-data /tmp/user_data.sh \
+    $vm_name -f value -c id && \
+fip=$(openstack floating ip create public1 -f value -c floating_ip_address) && \
+openstack server add floating ip $vm_name $fip && \
+openstack server add volume $vm_name aio-ceph
 
 
