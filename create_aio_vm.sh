@@ -8,6 +8,7 @@ create_network_and_subnet () {
 	subnet_cidr=$2
 	subnet_range=$3
 	openstack network show $network || openstack network create $network
+  # create subnet with the same name as network
 	openstack subnet show $network || openstack subnet create $network --dns-nameserver 10.38.1.130  --allocation-pool ${subnet_range} --network $network --subnet-range ${subnet_cidr}
 }
 
@@ -19,13 +20,12 @@ create_network_and_subnet $network $subnet_cidr $subnet_range
 # Router
 
 router=aio_router
-openstack router show $router || openstack router create $router --project $PROJECT
-openstack router set --external-gateway public $router
+openstack router show $router || openstack router create $router
+openstack router set --external-gateway public1 $router
 attached_subnet_ids=$(openstack router show $router -f value -c interfaces_info | sed "s/'/\"/g" | jq -r .[].subnet_id)
 
-for subnet_name in $network; do
-	echo $attached_subnet_ids | grep -q $(openstack subnet show $subnet_name -f value -c id) || openstack router add subnet $router $subnet_name
-done
+subnet_name=$network
+echo $attached_subnet_ids | grep -q $(openstack subnet show $subnet_name -f value -c id) || openstack router add subnet $router $subnet_name
 
 
 # Security Groups
@@ -61,6 +61,8 @@ systemctl restart sshd
 echo "ubuntu:ubuntu" | chpasswd
 
 EOF
+
+# VM and Floating IP
 
 vm_name=aio
 openstack server show $vm_name || \
