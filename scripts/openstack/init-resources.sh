@@ -36,3 +36,5 @@ openstack network show public1  || \
 	openstack subnet create --no-dhcp --allocation-pool ${EXT_NET_RANGE} --network public1 --subnet-range ${EXT_NET_CIDR} --gateway ${EXT_NET_GATEWAY} public1-subnet )
 
 ./kolla-ansible/tools/init-runonce
+
+openstack router set --external-gateway public1 demo-router
