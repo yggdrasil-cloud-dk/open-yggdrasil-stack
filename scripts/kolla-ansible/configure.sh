@@ -126,7 +126,8 @@ EOF
 cat >  etc/kolla/config/trove.conf <<EOF
 [oslo_messaging_rabbit]
 rabbit_quorum_queue = false
-amqp_durable_queues = true
+rabbit_ha_queues = true
+amqp_durable_queues = false
 EOF
 mkdir -p etc/kolla/config/trove/
 cat >  etc/kolla/config/trove/trove-taskmanager.conf <<EOF
