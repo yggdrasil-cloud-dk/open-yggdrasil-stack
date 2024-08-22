@@ -71,7 +71,10 @@ symlink-etc-kolla:
 	ln -sfr workspace/etc/kolla/* /etc/kolla/
 
 openstack-octavia:
-	ansible-playbook ansible/octavia.yml -v
+	ansible-playbook ansible/openstack_initialize/octavia.yml -v
+
+openstack-rgw:
+	ansible-playbook ansible/openstack_initialize/rgw.yml -v
 
 openstack-magnum:
 	scripts/tests/magnum.sh
@@ -97,7 +100,7 @@ all-up: infra-up kollaansible-up
 
 all-upgrade: kollaansible-upgrade
 
-openstack-services: openstack-octavia openstack-magnum  openstack-manila openstack-trove-postgres
+openstack-services: openstack-octavia openstack-rgw openstack-magnum  openstack-manila openstack-trove-postgres
 
 all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload symlink-etc-kolla  openstack-services
 

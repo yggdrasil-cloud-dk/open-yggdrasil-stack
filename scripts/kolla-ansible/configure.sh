@@ -59,8 +59,6 @@ set_global_config enable_cinder_backup yes
 set_global_config ceph_cinder_backup_keyring client.admin.keyring
 set_global_config ceph_cinder_backup_user admin
 
-set_global_config enable_ceph_rgw yes
-
 set_global_config neutron_plugin_agent ovn
 set_global_config neutron_ovn_dhcp_agent yes
 
@@ -102,7 +100,9 @@ set_global_config enable_watcher yes
 set_global_config octavia_provider_drivers '"amphora:Amphora provider, ovn:OVN provider"'
 set_global_config octavia_amp_network_cidr $OPENSTACK_AMPHORA_SUBNET_CIDR
 
+set_global_config enable_ceph_rgw yes
 set_global_config ceph_rgw_hosts "$OPENSTACK_CEPH_RGW_HOSTS"
+set_global_config ceph_rgw_swift_account_in_url yes
 
 set_global_config nova_console novnc
 

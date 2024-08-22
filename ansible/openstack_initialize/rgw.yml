@@ -1,0 +1,29 @@
+- name: Configure RGW
+  hosts: deployment_controller
+  any_errors_fatal: true
+  tasks:
+    - name: Configure RGW
+      shell: |
+        #!/bin/bash
+
+        client_name=global
+
+        ceph config set $client_name rgw_keystone_api_version 3
+        ceph config set $client_name rgw_keystone_accepted_roles "admin,member"
+        ceph config set $client_name rgw_keystone_admin_user ceph_rgw
+        ceph config set $client_name rgw_keystone_admin_password $(grep -ir ceph_rgw /etc/kolla/passwords.yml | awk '{print $2}')
+        ceph config set $client_name rgw_keystone_admin_domain default
+        ceph config set $client_name rgw_keystone_admin_project service
+        ceph config set $client_name rgw_s3_auth_use_keystone true
+        ceph config set $client_name rgw_keystone_url $OS_AUTH_URL
+        ceph config set $client_name rgw_swift_account_in_url true
+
+        # this needs to be set for the local ip of the node
+        # ceph config set $client_name rgw_frontends "beast endpoint={{ network_ceph_public_ip | ansible.netcommon.ipaddr('address') }}:6780"
+
+- name: Restart RGW
+  hosts: deployment_nodes
+  any_errors_fatal: true
+  serial: 1
+  tasks:
+    - shell: sleep 10 && (systemctl | grep ceph-.*@rgw. | awk '{print $1}' | xargs systemctl restart)

@@ -20,6 +20,7 @@ pip install -U -c https://releases.openstack.org/constraints/upper/$OPENSTACK_RE
   python-cloudkittyclient \
   gnocchiclient \
   aodhclient \
+  python-swiftclient \
   python-neutronclient \
   python-designateclient \
   python-muranoclient \
