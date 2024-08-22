@@ -32,7 +32,7 @@ export ENABLE_EXT_NET=0
 
 #openstack network create --external --provider-physical-network physnet1 --provider-network-type vlan public1 --provider-segment 600
 openstack network show public1  || \
-	(openstack network create --external --provider-physical-network physnet1 --provider-network-type flat public1 && \
+	(openstack network create --share --provider-physical-network physnet1 --provider-network-type flat public1 && \
 	openstack subnet create --no-dhcp --allocation-pool ${EXT_NET_RANGE} --network public1 --subnet-range ${EXT_NET_CIDR} --gateway ${EXT_NET_GATEWAY} public1-subnet )
 
 ./kolla-ansible/tools/init-runonce
