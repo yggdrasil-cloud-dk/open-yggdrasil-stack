@@ -18,7 +18,7 @@ grep -q os02 ~/.ssh/config || cat >> ~/.ssh/config <<EOF
 
 # hetzner
 Host os01-hetzner
-    Hostname 138.201.130.112
+    Hostname 144.76.28.49
     User root
     ForwardAgent yes
 EOF
@@ -31,12 +31,12 @@ git clone git@bitbucket.org:mgindi/kolla-deploy.git && cd kolla-deploy
 
 4. Run script to setup remote server
 ```
-./setup_remote_os_server.sh os02
+./setup_remote_os_server.sh os01-hetzner
 ```
 
 5. Connect to remote server
 ```
-ssh os02
+ssh os01-hetzner
 ```
 
 ### On Remote Server: ###
