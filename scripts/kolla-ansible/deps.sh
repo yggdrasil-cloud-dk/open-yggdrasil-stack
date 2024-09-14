@@ -11,10 +11,10 @@ cd workspace
 apt update
 
 # install python and deps
-apt install -y python3-dev libffi-dev gcc libssl-dev python3-venv python3-pip
+apt install -y python3-dev libffi-dev gcc libssl-dev python3-venv python3-pip python3-openssl python3-docker
 
 # ensure pyopenssl and docker installed and updated
-pip install -U pyopenssl docker
+#pip install -U pyopenssl docker
 
 # create venv
 # NOTE: adding `--system-site-packages` because it needs python-apt module`

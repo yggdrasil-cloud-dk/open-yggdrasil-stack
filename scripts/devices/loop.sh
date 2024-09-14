@@ -28,6 +28,11 @@ set -x
 # change dir
 cd /mnt
 
+ls disk-0.img || truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-0.img
+ls disk-1.img || truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-1.img
+ls disk-2.img || truncate -s ${LOOP_DEVICE_SIZE_GB}G disk-2.img
+
+
 # create image files
 lsblk | grep -q loop100 || losetup /dev/loop100 disk-0.img
 lsblk | grep -q loop101 || losetup /dev/loop101 disk-1.img
@@ -74,6 +79,5 @@ systemctl daemon-reload
 systemctl restart loop-device
 systemctl enable loop-device
 
-touch /root/loop_devices.done
 
 exit 0

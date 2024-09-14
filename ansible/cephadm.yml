@@ -116,7 +116,7 @@
         set -e
         {% for device in storage_ceph_osd_devices -%}
           docker exec $(docker ps | grep ceph-.*-mon | awk '{print $1}') \
-            bash -c "ceph-volume lvm zap {{ device }} --destroy"
+            bash -c "ceph-volume lvm zap {{ device }}"
         {% endfor %}
       delegate_to: "{{ item }}"
       loop: "{{ groups['deployment_nodes'] }}"
