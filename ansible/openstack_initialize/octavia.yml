@@ -52,7 +52,7 @@
         openstack router set --disable-snat --external-gateway public1 --fixed-ip subnet=public1-subnet,ip-address=$lb_mgmt_router_external_gatway_ip lb-mgmt-router
         
       args:
-        chdir: "{{ playbook_dir }}/.."
+        chdir: "{{ playbook_dir }}/../.."
         executable: /bin/bash
 
 - name: Setup octavia routes
