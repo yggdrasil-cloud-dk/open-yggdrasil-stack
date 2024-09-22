@@ -18,10 +18,11 @@
         ceph config set $client_name rgw_keystone_url $OS_AUTH_URL
         ceph config set $client_name rgw_swift_account_in_url true
 
-        # this needs to be set for the local ip of the node. It'll work for only aio
-        {% if groups["deployment_nodes"] | length == 1 %}
+        # TODO: Fix for when no an aio
+        {% if (groups['deployment_nodes'] | length) == 1 %}
         ceph config set $client_name rgw_frontends "beast endpoint={{ network_ceph_public_ip | ansible.netcommon.ipaddr('address') }}:6780"
         {% endif %}
+
 - name: Restart RGW
   hosts: deployment_nodes
   any_errors_fatal: true
