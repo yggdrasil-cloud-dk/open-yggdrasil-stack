@@ -55,6 +55,7 @@ test \$(lvscan | grep "/dev/vg-0/lv-0\|/dev/vg-1/lv-1\|/dev/vg-2/lv-2" | wc -l) 
 	lvcreate -n lv-1 -l 100%FREE vg-1
 	lvcreate -n lv-2 -l 100%FREE vg-2
 )
+vgchange -ay
 exit 0
 
 EOF
