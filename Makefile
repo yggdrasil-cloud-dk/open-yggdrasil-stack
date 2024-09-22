@@ -41,7 +41,7 @@ kollaansible-prechecks:
 kollaansible-deploy:
 	scripts/kolla-ansible/kolla-ansible.sh deploy
 
-kollaansible-upgrade-cloud:
+kollaansible-upgrade:
 	scripts/kolla-ansible/kolla-ansible.sh upgrade
 
 kollaansible-postdeploy:
@@ -94,7 +94,7 @@ infra-up: harden prepare-ansible devices-configure cephadm-deploy
 #kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 
-kollaansible-upgrade: kollaansible-images kollaansible-prepare kollaansible-prechecks kollaansible-upgrade-cloud kollaansible-lma
+kollaansible-up-upgrade: kollaansible-images kollaansible-prepare kollaansible-prechecks kollaansible-upgrade kollaansible-lma
 
 all-up: infra-up kollaansible-up
 
@@ -117,6 +117,9 @@ print-tags:
 
 kollaansible-tags-deploy: kollaansible-prepare
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $(TAGS)
+
+kollaansible-tags-upgrade: kollaansible-prepare
+	scripts/kolla-ansible/kolla-ansible.sh upgrade -t $(TAGS)
 
 # Set single tag
 kollaansible-fromtag-deploy: kollaansible-prepare
