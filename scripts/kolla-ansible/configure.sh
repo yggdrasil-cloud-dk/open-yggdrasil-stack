@@ -79,7 +79,7 @@ set_global_config enable_kuryr yes
 set_global_config enable_magnum yes
 set_global_config enable_manila yes
 set_global_config enable_manila_backend_generic yes
-set_global_config enable_masakari yes
+#set_global_config enable_masakari yes  # hacluster must be enabled - but this is an aio
 set_global_config enable_mistral yes
 #set_global_config enable_murano yes  # broken in 2023.2 for some reason
 set_global_config enable_neutron_vpnaas yes
@@ -96,6 +96,8 @@ set_global_config enable_venus yes
 #set_global_config enable_vitrage yes
 set_global_config enable_watcher yes
 #set_global_config enable_zun yes  # not supported in 2023.2
+
+#set_global_config magnum_tag zed-ubuntu-jammy
 
 set_global_config octavia_provider_drivers '"amphora:Amphora provider, ovn:OVN provider"'
 set_global_config octavia_amp_network_cidr $OPENSTACK_AMPHORA_SUBNET_CIDR
@@ -126,8 +128,8 @@ EOF
 cat >  etc/kolla/config/trove.conf <<EOF
 [oslo_messaging_rabbit]
 rabbit_quorum_queue = false
-rabbit_ha_queues = true
 amqp_durable_queues = false
+rabbit_ha_queues = true
 EOF
 mkdir -p etc/kolla/config/trove/
 cat >  etc/kolla/config/trove/trove-taskmanager.conf <<EOF
@@ -181,6 +183,11 @@ show_image_direct_url = true
 EOF
 
 # nova
+cat >  etc/kolla/config/nova.conf <<EOF
+[DEFAULT]
+cpu_allocation_ratio = 16.0
+ram_allocation_ratio = 5.0
+EOF
 config_dir=etc/kolla/config/nova
 mkdir -p $config_dir
 cat > $config_dir/nova-compute.conf <<EOF
