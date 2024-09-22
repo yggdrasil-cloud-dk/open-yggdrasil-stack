@@ -4,17 +4,15 @@ set -xe
 # Networks & Subnets
 
 create_network_and_subnet () {
-	network=$1
 	subnet_cidr=$2
 	subnet_range=$3
-	openstack network show $network || openstack network create $network
-  # create subnet with the same name as network
-	openstack subnet show $network || openstack subnet create $network --dns-nameserver 10.38.1.130  --allocation-pool ${subnet_range} --network $network --subnet-range ${subnet_cidr}
+	openstack network show aio_net || openstack network create aio_net
+	openstack subnet show aio_subnet || openstack subnet create aio_subnet --dns-nameserver 8.8.8.8  --allocation-pool ${subnet_range} --network $network --subnet-range ${subnet_cidr}
 }
 
 network=aio_net
-subnet_cidr=192.168.100.0/24
-subnet_range="start=192.168.100.101,end=192.168.100.254"
+subnet_cidr=172.16.0.0/24
+subnet_range="start=172.16.0.101,end=172.16.0.254"
 create_network_and_subnet $network $subnet_cidr $subnet_range
 
 # Router
@@ -24,7 +22,7 @@ openstack router show $router || openstack router create $router
 openstack router set --external-gateway public1 $router
 attached_subnet_ids=$(openstack router show $router -f value -c interfaces_info | sed "s/'/\"/g" | jq -r .[].subnet_id)
 
-subnet_name=$network
+subnet_name=aio_subnet
 echo $attached_subnet_ids | grep -q $(openstack subnet show $subnet_name -f value -c id) || openstack router add subnet $router $subnet_name
 
 
@@ -39,7 +37,13 @@ openstack security group rule create $nsg --protocol udp || true  # TODO: remove
 
 # Flavor
 
-openstack flavor show aio || openstack flavor create aio --private --ram 65536 --disk 300 --vcpus 16 
+total_cpus=$(lscpu | grep "^CPU(s)" | awk '{print $2}')
+needed_cpus=16
+
+vcpus=$total_cpus
+if [ $needed_cpus -lt $total_cpus ]; then vcpus=$needed_cpus; fi
+
+openstack flavor show aio || openstack flavor create aio --private --project admin --ram 65536 --disk 300 --vcpus $vcpus
 
 # Volume
 
@@ -65,7 +69,7 @@ EOF
 # VM and Floating IP
 
 vm_name=aio
-openstack server show $vm_name || \
+openstack server show $vm_name || ( \
 openstack server create \
     --image jammy-server-cloudimg-amd64 \
     --flavor aio \
@@ -73,7 +77,9 @@ openstack server create \
     --user-data /tmp/user_data.sh \
     $vm_name -f value -c id && \
 fip=$(openstack floating ip create public1 -f value -c floating_ip_address) && \
+sleep 5 && \
 openstack server add floating ip $vm_name $fip && \
 openstack server add volume $vm_name aio-ceph
+)
 
 
