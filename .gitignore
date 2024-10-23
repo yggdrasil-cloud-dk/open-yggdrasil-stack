@@ -56,3 +56,6 @@ workspace
 
 # sahara repo
 sahara-images/sahara-image-elements
+
+# ignore images
+images/

@@ -77,7 +77,7 @@ openstack server create \
     --user-data /tmp/user_data.sh \
     $vm_name -f value -c id && \
 fip=$(openstack floating ip create public1 -f value -c floating_ip_address) && \
-sleep 5 && \
+sleep 30 && \
 openstack server add floating ip $vm_name $fip && \
 openstack server add volume $vm_name aio-ceph
 )

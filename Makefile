@@ -91,8 +91,8 @@ openstack-trove-postgres:
 
 infra-up: harden prepare-ansible devices-configure cephadm-deploy
 
-#kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
-kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
+kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
+#kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 
 kollaansible-up-upgrade: kollaansible-images kollaansible-prepare kollaansible-prechecks kollaansible-upgrade kollaansible-lma
 

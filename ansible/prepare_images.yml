@@ -137,7 +137,8 @@
       shell: |
         set -xe
         docker inspect {{ item.image }} 2>/dev/null 1>&2 || docker pull {{ item.image }}
-        test -z $(docker images {{ item.image }} --filter since=ubuntu:latest --format {% raw %}"{{ .ID }}"{% endraw %}) && docker pull {{ item.image }} || exit 0
+        docker pull {{ item.image }}
+        #test -z $(docker images {{ item.image }} --filter since=ubuntu:latest --format {% raw %}"{{ .ID }}"{% endraw %}) && docker pull {{ item.image }} || exit 0
       register: docker_pull
       changed_when: ("Downloaded newer image" in docker_pull.stdout)
       loop: "{{ images }}"
@@ -154,5 +155,5 @@
       when:
         - item.item.custom_cmds is defined
         - item.item.custom_cmds | length > 0
-        - item.changed
+        - True
  
