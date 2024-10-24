@@ -74,8 +74,13 @@ index 5041d00..1a70399 100644
 +            "vnc_bind_address": "0.0.0.0",
              "qemuargs": [ [ "-cdrom", "{{user `virtio_iso_path`}}" ] ],' > /tmp/packer.diff
 
-# taken from https://github.com/eaksel/packer-Win2022
+# windows
 git clone https://github.com/eaksel/packer-Win2022.git
+
+# ubuntu
+git clone https://github.com/rlaun/packer-ubuntu-22.04/
+# TODO: Get this working
+
 cd packer-Win2022
 
 # apply patch
