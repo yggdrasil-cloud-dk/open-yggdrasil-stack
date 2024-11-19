@@ -15,37 +15,36 @@
 
         CONFIG_DIR=$(pwd)/etc/kolla
 
-        image=octavia-amphora-haproxy-{{ openstack_release }}
-
-        rm -f $image.qcow2.CHECKSUM*
-        wget https://swift.services.a.regiocloud.tech/swift/v1/AUTH_b182637428444b9aa302bb8d5a5a418c/openstack-octavia-amphora-image/$image.qcow2.CHECKSUM
-
-        ls $image.qcow2 && test "$(sha256sum $image.qcow2)" == "$(cat $image.qcow2.CHECKSUM)" && echo image downloaded || wget https://swift.services.a.regiocloud.tech/swift/v1/AUTH_b182637428444b9aa302bb8d5a5a418c/openstack-octavia-amphora-image/$image.qcow2
-
         # source admin rc
         . $CONFIG_DIR/admin-openrc.sh
 
-        apt install -y qemu-utils
+        image=octavia-amphora-haproxy-{{ openstack_release }}
 
-        qemu-img convert $image.qcow2 $image.raw
+        rm -f $image.qcow2.CHECKSUM*
 
-        openstack image list -f value | grep -i amphora || openstack image create $image \
-          --progress \
-          --container-format bare \
-          --disk-format raw \
-          --private \
-          --tag amphora \
-          --file $image.raw \
-          --property hw_architecture='x86_64' \
-          --property hw_rng_model=virtio \
-          --project service
-
-        rm -f $image.qcow2 $image.raw
+        openstack image list -f value | grep -i amphora || (
+          wget https://swift.services.a.regiocloud.tech/swift/v1/AUTH_b182637428444b9aa302bb8d5a5a418c/openstack-octavia-amphora-image/$image.qcow2
+          apt install -y qemu-utils
+          qemu-img convert $image.qcow2 $image.raw
+          openstack image create $image \
+            --progress \
+            --container-format bare \
+            --disk-format raw \
+            --private \
+            --tag amphora \
+            --file $image.raw \
+            --property hw_architecture='x86_64' \
+            --property hw_rng_model=virtio \
+            --project service
+          rm -f $image.qcow2 $image.raw
+        )
 
         lb_mgmt_router_external_gatway_ip={{ openstack_octavia_mgmt_router_external_gateway_ip }}
 
+        openstack subnet show lb-mgmt-subnet || openstack subnet create lb-mgmt-subnet --network lb-mgmt-net --subnet-range {{ openstack_amphora_subnet_cidr }}
+
         # set gateway on octavia management network
-        openstack subnet set --gateway 10.1.0.1 lb-mgmt-subnet
+        openstack subnet set --gateway {{ openstack_amphora_router_gateway_ip }} lb-mgmt-subnet
 
         # create router and to make it reachable from octavia worker
         openstack router show lb-mgmt-router || (openstack router create lb-mgmt-router && openstack router add subnet lb-mgmt-router lb-mgmt-subnet)
@@ -64,7 +63,7 @@
         service=octavia-mgmt-route.service
         unit_file=/etc/systemd/system/$service
 
-        test -e $unit_file || cat > $unit_file << EOF
+        cat > $unit_file <<EOF
         [Unit]
         Description=Add static route for octavia mgmt network
         After=network.target

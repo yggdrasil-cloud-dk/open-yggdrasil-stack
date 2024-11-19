@@ -14,7 +14,9 @@ git clone --branch stable/$OPENSTACK_RELEASE https://github.com/openstack/kolla-
 
 # apply patch and setup
 cd kolla-ansible
-git apply --reject --whitespace=fix ../../kolla-ansible.patch
+if [[ -s ../../kolla-ansible.patch ]]; then
+  git apply --reject --whitespace=fix ../../kolla-ansible.patch
+fi
 python3 setup.py develop
 cd ..
 

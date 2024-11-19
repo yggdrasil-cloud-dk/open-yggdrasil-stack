@@ -7,13 +7,13 @@ TAGS =
 #########
 
 # TODO: run in ansible so it runs on all nodes
-harden:
-	ansible-playbook ansible/harden.yml
-
 prepare-ansible:
 	mkdir -p /etc/ansible
 	ln -sfr ansible/inventory/hosts /etc/ansible/hosts
 	ln -sfr ansible/ansible.cfg /etc/ansible/ansible.cfg
+
+harden:
+	ansible-playbook ansible/harden.yml
 
 devices-configure:
 	ansible-playbook ansible/devices.yml
@@ -89,7 +89,7 @@ openstack-trove-postgres:
 # Util #
 ########
 
-infra-up: harden prepare-ansible devices-configure cephadm-deploy
+infra-up: prepare-ansible harden devices-configure cephadm-deploy
 
 kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 #kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma

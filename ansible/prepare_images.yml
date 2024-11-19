@@ -12,10 +12,10 @@
               apt-get -y install python3-dev default-libmysqlclient-dev build-essential pkg-config
               . /var/lib/kolla/venv/bin/activate
               pip install mysqlclient
-          - image: quay.io/openstack.kolla/freezer-scheduler:{{ openstack_release }}-ubuntu-jammy
-            custom_cmds: |
-              mkdir -p /etc/freezer/scheduler
-              chown freezer:freezer /etc/freezer/scheduler
+ #         - image: quay.io/openstack.kolla/freezer-scheduler:{{ openstack_release }}-ubuntu-jammy
+ #           custom_cmds: |
+ #             mkdir -p /etc/freezer/scheduler
+ #             chown freezer:freezer /etc/freezer/scheduler
           - image: quay.io/openstack.kolla/cloudkitty-processor:{{ openstack_release }}-ubuntu-jammy
             custom_cmds: |
               cat > /etc/cloudkitty/metrics.yml <<EOF
@@ -127,18 +127,11 @@
               pip uninstall -y magnum-cluster-api
 
 
-    - name: Pull latest ubuntu image as reference
-      command: docker pull ubuntu:latest
-      register: docker_pull
-      changed_when: ("Image is up to date" not in docker_pull.stdout)
-
     # pull images only if doesn't exist or older than ubuntu:latest
     - name: Pull images
       shell: |
         set -xe
-        docker inspect {{ item.image }} 2>/dev/null 1>&2 || docker pull {{ item.image }}
-        docker pull {{ item.image }}
-        #test -z $(docker images {{ item.image }} --filter since=ubuntu:latest --format {% raw %}"{{ .ID }}"{% endraw %}) && docker pull {{ item.image }} || exit 0
+        docker inspect {{ item.image }} || docker pull {{ item.image }}
       register: docker_pull
       changed_when: ("Downloaded newer image" in docker_pull.stdout)
       loop: "{{ images }}"
@@ -146,11 +139,11 @@
     - name: Customize images
       shell: |
         set -xe
-        docker rm -f tmp_build || true
-        docker run --network host -u root --name tmp_build {{ item.item.image }} bash -c "set -xe; {{ item.item.custom_cmds }}" || (docker rm -f tmp_build; exit 1)
+        docker rm -f tmp_build 2>/dev/null || true
+        docker run --network host -u root --name tmp_build {{ item.item.image }} bash -c "set -xe; ls customize.done || ( {{ item.item.custom_cmds }} ); touch customize.done" || (docker rm -f tmp_build; exit 1)
         docker commit -c 'ENTRYPOINT ["dumb-init", "--"]' -c 'CMD ["kolla_start"]' tmp_build {{ item.item.image }}
         sleep 1
-        docker rm -f tmp_buld || true
+        docker rm -f tmp_buld 2>/dev/null || true
       loop: "{{ docker_pull.results }}"
       when:
         - item.item.custom_cmds is defined

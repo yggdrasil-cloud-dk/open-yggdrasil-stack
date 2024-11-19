@@ -61,6 +61,7 @@ set_global_config ceph_cinder_backup_user admin
 
 set_global_config neutron_plugin_agent ovn
 set_global_config neutron_ovn_dhcp_agent yes
+set_global_config neutron_dns_domain "xyz.local."
 
 set_global_config designate_dnssec_validation no
 set_global_config designate_recursion yes
@@ -105,6 +106,7 @@ set_global_config octavia_amp_network_cidr $OPENSTACK_AMPHORA_SUBNET_CIDR
 set_global_config enable_ceph_rgw yes
 set_global_config ceph_rgw_hosts "$OPENSTACK_CEPH_RGW_HOSTS"
 set_global_config ceph_rgw_swift_account_in_url yes
+set_global_config ceph_rgw_swift_compatibility yes
 
 set_global_config nova_console novnc
 
@@ -128,11 +130,15 @@ EOF
 cat >  etc/kolla/config/trove.conf <<EOF
 [oslo_messaging_rabbit]
 rabbit_quorum_queue = false
-amqp_durable_queues = false
+amqp_durable_queues = true
 rabbit_ha_queues = true
 EOF
 mkdir -p etc/kolla/config/trove/
 cat >  etc/kolla/config/trove/trove-taskmanager.conf <<EOF
+[oslo_messaging_rabbit]
+rabbit_quorum_queue = true
+rabbit_ha_queues = false
+
 [DEFAULT]
 nova_keypair = testkey
 EOF
