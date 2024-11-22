@@ -18,6 +18,7 @@ dpkg -i clamav-$CLAMAV_VERSION.linux.x86_64.deb
 # symlink newer binaries 
 ln -sf /usr/local/bin/*clam* /usr/bin/
 ln -sf /usr/local/sbin/*clam* /usr/sbin/
+ln -sf /etc/clamav/* /usr/local/etc/
 
 ensure_config_line_added () {
   line=$1

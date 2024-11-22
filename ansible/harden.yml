@@ -27,7 +27,7 @@
           {{ file }}
           {% endfor %}
 
-    - name: Enable docker service
+    - name: Enable rc.local service
       systemd:
         name: rc-local
         state: restarted
