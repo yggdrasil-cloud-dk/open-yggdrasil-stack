@@ -27,7 +27,7 @@ pipelines:
         deployment: staging
         script:
           - echo "Your deployment to staging script goes here..."
-          - echo "TEST_SECRET is "$TEST_SECRET"
+          - echo "TEST_SECRET is $TEST_SECRET"
           - expr 10 / $MY_HIDDEN_NUMBER
     - step:
         name: 'Deployment to Production'
