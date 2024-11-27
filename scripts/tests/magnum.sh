@@ -33,7 +33,9 @@ openstack keypair show testkey || openstack keypair create --public-key ~/.ssh/i
 
 sleep 3
 
-openstack coe cluster template show k8s-cluster-template || openstack coe cluster template create k8s-cluster-template \
+suffix=${RANDOM}
+
+openstack coe cluster template create k8s-cluster-template-$suffix \
     --image $fedora_image \
     --keypair testkey \
     --external-network public1 \
@@ -42,14 +44,11 @@ openstack coe cluster template show k8s-cluster-template || openstack coe cluste
     --master-flavor ds2G \
     --docker-volume-size 5 \
     --volume-driver cinder \
-    --network-driver flannel \
+    --network-driver calico \
     --docker-storage-driver overlay2 \
     --coe kubernetes \
-    --labels kube_tag=v1.26.8-rancher1,flannel_tag=v0.21.5,master_lb_floating_ip_enabled=true,cinder_csi_enabled=true,ingress_controller=octavia,container_runtime=containerd,containerd_version=1.6.20,containerd_tarball_sha256=1d86b534c7bba51b78a7eeb1b67dd2ac6c0edeb01c034cc5f590d5ccd824b416,cloud_provider_tag=v1.26.3,cinder_csi_plugin_tag=v1.26.3,k8s_keystone_auth_tag=v1.26.3,octavia_ingress_controller_tag=v1.26.3,coredns_tag=1.10.1,csi_snapshotter_tag=v6.2.1,csi_attacher_tag=v4.2.0,csi_resizer_tag=v1.7.0,csi_provisioner_tag=v3.4.1,csi_node_driver_registrar_tag=v2.8.0
+    --labels kube_tag=v1.27.8-rancher2,container_runtime=containerd,containerd_version=1.6.28,containerd_tarball_sha256=f70736e52d61e5ad225f4fd21643b5ca1220013ab8b6c380434caeefb572da9b,cloud_provider_tag=v1.27.3,cinder_csi_plugin_tag=v1.27.3,k8s_keystone_auth_tag=v1.27.3,magnum_auto_healer_tag=v1.27.3,octavia_ingress_controller_tag=v1.27.3,calico_tag=v3.26.4
 
-
-sleep 5
-
-openstack coe cluster create k8s-cluster \
-    --cluster-template k8s-cluster-template \
-     --node-count 1
+openstack coe cluster create k8s-cluster-$suffix \
+    --cluster-template k8s-cluster-template-$suffix \
+    --node-count 1

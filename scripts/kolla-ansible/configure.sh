@@ -105,8 +105,8 @@ set_global_config octavia_amp_network_cidr $OPENSTACK_AMPHORA_SUBNET_CIDR
 
 set_global_config enable_ceph_rgw yes
 set_global_config ceph_rgw_hosts "$OPENSTACK_CEPH_RGW_HOSTS"
-set_global_config ceph_rgw_swift_account_in_url yes
-set_global_config ceph_rgw_swift_compatibility yes
+set_global_config ceph_rgw_swift_account_in_url yes  # used to namespace per project with "AUTH_%(project_id)s"
+set_global_config ceph_rgw_swift_compatibility no  # this is used to add "/swift/" in url, to distinguish from s3
 
 set_global_config nova_console novnc
 

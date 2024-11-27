@@ -120,18 +120,19 @@
           - image: quay.io/openstack.kolla/magnum-api:{{ openstack_release }}-ubuntu-jammy
             custom_cmds: |
               pip uninstall -y magnum-cluster-api
+              pip install -U oslo.db==14.1.0
           - image: quay.io/openstack.kolla/magnum-conductor:{{ openstack_release }}-ubuntu-jammy
             custom_cmds: |
               sed -i 's/\[Service\]/StartLimitIntervalSec=500\nStartLimitBurst=5\n[Service]\nRestart=on-failure\nRestartSec=5s/g' \
               /var/lib/kolla/venv/lib/python3.10/site-packages/magnum/drivers/common/templates/kubernetes/fragments/configure-etcd.sh
               pip uninstall -y magnum-cluster-api
-
+              pip install -U oslo.db==14.1.0
 
     # pull images only if doesn't exist or older than ubuntu:latest
     - name: Pull images
       shell: |
         set -xe
-        docker inspect {{ item.image }} || docker pull {{ item.image }}
+        docker inspect {{ item.image }} >/dev/null  || docker pull {{ item.image }}
       register: docker_pull
       changed_when: ("Downloaded newer image" in docker_pull.stdout)
       loop: "{{ images }}"
@@ -140,13 +141,20 @@
       shell: |
         set -xe
         docker rm -f tmp_build 2>/dev/null || true
-        docker run --network host -u root --name tmp_build {{ item.item.image }} bash -c "set -xe; ls customize.done || ( {{ item.item.custom_cmds }} ); touch customize.done" || (docker rm -f tmp_build; exit 1)
-        docker commit -c 'ENTRYPOINT ["dumb-init", "--"]' -c 'CMD ["kolla_start"]' tmp_build {{ item.item.image }}
-        sleep 1
-        docker rm -f tmp_buld 2>/dev/null || true
+        docker run -it -d --network host -u root --name tmp_build {{ item.item.image }} bash
+        docker exec tmp_build bash -c "set -xe; (ls customize.done && touch do_not_commit) || ( {{ item.item.custom_cmds }} ) && touch customize.done" || (docker rm -f tmp_build; exit 1)
+        docker exec tmp_build ls do_not_commit || docker commit -c 'ENTRYPOINT ["dumb-init", "--"]' -c 'CMD ["kolla_start"]' tmp_build {{ item.item.image }}
       loop: "{{ docker_pull.results }}"
+      register: customize_images
+      changed_when: '"docker commit" in customize_images.stderr'
       when:
         - item.item.custom_cmds is defined
         - item.item.custom_cmds | length > 0
-        - True
- 
+         
+    # Doesn't work part of shell above..
+    - name: Delete tmp build 
+      shell: |
+        docker rm -f tmp_build
+      failed_when: false
+      changed_when: false
+      

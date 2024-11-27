@@ -16,7 +16,8 @@
         ceph config set $client_name rgw_keystone_admin_project service
         ceph config set $client_name rgw_s3_auth_use_keystone true
         ceph config set $client_name rgw_keystone_url $OS_AUTH_URL
-        ceph config set $client_name rgw_swift_account_in_url true
+        ceph config set $client_name rgw_swift_account_in_url true  # used to namespace per project with "AUTH_%(project_id)s"
+        ceph config set $client_name rgw_swift_url_prefix swift  # this is used to add "/swift" in url, to distinguish from s3
 
         # TODO: Fix for when no an aio
         {% if (groups['deployment_nodes'] | length) == 1 %}

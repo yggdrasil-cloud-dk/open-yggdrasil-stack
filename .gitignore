@@ -59,3 +59,6 @@ sahara-images/sahara-image-elements
 
 # ignore images
 images/
+
+# ignore kubernetes config from magnum
+./config
