@@ -62,3 +62,6 @@ images/
 
 # ignore kubernetes config from magnum
 ./config
+
+# ignore vagrant files
+./vagrant/.vagrant
