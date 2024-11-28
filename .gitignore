@@ -64,4 +64,4 @@ images/
 ./config
 
 # ignore vagrant files
-./vagrant/.vagrant
+vagrant/.vagrant/

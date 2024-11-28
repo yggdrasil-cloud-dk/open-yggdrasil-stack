@@ -1,18 +1,30 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-vagrant_box = "generic/ubuntu2204"
-
 Vagrant.configure("2") do |config|
     
+  config.vm.box = "generic/ubuntu2204"
+  
+  # script
+  $script = <<-SCRIPT
+  echo I am provisioning...
+  SCRIPT
+
   config.vm.define "hyper01" do |hyper01|
-    hyper01.vm.box = vagrant_box
+    hyper01.vm.provider :libvirt do |domain|
+      domain.memory = 1024
+      domain.cpus = 2
+    end
+    hyper01.vm.provision "shell", inline: $script
   end
   
   config.vm.define "hyper02" do |hyper02|
-    hyper02.vm.box = vagrant_box
+    hyper02.vm.provider :libvirt do |domain|
+      domain.memory = 1024
+      domain.cpus = 2
+    end
   end
   
 end
 
-system('vagrant ssh-config > ~/.ssh/config')
+#system('vagrant ssh-config > ~/.ssh/config')
