@@ -120,15 +120,12 @@
           - image: quay.io/openstack.kolla/magnum-api:{{ openstack_release }}-ubuntu-jammy
             custom_cmds: |
               pip uninstall -y magnum-cluster-api
-              pip install -U oslo.db==14.1.0
           - image: quay.io/openstack.kolla/magnum-conductor:{{ openstack_release }}-ubuntu-jammy
             custom_cmds: |
               sed -i 's/\[Service\]/StartLimitIntervalSec=500\nStartLimitBurst=5\n[Service]\nRestart=on-failure\nRestartSec=5s/g' \
               /var/lib/kolla/venv/lib/python3.10/site-packages/magnum/drivers/common/templates/kubernetes/fragments/configure-etcd.sh
               pip uninstall -y magnum-cluster-api
-              pip install -U oslo.db==14.1.0
 
-    # pull images only if doesn't exist or older than ubuntu:latest
     - name: Pull images
       shell: |
         set -xe
