@@ -51,7 +51,7 @@ ansible-galaxy collection install ansible.netcommon:2.5.1
 echo "set -g history-limit 10000" > ~/.tmux.conf
 echo "set paste" > ~/.vimrc
 echo '#!/bin/bash
-latest_ssh_auth_sock=$(ls -dt /tmp/ssh-* | head -n 1)
+latest_ssh_auth_sock=$(ls -dt /tmp/ssh-*/agent* | head -n 1)
 ln -sf $latest_ssh_auth_sock ~/.ssh/ssh_auth_sock
 echo Updating ~/.ssh/ssh_auth_sock to point to $latest_ssh_auth_sock' > ~/.ssh/rc
 sed -i 's/.*PermitUserEnvironment.*/PermitUserEnvironment yes/g' /etc/ssh/sshd_config
