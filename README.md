@@ -50,13 +50,12 @@ apt install -y git make ansible bash-completion
 ansible-galaxy collection install ansible.netcommon:2.5.1
 echo "set -g history-limit 10000" > ~/.tmux.conf
 echo "set paste" > ~/.vimrc
-cat > ~/.ssh/rc <<EOT
-#!/bin/bash
+echo '#!/bin/bash
 # Fix SSH auth socket location so agent forwarding works with tmux.
 if test "$SSH_AUTH_SOCK" ; then
   ln -sf $SSH_AUTH_SOCK ~/.ssh/ssh_auth_sock
-fi
-EOT
+  echo Updating ~/.ssh/ssh_auth_sock to point to $SSH_AUTH_SOCK
+fi' > ~/.ssh/rc
 grep -q SSH_AUTH_SOCK ~/.bashrc || echo export SSH_AUTH_SOCK=/root/.ssh/ssh_auth_sock | tee -a ~/.bashrc
 cd ~
 GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git clone git@bitbucket.org:mgindi/kolla-deploy.git
