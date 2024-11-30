@@ -56,7 +56,7 @@ ln -sf $latest_ssh_auth_sock ~/.ssh/ssh_auth_sock
 echo Updating ~/.ssh/ssh_auth_sock to point to $latest_ssh_auth_sock' > ~/.ssh/rc
 sed -i 's/.*PermitUserEnvironment.*/PermitUserEnvironment yes/g' /etc/ssh/sshd_config
 systemctl restart ssh
-echo 'SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock' > ~/.ssh/environment
+echo 'SSH_AUTH_SOCK=/root/.ssh/ssh_auth_sock' > ~/.ssh/environment
 cd ~
 GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git clone git@bitbucket.org:mgindi/kolla-deploy.git
 cd kolla-deploy
