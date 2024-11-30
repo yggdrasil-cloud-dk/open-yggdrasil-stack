@@ -125,6 +125,13 @@
         state: present
         reload: yes
 
+    - sysctl:
+        name: fs.inotify.max_user_instances
+        value: '512'
+        sysctl_set: yes
+        state: present
+        reload: yes
+
     - name: Run script to setup veth pair
       script: "{{ playbook_dir }}/../scripts/devices/veth_pair.sh"
       environment:
