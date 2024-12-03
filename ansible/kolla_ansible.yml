@@ -7,19 +7,19 @@
       script: "{{ playbook_dir }}/../scripts/kolla-ansible/deps.sh"
       args:
         chdir: "{{ playbook_dir }}/.."
-        creates: "{{ playbook_dir }}/../workspace/kolla-venv/"
  
     - name: Install kolla-ansible
       script: "{{ playbook_dir }}/../scripts/kolla-ansible/install.sh"
       args:
         chdir: "{{ playbook_dir }}/.."
-        creates: "{{ playbook_dir }}/../workspace/kolla-ansible/"
+      environment:
+        OPENSTACK_RELEASE: "{{ openstack_release }}"
 
     - name: Add inventory for nodes
       copy: 
         dest: "{{ playbook_dir }}/../workspace/inventory/0{{ hostvars[item].inventory_index }}-{{ item }}"
         content: |
-          {{ item }} ansible_host={{ hostvars[item].ansible_host }} neutron_external_interface={{ default_gateway_interface }} {{ 'ansible_connection=local' if item == inventory_hostname }}
+          {{ item }} ansible_host={{ hostvars[item].ansible_host }} {{ 'ansible_connection=local' if item == inventory_hostname }}
 
           [control]
           {{ item }}
@@ -46,6 +46,15 @@
       script: "{{ playbook_dir }}/../scripts/kolla-ansible/configure.sh"
       args:
         chdir: "{{ playbook_dir }}/.."
+      environment:
+        OPENSTACK_NETWORK_INTERFACE: "{{ openstack_network_interface }}"
+        OPENSTACK_NEUTRON_EXTERNAL_INTERFACE: "{{ openstack_neutron_external_interface }}"
+        OPENSTACK_KOLLA_INTERNAL_VIP_ADDRESS: "{{ openstack_kolla_internal_vip_address }}"
+        OPENSTACK_DESIGNATE_FORWARDERS_FIRST_ADDRESS: "{{ openstack_designate_forwarders_first_address }}"
+        OPENSTACK_DESIGNATE_FORWARDERS_SECOND_ADDRESS: "{{ openstack_designate_forwarders_second_address }}"
+        OPENSTACK_CEPH_RGW_HOSTS: "{{ openstack_ceph_rgw_hosts }}"
+        OPENSTACK_WORKER_COUNT: "{{ openstack_worker_count }}"
+        OPENSTACK_AMPHORA_SUBNET_CIDR: "{{ openstack_amphora_subnet_cidr }}"
 
     - name: Run kolla-ansible
       debug:

@@ -11,7 +11,7 @@ cd workspace
 apt update
 
 # install python and deps
-apt install -y python3-dev libffi-dev gcc libssl-dev python3-venv python3-pip
+apt install -y python3-dev libffi-dev gcc libssl-dev python3-venv python3-pip #python3-openssl python3-docker
 
 # ensure pyopenssl and docker installed and updated
 pip install -U pyopenssl docker
@@ -27,7 +27,7 @@ source kolla-venv/bin/activate
 pip install -U pip
 
 # install ansible
-ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install -U --ignore-installed 'ansible>=6,<8'
+ANSIBLE_SKIP_CONFLICT_CHECK=1 pip install -U --ignore-installed 'ansible-core>=2.14,<2.16' 
 
 # get python path in venv
 #PYTHON_PATH=$(realpath -s kolla-venv/bin/python)

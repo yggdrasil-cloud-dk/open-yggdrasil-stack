@@ -10,11 +10,13 @@ source kolla-venv/bin/activate
 
 # install kolla-ansible
 rm -rf kolla-ansible
-git clone --branch stable/2023.1 https://github.com/openstack/kolla-ansible.git
+git clone --branch stable/$OPENSTACK_RELEASE https://github.com/openstack/kolla-ansible.git
 
 # apply patch and setup
 cd kolla-ansible
-git apply ../../kolla-ansible.patch
+if [[ -s ../../kolla-ansible.patch ]]; then
+  git apply --reject --whitespace=fix ../../kolla-ansible.patch
+fi
 python3 setup.py develop
 cd ..
 
@@ -37,8 +39,23 @@ cat >> etc/kolla/globals.yml <<-EOF
 	######################
 	EOF
 
-# copy password file if it doesn't exist
-test -f etc/kolla/passwords.yml || cp kolla-ansible/etc/kolla/passwords.yml etc/kolla/passwords.yml
+date_suffix=$(date +"%Y%m%dT%H%M")
+
+PW_FILE=etc/kolla/passwords.yml
+PW_FILE_BK=$PW_FILE.bk_$date_suffix
+
+if [ -f "$PW_FILE" ]; then
+	mv $PW_FILE $PW_FILE_BK
+fi
+cp kolla-ansible/etc/kolla/passwords.yml $PW_FILE
+kolla-genpwd -p $PW_FILE
+if [ -f "$PW_FILE_BK" ]; then
+	kolla-mergepwd --old $PW_FILE_BK --new $PW_FILE --final $PW_FILE
+        if [[ -z $(diff $PW_FILE $PW_FILE_BK) ]] || [[ ! -s $PW_FILE_BK ]]; then 
+		rm $PW_FILE_BK
+	fi
+fi
+
 
 # create inventory directory in workspace
 mkdir -p inventory

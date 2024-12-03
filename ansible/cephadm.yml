@@ -25,19 +25,19 @@
         dest: /etc/ceph/initial-ceph.conf
         content: |
           [global]
-          {% if dev %}
-          osd_pool_default_size = 1
+          {% if (groups['deployment_nodes'] | length) < 3 %}
+          osd_pool_default_size = {{ groups['deployment_nodes'] | length }}
           osd_pool_default_min size = 1
           {% else %}
           osd_pool_default_size = 3
           osd_pool_default_min size = 2
           {% endif %}
 
-          public_network = {{ ceph_public_ip | ansible.netcommon.ipaddr('network') }}/{{ ceph_public_ip | ansible.netcommon.ipaddr('prefix') }}
-          cluster_network = {{ ceph_cluster_ip | ansible.netcommon.ipaddr('network') }}/{{ ceph_cluster_ip | ansible.netcommon.ipaddr('prefix') }}
+          public_network = {{ network_ceph_public_ip | ansible.netcommon.ipaddr('network') }}/{{ network_ceph_public_ip | ansible.netcommon.ipaddr('prefix') }}
+          cluster_network = {{ network_ceph_cluster_ip | ansible.netcommon.ipaddr('network') }}/{{ network_ceph_cluster_ip | ansible.netcommon.ipaddr('prefix') }}
 
     - name: Run cephadm bootstrap
-      command: "cephadm bootstrap --config /etc/ceph/initial-ceph.conf --allow-overwrite --mon-ip {{ ceph_public_ip | ansible.netcommon.ipaddr('address') }} --skip-monitoring-stack"
+      command: "cephadm bootstrap --config /etc/ceph/initial-ceph.conf --allow-overwrite --mon-ip {{ network_ceph_public_ip | ansible.netcommon.ipaddr('address') }} --skip-monitoring-stack"
       args:
         creates: /etc/ceph/ceph.client.admin.keyring
       register: cephadm_bootstrap
@@ -114,7 +114,7 @@
     - name: Zap osds
       shell: |
         set -e
-        {% for device in ceph_osd_devices -%}
+        {% for device in storage_ceph_osd_devices -%}
           docker exec $(docker ps | grep ceph-.*-mon | awk '{print $1}') \
             bash -c "ceph-volume lvm zap {{ device }}"
         {% endfor %}
@@ -125,7 +125,7 @@
     - name: Add osds
       shell: |
         set -e
-        {% for device in ceph_osd_devices -%}
+        {% for device in storage_ceph_osd_devices -%}
           ceph orch daemon add osd {{ item }}:{{ device }}
         {% endfor %}
       loop: "{{ groups['deployment_nodes'] }}"
@@ -140,7 +140,7 @@
             label: _admin
             count_per_host: 1
           networks:
-          - {{ ceph_public_ip | ansible.netcommon.ipaddr('network') }}/{{ ceph_public_ip | ansible.netcommon.ipaddr('prefix') }}
+          - {{ network_ceph_public_ip | ansible.netcommon.ipaddr('network') }}/{{ network_ceph_public_ip | ansible.netcommon.ipaddr('prefix') }}
           spec:
             rgw_frontend_port: 6780
 

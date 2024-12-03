@@ -7,16 +7,13 @@ TAGS =
 #########
 
 # TODO: run in ansible so it runs on all nodes
-harden:
-	cp scripts/hardening/ssh.sh /etc/rc.local
-	chmod 755 /etc/rc.local
-	systemctl restart rc-local
-	systemctl enable rc-local
-
 prepare-ansible:
 	mkdir -p /etc/ansible
 	ln -sfr ansible/inventory/hosts /etc/ansible/hosts
 	ln -sfr ansible/ansible.cfg /etc/ansible/ansible.cfg
+
+harden:
+	ansible-playbook ansible/harden.yml
 
 devices-configure:
 	ansible-playbook ansible/devices.yml
@@ -30,7 +27,7 @@ kollaansible-images:
 	ansible-playbook ansible/prepare_images.yml -v
 
 kollaansible-prepare:
-	ansible-playbook ansible/kolla_ansible.yml
+	ansible-playbook ansible/kolla_ansible.yml -v
 
 kollaansible-create-certs:
 	scripts/kolla-ansible/kolla-ansible.sh octavia-certificates
@@ -44,17 +41,16 @@ kollaansible-prechecks:
 kollaansible-deploy:
 	scripts/kolla-ansible/kolla-ansible.sh deploy
 
+kollaansible-upgrade:
+	scripts/kolla-ansible/kolla-ansible.sh upgrade
+
 kollaansible-postdeploy:
 	scripts/kolla-ansible/kolla-ansible.sh post-deploy
 
-kollaansible-lma: 
-	scripts/lma/custom-exporter.sh
-	scripts/lma/ceph.sh
-	scripts/lma/grafana/import.sh
-	scripts/lma/prometheus-alerts/copy-rules.sh
+kollaansible-lma:
+	ansible-playbook ansible/lma.yml -v
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t prometheus
 
-# TODO REMOVE
 prometheus-alerts:
 	scripts/lma/prometheus-alerts/copy-rules.sh
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t prometheus
@@ -62,10 +58,11 @@ prometheus-alerts:
 # openstack #
 
 openstack-client-install:
-	scripts/openstack/install-client.sh
+	ansible-playbook ansible/client.yml -v
 
 openstack-resources-init:
-	scripts/openstack/init-resources.sh
+	ansible-playbook ansible/init_resources.yml -v
+	#scripts/openstack/init-resources.sh
 
 openstack-images-upload:
 	scripts/openstack/upload-images.sh
@@ -73,17 +70,40 @@ openstack-images-upload:
 symlink-etc-kolla:
 	ln -sfr workspace/etc/kolla/* /etc/kolla/
 
+openstack-octavia:
+	ansible-playbook ansible/openstack_initialize/octavia.yml -v
+
+openstack-rgw:
+	ansible-playbook ansible/openstack_initialize/rgw.yml -v
+
+openstack-magnum:
+	scripts/tests/magnum.sh
+
+openstack-manila:
+	scripts/tests/manila.sh
+
+openstack-trove-postgres:
+	scripts/tests/trove_postgres.sh
+
 ########
 # Util #
 ########
 
-infra-up: harden prepare-ansible devices-configure cephadm-deploy
+infra-up: prepare-ansible harden devices-configure cephadm-deploy
 
 kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
+#kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
+
+kollaansible-up-upgrade: kollaansible-images kollaansible-prepare kollaansible-prechecks kollaansible-upgrade kollaansible-lma
 
 all-up: infra-up kollaansible-up
 
-all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload symlink-etc-kolla
+all-upgrade: kollaansible-upgrade
+
+openstack-services: openstack-octavia openstack-rgw openstack-magnum  openstack-manila openstack-trove-postgres
+
+all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload symlink-etc-kolla  openstack-services
+
 
 # print vars
 print-%  : ; @echo $* = $($*)
@@ -92,17 +112,26 @@ print-%  : ; @echo $* = $($*)
 ping-nodes:
 	scripts/ping-nodes.sh
 
-kollaansible-tags-deploy:
+print-tags:
+	@grep "^        tags:" workspace/kolla-ansible/ansible/site.yml | sed 's/        tags: //g; s/ }//g; s/,.*//g; s/\[//g' | xargs | sed 's/ /,/g'
+
+kollaansible-tags-deploy: kollaansible-prepare
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $(TAGS)
 
+kollaansible-tags-upgrade: kollaansible-prepare
+	scripts/kolla-ansible/kolla-ansible.sh upgrade -t $(TAGS)
+
 # Set single tag
-kollaansible-fromtag-deploy:
+kollaansible-fromtag-deploy: kollaansible-prepare
 	all_tags=$$(grep "^        tags:" workspace/kolla-ansible/ansible/site.yml | sed 's/        tags: //g; s/ }//g; s/,.*//g; s/\[//g' | xargs | sed 's/ /,/g') && \
 	remaining_tags=$$(echo $$all_tags | grep -o $(TAGS).*) && \
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $$remaining_tags
 
-kollaansible-tags-reconfigure:
-	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS)
+kollaansible-tags-reconfigure: kollaansible-prepare
+	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS) -v
+
+kollaansible-reconfigure: kollaansible-prepare
+	scripts/kolla-ansible/kolla-ansible.sh reconfigure -v
 
 kollaansible-destroy:
 	scripts/kolla-ansible/kolla-ansible.sh destroy --yes-i-really-really-mean-it

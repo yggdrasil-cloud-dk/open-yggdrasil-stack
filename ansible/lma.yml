@@ -1,0 +1,35 @@
+---
+- name: Custom exporter setup
+  hosts: deployment_nodes
+  any_errors_fatal: true
+  tasks:
+    - name: Setup custom exporter
+      script: "{{ playbook_dir }}/../scripts/lma/custom-exporter.sh"
+      args:
+        chdir: "{{ playbook_dir }}/.."
+
+    - name: Import Grafana dashboards
+      script: "{{ playbook_dir }}/../scripts/lma/grafana/import.sh"
+      args:
+        chdir: "{{ playbook_dir }}/.."
+      environment:
+        IP: localhost
+      run_once: true
+
+- name: Scrape configs
+  hosts: deployment_controller
+  any_errors_fatal: true
+  tasks:
+    - name: Scrape configs
+      script: "{{ playbook_dir }}/../{{ item }}"
+      args:
+        chdir: "{{ playbook_dir }}/.."
+      environment:
+        CEPH_PUBLIC_IP: "{{ ansible_ceph_public.ipv4.address }}"
+        OPENSTACK_MGMT_IP: "{{ ansible_openstack_mgmt.ipv4.address }}"
+      loop:
+        - scripts/lma/custom-exporter-scrape.sh
+        - scripts/lma/ceph.sh
+        - scripts/lma/prometheus-alerts/copy-rules.sh
+
+

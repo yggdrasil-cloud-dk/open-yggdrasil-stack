@@ -17,22 +17,24 @@ CONFIG_DIR=$(pwd)/etc/kolla
 DEFAULT_IF=$(ip route | grep "^default" | grep -o 'dev .\+' | cut -d ' ' -f 2 | head -n 1)
 DEFAULT_NETMASK=$(ifconfig $DEFAULT_IF | grep -o "netmask .\+" | cut -d ' ' -f 2)
 
-if [[ $DEFAULT_NETMASK != "255.255.255.0" ]]; then
-	echo "Script can't handle this netmask"
-	exit 1
-fi
+#if [[ $DEFAULT_NETMASK != "255.255.255.0" ]]; then
+#	echo "Script can't handle this netmask"
+#	exit 1
+#fi
 
-DEFAULT_GW_ROUTE=$(ip route | grep "^default")
-DEFAULT_GW_IP=$(echo $DEFAULT_GW_ROUTE | grep -o 'via .\+' | cut -d ' ' -f 2)
-DEFAULT_GW_FIRST_THREE_OCTETS=$(echo $DEFAULT_GW_ROUTE | grep -o 'via [0-9]\+\.[0-9]\+\.[0-9]\+' | cut -d ' ' -f 2)
 
-DEFAULT_GW_IP=192.168.1.1
-DEFAULT_GW_FIRST_THREE_OCTETS=192.168.1
-
-export EXT_NET_CIDR="$DEFAULT_GW_FIRST_THREE_OCTETS.0/24"
-export EXT_NET_RANGE="start=$DEFAULT_GW_FIRST_THREE_OCTETS.150,end=$DEFAULT_GW_FIRST_THREE_OCTETS.199"
-export EXT_NET_GATEWAY=$DEFAULT_GW_IP
+export EXT_NET_CIDR=$EXT_NET_CIDR
+export EXT_NET_RANGE=$EXT_NET_RANGE
+export EXT_NET_GATEWAY=$EXT_NET_GATEWAY
 
 export KOLLA_CONFIG_PATH=$CONFIG_DIR
+export ENABLE_EXT_NET=0
+
+#openstack network create --external --provider-physical-network physnet1 --provider-network-type vlan public1 --provider-segment 600
+openstack network show public1  || \
+	(openstack network create --share --external --provider-physical-network physnet1 --provider-network-type flat public1 && \
+	openstack subnet create --no-dhcp --allocation-pool ${EXT_NET_RANGE} --network public1 --subnet-range ${EXT_NET_CIDR} --gateway ${EXT_NET_GATEWAY} public1-subnet )
 
 ./kolla-ansible/tools/init-runonce
+
+openstack router set --external-gateway public1 demo-router

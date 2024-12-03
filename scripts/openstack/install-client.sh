@@ -4,12 +4,15 @@
 
 set -xe
 
+
+OPENSTACK_RELEASE="${OPENSTACK_RELEASE:-2023.2}"
+
 # source venv
 cd workspace
 source kolla-venv/bin/activate
 
 # install openstack clients
-pip install -U -c https://releases.openstack.org/constraints/upper/2023.1 \
+pip install -U -c https://releases.openstack.org/constraints/upper/$OPENSTACK_RELEASE \
   python-openstackclient \
   python-heatclient \
   python-troveclient \
@@ -17,9 +20,12 @@ pip install -U -c https://releases.openstack.org/constraints/upper/2023.1 \
   python-cloudkittyclient \
   gnocchiclient \
   aodhclient \
+  python-swiftclient \
   python-neutronclient \
   python-designateclient \
   python-muranoclient \
   python-manilaclient \
   python-solumclient \
-  python-zunclient
+  python-zunclient \
+  python-octaviaclient \
+  python-barbicanclient

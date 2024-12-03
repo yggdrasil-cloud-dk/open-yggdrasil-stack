@@ -1,0 +1,11 @@
+---
+- name: Prepare kolla-ansible
+  hosts: deployment_controller
+  any_errors_fatal: true
+  tasks:
+    - name: Install openstack client
+      script: "{{ playbook_dir }}/../scripts/openstack/install-client.sh"
+      args:
+        chdir: "{{ playbook_dir }}/.."
+      environment:
+        OPENSTACK_RELEASE: "{{ openstack_release }}"
