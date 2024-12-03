@@ -3,9 +3,16 @@
   hosts: deployment_nodes
   any_errors_fatal: true
   tasks:
+
+    - name: Copy hardening folder
+      copy:
+        src: "{{ playbook_dir }}/../scripts/hardening"
+        dest: /opt/
+        mode: preserve
+
     - name: Find hardening files
       find:
-        paths: "{{ playbook_dir }}/../scripts/hardening"
+        paths: /opt/hardening
       register: find_in_path
 
     - name: Set fact for hardening files

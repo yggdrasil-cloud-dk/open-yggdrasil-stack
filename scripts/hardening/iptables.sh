@@ -4,8 +4,9 @@
 rules=(
   "\-A INPUT -i lo -j ACCEPT"
   "\-A INPUT -p icmp -j ACCEPT"
-  "\-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT"
   "\-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT"
+  "\-A INPUT -p tcp -m tcp -s 192.168.150.0/24 --dport 22 -j DROP"
+  "\-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT"
   "\-A INPUT -s 192.168.150.0/24 -j ACCEPT"
 )
 
