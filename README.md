@@ -50,20 +50,28 @@ apt install -y git make ansible bash-completion
 ansible-galaxy collection install ansible.netcommon:2.5.1
 echo "set -g history-limit 10000" > ~/.tmux.conf
 echo "set paste" > ~/.vimrc
-echo '#!/bin/bash
-latest_ssh_auth_sock=$(ls -dt /tmp/ssh-*/agent* | head -n 1)
-ln -sf $latest_ssh_auth_sock ~/.ssh/ssh_auth_sock
-echo Updating ~/.ssh/ssh_auth_sock to point to $latest_ssh_auth_sock' > ~/.ssh/rc
+
+cat << 'EOT' > ~/.ssh/rc
+#!/bin/bash
+latest_ssh_auth_sock=\$(ls -dt /tmp/ssh-*/agent* | head -n 1)
+ln -sf \$latest_ssh_auth_sock ~/.ssh/ssh_auth_sock
+echo Updating ~/.ssh/ssh_auth_sock to point to \$latest_ssh_auth_sock
+EOT
 sed -i 's/.*PermitUserEnvironment.*/PermitUserEnvironment yes/g' /etc/ssh/sshd_config
 systemctl restart ssh
 echo 'SSH_AUTH_SOCK=/root/.ssh/ssh_auth_sock' > ~/.ssh/environment
+
 cd ~
-GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git clone git@bitbucket.org:mgindi/kolla-deploy.git
+ls kolla-deploy || GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git clone git@bitbucket.org:mgindi/kolla-deploy.git
 cd kolla-deploy
 git config --global user.email "mo.gindi@gmail.com"
 git config --global user.name "Mohamed El Gindi"
+git pull
+
 EOF
 
+bash ~/.ssh/rc
+export SSH_AUTH_SOCK=/root/.ssh/ssh_auth_sock
 cd kolla-deploy
 tmux
 ```
