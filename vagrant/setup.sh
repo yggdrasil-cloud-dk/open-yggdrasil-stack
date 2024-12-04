@@ -17,7 +17,13 @@ vagrant plugin install vagrant-mutate
 sudo usermod --append --groups libvirt $USER
 
 # ensure vagrant directors have correct owner
-sudo chown -R $USER .vagrant ~/.vagrant.d/ 
+sudo chown -R $USER ~/.vagrant.d/ 
+
+cat <<EOF
+---
+
+Now you can run "vagrant up"
+EOF
 
 
 

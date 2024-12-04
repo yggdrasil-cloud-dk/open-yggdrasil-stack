@@ -7,24 +7,31 @@ Vagrant.configure("2") do |config|
   
   # script
   $script = <<-SCRIPT
-  echo I am provisioning...
+  rm -rf /root/.ssh
+  cp -r /home/vagrant/.ssh/ /root/
   SCRIPT
 
   config.vm.define "hyper01" do |hyper01|
     hyper01.vm.provider :libvirt do |domain|
-      domain.memory = 1024
-      domain.cpus = 2
+      domain.memory = 65536 
+      domain.cpus = 6
+      domain.machine_virtual_size = 150
     end
     hyper01.vm.provision "shell", inline: $script
   end
   
   config.vm.define "hyper02" do |hyper02|
     hyper02.vm.provider :libvirt do |domain|
-      domain.memory = 1024
-      domain.cpus = 2
+      domain.memory = 65536
+      domain.cpus = 6
+      domain.machine_virtual_size = 150
     end
+    hyper02.vm.provision "shell", inline: $script
   end
-  
+
+  config.trigger.after :up do |trigger|
+    trigger.run = {inline: "bash -c 'vagrant ssh-config | sed \"s/User vagrant/User root/g\" > ~/.ssh/config'"}
+  end
+
 end
 
-#system('vagrant ssh-config > ~/.ssh/config')

@@ -1,6 +1,8 @@
 SHELL:=/bin/bash
 
 TAGS = 
+ENV = hetzner-vagrant-dev01
+
 
 #########
 # Setup #
@@ -8,11 +10,12 @@ TAGS =
 
 # TODO: run in ansible so it runs on all nodes
 prepare-ansible:
+	rm -rf /etc/ansible/
 	mkdir -p /etc/ansible
-	ln -sfr ansible/inventory/hosts /etc/ansible/hosts
+	ln -sfr ansible/inventory/$(ENV) /etc/ansible/hosts
 	ln -sfr ansible/ansible.cfg /etc/ansible/ansible.cfg
 
-harden:
+harden: prepare-ansible
 	ansible-playbook ansible/harden.yml
 
 devices-configure:
@@ -85,9 +88,9 @@ openstack-manila:
 openstack-trove-postgres:
 	scripts/tests/trove_postgres.sh
 
-########
-# Util #
-########
+###########
+# Bundles #
+###########
 
 infra-up: prepare-ansible harden devices-configure cephadm-deploy
 
@@ -104,14 +107,27 @@ openstack-services: openstack-octavia openstack-rgw openstack-magnum  openstack-
 
 all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload symlink-etc-kolla  openstack-services
 
+########
+# Util #
+########
 
-# print vars
+vagrant-install:
+	cd vagrant && ./setup.sh
+
+vagrant-up:
+	cd vagrant && vagrant up
+
+# print make vars. Use like this "make print-ENV" to print ENV 
 print-%  : ; @echo $* = $($*)
 
 # ping nodes
 ping-nodes:
 	scripts/ping-nodes.sh
 
+# print ansible inventory vars
+print-ansible-vars:
+	ansible all -m debug -a "var=hostvars"
+	
 print-tags:
 	@grep "^        tags:" workspace/kolla-ansible/ansible/site.yml | sed 's/        tags: //g; s/ }//g; s/,.*//g; s/\[//g' | xargs | sed 's/ /,/g'
 
