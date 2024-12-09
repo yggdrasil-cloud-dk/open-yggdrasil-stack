@@ -79,25 +79,29 @@
       hostname:
         name: "{{ inventory_hostname }}"
 
-    # - name: Add entry in /etc/hosts
-    #   blockinfile:
-    #       state: present
-    #       dest: /etc/hosts
-    #       content: |
-    #         {% for host in groups.all %}
-    #         {{ host }}
-    #         {% endfor %}
+    - name: Add hosts on deployment controller
+      blockinfile:
+        state: present
+        dest: /etc/hosts
+        content: |
+          {% for host in groups['deployment_nodes'] %}
+          {{ hostvars[host].network_openstack_mgmt_ip | ansible.netcommon.ipaddr('address') }} {{ host }}
+          {% endfor %}
+      delegate_to: "{{ groups['deployment_controller'][0] }}"
+      run_once: true
 
-    # - name: Configure hosts
-    #   copy: 
-    #     dest: /etc/hosts
-    #     content: |
-    #       127.0.0.1 localhost
+      # Needed to be added before cephadm deployment
+      # Kolla ansible prepare does the same thing
+    - name: Configure hosts on deployment nodes
+      copy: 
+        dest: /etc/hosts
+        content: |
+          127.0.0.1 localhost
 
-    #       # openstack mgmt ips
-    #       # {% for host in groups['deployment_nodes'] %}
-    #       # {{ hostvars[host].network_openstack_mgmt_ip | ansible.netcommon.ipaddr('address') }} {{ host }}
-    #       # {% endfor %}
+          # openstack mgmt ips
+          {% for host in groups['deployment_nodes'] %}
+          {{ hostvars[host].network_openstack_mgmt_ip | ansible.netcommon.ipaddr('address') }} {{ host }}
+          {% endfor %}
 
     - name: Add netplan overrides file
       copy:
@@ -136,7 +140,24 @@
       script: "{{ playbook_dir }}/../scripts/devices/veth_pair.sh"
       environment:
         NETWORK_VETH_PAIR_GATEWAY: "{{ network_veth_pair_gateway }}"
-      when: network_create_veth_pair
+      when: development_environment and network_create_veth_pair
+
+    # when running in development using neutron_ext vlan
+    - name: Run script to masquerade vlans when exiting primary interface
+      script: "{{ playbook_dir }}/../scripts/devices/masquerade.sh"
+      when: network_masquerade_vlans
+
+    - name: Configure network routes on deployment controller
+      script: "{{ playbook_dir }}/../scripts/devices/configure_routes.sh"
+      environment:
+        OPENSTACK_MGMT_NET: "{{ network_openstack_mgmt_ip | ansible.netcommon.ipaddr('network/prefix') }}"
+        CEPH_PUBLIC_NET: "{{ network_ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}"
+        NETWORK_PROVIDER_NET: "{{ network_provider_ip | ansible.netcommon.ipaddr('network/prefix') }}"
+        NETWORK_PRIMARY_GATEWAY_IP: "{{ network_primary_gateway_ip | ansible.netcommon.ipaddr('address') }}"
+        NETWORK_PROVIDER_GATEWAY_IP: "{{ network_provider_gateway_ip | ansible.netcommon.ipaddr('address') }}"
+      when: network_add_routes_to_deployment_controller
+      delegate_to: "{{ groups['deployment_controller'][0] }}"
+      run_once: true
 
     - name: Create cni directory for Zun
       command: mkdir -p /opt/cni/bin/
@@ -149,6 +170,7 @@
       environment:
         LOOP_DEVICE_SIZE_GB: "{{ storage_loop_device_size_gb }}"
       when: storage_create_loop_devices
+      
 
 - name: Remove internet connectivity script and destroy loop devices
   hosts: deployment_nodes

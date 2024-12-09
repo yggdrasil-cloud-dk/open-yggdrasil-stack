@@ -2,7 +2,7 @@
 
 set -x
 
-apt -y install libopenscap8 bzip2
+apt install -y libopenscap8 bzip2
 
 cd /tmp 
 wget https://security-metadata.canonical.com/oval/com.ubuntu.$(lsb_release -cs).usn.oval.xml.bz2

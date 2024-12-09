@@ -17,7 +17,7 @@ cat > /etc/systemd/system/$service.service << EOF
 After=docker.service
 
 [Service]
-ExecStart=-/bin/bash $(pwd)/scripts/lma/custom_metrics/docker.sh
+ExecStart=-/bin/bash /opt/custom_metrics/docker.sh
 
 [Install]
 WantedBy=default.target

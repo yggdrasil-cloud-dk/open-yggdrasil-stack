@@ -1,8 +1,8 @@
 SHELL:=/bin/bash
 
-TAGS = 
 ENV = hetzner-vagrant-dev01
-
+ARGS = 
+TAGS = 
 
 #########
 # Setup #
@@ -16,21 +16,24 @@ prepare-ansible:
 	ln -sfr ansible/ansible.cfg /etc/ansible/ansible.cfg
 
 harden: prepare-ansible
-	ansible-playbook ansible/harden.yml
+	ansible-playbook ansible/harden.yml $(ARGS)
 
 devices-configure:
-	ansible-playbook ansible/devices.yml
+	ansible-playbook ansible/devices.yml $(ARGS)
+
+checks:
+	ansible-playbook ansible/checks.yml $(ARGS)
 
 cephadm-deploy:
-	ansible-playbook ansible/cephadm.yml
+	ansible-playbook ansible/cephadm.yml $(ARGS)
 
 # kolla-ansible #
 
 kollaansible-images:
-	ansible-playbook ansible/prepare_images.yml -v
+	ansible-playbook ansible/prepare_images.yml $(ARGS)
 
 kollaansible-prepare:
-	ansible-playbook ansible/kolla_ansible.yml -v
+	ansible-playbook ansible/kolla_ansible.yml $(ARGS)
 
 kollaansible-create-certs:
 	scripts/kolla-ansible/kolla-ansible.sh octavia-certificates
@@ -61,10 +64,10 @@ prometheus-alerts:
 # openstack #
 
 openstack-client-install:
-	ansible-playbook ansible/client.yml -v
+	ansible-playbook ansible/client.yml $(ARGS)
 
 openstack-resources-init:
-	ansible-playbook ansible/init_resources.yml -v
+	ansible-playbook ansible/init_resources.yml $(ARGS)
 	#scripts/openstack/init-resources.sh
 
 openstack-images-upload:
@@ -74,10 +77,10 @@ symlink-etc-kolla:
 	ln -sfr workspace/etc/kolla/* /etc/kolla/
 
 openstack-octavia:
-	ansible-playbook ansible/openstack_initialize/octavia.yml -v
+	ansible-playbook ansible/openstack_initialize/octavia.yml $(ARGS)
 
 openstack-rgw:
-	ansible-playbook ansible/openstack_initialize/rgw.yml -v
+	ansible-playbook ansible/openstack_initialize/rgw.yml $(ARGS)
 
 openstack-magnum:
 	scripts/tests/magnum.sh
@@ -92,7 +95,7 @@ openstack-trove-postgres:
 # Bundles #
 ###########
 
-infra-up: prepare-ansible harden devices-configure cephadm-deploy
+infra-up: prepare-ansible harden devices-configure checks cephadm-deploy 
 
 kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 #kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
@@ -100,6 +103,10 @@ kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-ce
 kollaansible-up-upgrade: kollaansible-images kollaansible-prepare kollaansible-prechecks kollaansible-upgrade kollaansible-lma
 
 all-up: infra-up kollaansible-up
+
+dev-up: vagrant-up all-up all-postdeploy
+
+dev-down: vagrant-destroy
 
 all-upgrade: kollaansible-upgrade
 
@@ -117,6 +124,9 @@ vagrant-install:
 vagrant-up:
 	cd vagrant && vagrant up
 
+vagrant-destroy:
+	cd vagrant && vagrant destroy -f
+
 # print make vars. Use like this "make print-ENV" to print ENV 
 print-%  : ; @echo $* = $($*)
 
@@ -128,8 +138,9 @@ ping-nodes:
 print-ansible-vars:
 	ansible all -m debug -a "var=hostvars"
 	
+# missing tags that are used with "import_playbook" list nova
 print-tags:
-	@grep "^        tags:" workspace/kolla-ansible/ansible/site.yml | sed 's/        tags: //g; s/ }//g; s/,.*//g; s/\[//g' | xargs | sed 's/ /,/g'
+	@grep "^        tags:" workspace/kolla-ansible/ansible/site.yml | sed 's/        tags: //g; s/ }//g; s/,.*//g; s/\[//g' | xargs | sed 's/ /,/g' | tee /tmp/print-tags
 
 kollaansible-tags-deploy: kollaansible-prepare
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $(TAGS)
@@ -138,8 +149,8 @@ kollaansible-tags-upgrade: kollaansible-prepare
 	scripts/kolla-ansible/kolla-ansible.sh upgrade -t $(TAGS)
 
 # Set single tag
-kollaansible-fromtag-deploy: kollaansible-prepare
-	all_tags=$$(grep "^        tags:" workspace/kolla-ansible/ansible/site.yml | sed 's/        tags: //g; s/ }//g; s/,.*//g; s/\[//g' | xargs | sed 's/ /,/g') && \
+kollaansible-fromtag-deploy: kollaansible-prepare print-tags
+	all_tags=$$(cat /tmp/print-tags) && \
 	remaining_tags=$$(echo $$all_tags | grep -o $(TAGS).*) && \
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $$remaining_tags
 

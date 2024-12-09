@@ -1,0 +1,52 @@
+- name: Check networking
+  hosts: deployment_nodes
+  any_errors_fatal: true
+  tasks:
+    # - name: Ensure hardening via rc.local working fine
+    #   command: systemctl is-active rc-local | grep -q ^active$
+
+    - name: Check interfaces exist
+      command: ifconfig {{ item }}
+      loop:
+        - "{{ openstack_network_interface }}"
+        - "{{ openstack_neutron_external_interface }}"
+
+    - name: Check nodes could ping each other on the different vlans
+      command: ping -c 1 -W 2 {{ hostvars[item[0]][item[1]] | ansible.netcommon.ipaddr('address') }}
+      loop: "{{ groups['deployment_nodes'] | product(['network_openstack_mgmt_ip', 'network_ceph_public_ip', 'network_ceph_cluster_ip']) | list }}"
+
+    - name: Check if neutron is deployed
+      shell: docker ps | grep -q neutron
+      register: check_neutron
+      failed_when: false
+
+    - name: Check nodes could ping each other on neutron external interface if neutron not deployed
+      command: ping -c 1 -W 2 {{ hostvars[item].network_provider_ip | ansible.netcommon.ipaddr('address') }}
+      loop: "{{ groups['deployment_nodes'] }}"
+      when: check_neutron.rc == 1
+
+- name: Check networking on deployment controller
+  hosts: deployment_controller
+  any_errors_fatal: true
+  tasks:
+
+    - name: Check hosts file in deployment controller
+      command: grep {{ item }} /etc/hosts
+      loop: "{{ groups['deployment_nodes'] }}"
+
+    - name: Check deployment controller can ping vlans
+      command: ping -c 1 -W 2 {{ hostvars[item[0]][item[1]] | ansible.netcommon.ipaddr('address') }}
+      loop: "{{ groups['deployment_nodes'] | product(['network_openstack_mgmt_ip', 'network_ceph_public_ip'] ) | list }}"
+
+- name: Check storage
+  hosts: deployment_nodes
+  any_errors_fatal: true
+  tasks:
+  
+    - name: Check storage devices exist
+      command: ls {{ item }}
+      loop: "{{ storage_ceph_osd_devices }}"
+
+    - name: Check storage devices not mounted
+      shell: "! (mount | grep {{ item }})"
+      loop: "{{ storage_ceph_osd_devices }}"

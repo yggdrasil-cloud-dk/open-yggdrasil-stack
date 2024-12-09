@@ -1,6 +1,8 @@
 ---
-- name: Deploy cephadm
-  hosts: deployment_controller
+- name: Prepare ceph nodes
+  hosts:
+    - deployment_controller
+    - deployment_nodes
   any_errors_fatal: true
   tasks:
     - name: Install cephadm key
@@ -12,29 +14,31 @@
         pkg: 
           - cephadm
           - ceph-common
-      loop: "{{ groups['deployment_nodes'] }}"
-      delegate_to: "{{ item }}"
 
     - name: Create ceph directory
       file:
         path: /etc/ceph/
         state: directory
 
+- name: Deploy cephadm
+  hosts: deployment_nodes[0]
+  any_errors_fatal: true
+  tasks:
     - name: Add initial-ceph.conf
       copy: 
         dest: /etc/ceph/initial-ceph.conf
         content: |
           [global]
-          {% if (groups['deployment_nodes'] | length) < 3 %}
-          osd_pool_default_size = {{ groups['deployment_nodes'] | length }}
-          osd_pool_default_min size = 1
+          {% if development_environment %}
+          osd_pool_default_size = 1
+          osd_pool_default_min_size = 1
           {% else %}
           osd_pool_default_size = 3
-          osd_pool_default_min size = 2
+          osd_pool_default_min_size = 2
           {% endif %}
 
-          public_network = {{ network_ceph_public_ip | ansible.netcommon.ipaddr('network') }}/{{ network_ceph_public_ip | ansible.netcommon.ipaddr('prefix') }}
-          cluster_network = {{ network_ceph_cluster_ip | ansible.netcommon.ipaddr('network') }}/{{ network_ceph_cluster_ip | ansible.netcommon.ipaddr('prefix') }}
+          public_network = {{ network_ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}
+          cluster_network = {{ network_ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}
 
     - name: Run cephadm bootstrap
       command: "cephadm bootstrap --config /etc/ceph/initial-ceph.conf --allow-overwrite --mon-ip {{ network_ceph_public_ip | ansible.netcommon.ipaddr('address') }} --skip-monitoring-stack"
@@ -62,10 +66,10 @@
     - name: Apply mons placement
       command: "ceph orch apply mon --placement='{% for host in groups['deployment_nodes'] %}{{ host }},{% endfor %}'"
 
-    - name: Add mons
+    - name: Add (other) mons
       command: "ceph orch daemon add mon {{ item }}"
       loop: "{{ groups['deployment_nodes'] }}"
-      when: item != inventory_hostname
+      when: item != groups['deployment_nodes'][0]
       failed_when: false
 
     - pause:
@@ -79,14 +83,7 @@
       fail:
         msg: There are {{ (ceph_status.stdout | from_json).monmap.num_mons }} mons but expected number of mons is {{ groups['deployment_nodes'] | length }}
       when: (ceph_status.stdout | from_json).monmap.num_mons != groups['deployment_nodes'] | length
-
-    - name: Create /etc/ceph directory if it does not exist
-      ansible.builtin.file:
-        path: /etc/ceph/
-        state: directory
-      loop: "{{ groups['deployment_nodes'] }}"
-      delegate_to: "{{ item }}"
-
+      
       # Note: This is supposed to happen automatically with _admin label
     - name: Generate new minimal ceph.conf
       command: ceph config generate-minimal-conf
@@ -96,7 +93,7 @@
       copy:
         content: "{{ ceph_conf.stdout }}\n"
         dest: /etc/ceph/ceph.conf
-      loop: "{{ groups['deployment_nodes'] }}"
+      loop: "{{ groups['deployment_nodes'] + groups['deployment_controller'] }}"
       delegate_to: "{{ item }}"
 
     - name: Get ceph admin keyring
@@ -107,7 +104,7 @@
       copy:
         content: "{{ ceph_keyring.stdout }}\n"
         dest: /etc/ceph/ceph.client.admin.keyring
-      loop: "{{ groups['deployment_nodes'] }}"
+      loop: "{{ groups['deployment_nodes'] + groups['deployment_controller'] }}"
       delegate_to: "{{ item }}"
 
     # run ceph-volume from mon containers

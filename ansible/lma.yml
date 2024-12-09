@@ -3,6 +3,12 @@
   hosts: deployment_nodes
   any_errors_fatal: true
   tasks:
+    - name: Copy hardening folder
+      copy:
+        src: "{{ playbook_dir }}/../scripts/lma/custom_metrics"
+        dest: /opt/
+        mode: preserve
+
     - name: Setup custom exporter
       script: "{{ playbook_dir }}/../scripts/lma/custom-exporter.sh"
       args:

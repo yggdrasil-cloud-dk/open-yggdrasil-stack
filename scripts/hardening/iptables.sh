@@ -1,13 +1,16 @@
 #!/bin/bash
 
-
 rules=(
   "\-A INPUT -i lo -j ACCEPT"
   "\-A INPUT -p icmp -j ACCEPT"
   "\-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT"
-  "\-A INPUT -p tcp -m tcp -s 192.168.150.0/24 --dport 22 -j DROP"
+  "\-A INPUT -s $NEUTRON_EXTERNAL_NET -p tcp -m tcp --dport 22 -j DROP"
   "\-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT"
-  "\-A INPUT -s 192.168.150.0/24 -j ACCEPT"
+  "\-A INPUT -s $OPENSTACK_MGMT_NET -j ACCEPT"
+  "\-A INPUT -s $CEPH_PUBLIC_NET -j ACCEPT"
+  "\-A INPUT -s $CEPH_CLUSTER_NET -j ACCEPT"
+  "\-A INPUT -s $NETWORK_PROVIDER_NET -j ACCEPT"
+  "\-A INPUT -s $NODE_MGMT_NET -j ACCEPT"
 )
 
 set -x

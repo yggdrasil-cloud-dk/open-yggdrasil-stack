@@ -2,7 +2,12 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-    
+  
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.management_network_name = "openstack-vlans"
+    libvirt.management_network_address = "192.168.121.0/24"  # default
+  end
+
   config.vm.box = "generic/ubuntu2204"
   
   # script
@@ -17,6 +22,8 @@ Vagrant.configure("2") do |config|
       domain.cpus = 6
       domain.machine_virtual_size = 150
     end
+    hyper01.vm.hostname = "hyper01"
+    hyper01.vm.network :private_network, :ip => '10.0.80.11', :libvirt__network_name => 'provider'
     hyper01.vm.provision "shell", inline: $script
   end
   
@@ -26,6 +33,8 @@ Vagrant.configure("2") do |config|
       domain.cpus = 6
       domain.machine_virtual_size = 150
     end
+    hyper02.vm.hostname = "hyper02"
+    hyper02.vm.network :private_network, :ip => '10.0.80.12', :libvirt__network_name => 'provider'
     hyper02.vm.provision "shell", inline: $script
   end
 

@@ -3,6 +3,18 @@
   hosts: deployment_nodes
   any_errors_fatal: true
   tasks:
+    - name: Install apt packages
+      apt:
+        name:
+          - libopenscap8
+          - bzip2
+          - fail2ban
+          - clamav
+          - clamav-daemon
+        update_cache: yes
+
+    - name: Correct any apt package issues
+      command: dpkg --configure -a
 
     - name: Copy hardening folder
       copy:
@@ -25,18 +37,41 @@
         dest: /etc/rc.local
         mode: 0755
         content: |
-          #!/bin/sh
+          #!/bin/bash
 
           set -xe
+
+          export OPENSTACK_MGMT_NET={{ network_openstack_mgmt_ip | ansible.netcommon.ipaddr('network/prefix') }}
+          export CEPH_PUBLIC_NET={{ network_ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}
+          export CEPH_CLUSTER_NET={{ network_ceph_cluster_ip | ansible.netcommon.ipaddr('network/prefix') }}
+          export NETWORK_PROVIDER_NET={{ network_provider_ip | ansible.netcommon.ipaddr('network/prefix') }}
+          export NODE_MGMT_NET={{ network_primary_gateway_ip | ansible.netcommon.ipaddr('network/prefix') }}
           
           # node hardening
           {% for file in hardening_files %}
           {{ file }}
           {% endfor %}
 
-    - name: Enable rc.local service
+    - name: Systemd Daemon reload
       systemd:
-        name: rc-local
-        state: restarted
-        enabled: yes
         daemon_reload: yes
+
+    # running as shell command because with systemd we get some "D-Bus terminated - connection reset by peer" issue
+    # Might have to do with the vulnerability scanning?
+    - name: Start rc-local service
+      shell: systemctl start rc-local
+      async: 300  # 5 minutes
+      poll: 0
+      register: start_rclocal
+
+    - name: Service rc-local is active
+      command: systemctl is-active rc-local
+      register: rc_local_is_active
+      until: rc_local_is_active.stdout == 'active'
+      retries: 30
+      delay: 10
+
+    - name: Clean up async file
+      ansible.builtin.async_status:
+        jid: '{{ start_rclocal.ansible_job_id }}'
+        mode: cleanup
