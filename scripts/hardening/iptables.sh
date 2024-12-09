@@ -4,7 +4,7 @@ rules=(
   "\-A INPUT -i lo -j ACCEPT"
   "\-A INPUT -p icmp -j ACCEPT"
   "\-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT"
-  "\-A INPUT -s $NEUTRON_EXTERNAL_NET -p tcp -m tcp --dport 22 -j DROP"
+  "\-A INPUT -s $NETWORK_PROVIDER_NET -p tcp -m tcp --dport 22 -j DROP"
   "\-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT"
   "\-A INPUT -s $OPENSTACK_MGMT_NET -j ACCEPT"
   "\-A INPUT -s $CEPH_PUBLIC_NET -j ACCEPT"

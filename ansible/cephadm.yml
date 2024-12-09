@@ -29,13 +29,8 @@
         dest: /etc/ceph/initial-ceph.conf
         content: |
           [global]
-          {% if development_environment %}
-          osd_pool_default_size = 1
-          osd_pool_default_min_size = 1
-          {% else %}
-          osd_pool_default_size = 3
-          osd_pool_default_min_size = 2
-          {% endif %}
+          osd_pool_default_size = {{ storage_ceph_default_pool_size }}
+          osd_pool_default_min_size = {{ storage_ceph_default_min_pool_size }}
 
           public_network = {{ network_ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}
           cluster_network = {{ network_ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}

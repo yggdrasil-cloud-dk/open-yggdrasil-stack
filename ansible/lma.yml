@@ -3,21 +3,25 @@
   hosts: deployment_nodes
   any_errors_fatal: true
   tasks:
-    - name: Copy hardening folder
+    - name: Copy custom_metrics folder
       copy:
         src: "{{ playbook_dir }}/../scripts/lma/custom_metrics"
+        dest: /opt/
+        mode: preserve
+
+    - name: Copy custom_exporter folder
+      copy:
+        src: "{{ playbook_dir }}/../custom_exporter"
         dest: /opt/
         mode: preserve
 
     - name: Setup custom exporter
       script: "{{ playbook_dir }}/../scripts/lma/custom-exporter.sh"
       args:
-        chdir: "{{ playbook_dir }}/.."
+        chdir: /opt
 
     - name: Import Grafana dashboards
       script: "{{ playbook_dir }}/../scripts/lma/grafana/import.sh"
-      args:
-        chdir: "{{ playbook_dir }}/.."
       environment:
         IP: localhost
       run_once: true
@@ -26,16 +30,29 @@
   hosts: deployment_controller
   any_errors_fatal: true
   tasks:
+    - name: Copy custom exporter target
+      copy:
+        dest: "{{ playbook_dir }}/../workspace/etc/kolla/config/prometheus/prometheus.yml.d/custom.yml"
+        content: |
+          scrape_configs:
+            - job_name: custom
+              static_configs:
+                - targets:
+          {% for node in groups['deployment_nodes'] %}
+                  - '{{ hostvars[node].ansible_openstack_mgmt.ipv4.address }}:8080'
+          {% endfor %}
+
+    - name: Copy ceph target
+      copy:
+        dest: "{{ playbook_dir }}/../workspace/etc/kolla/config/prometheus/prometheus.yml.d/ceph.yml"
+        content: |
+          scrape_configs:
+            - job_name: ceph
+              static_configs:
+                - targets:
+          {% for node in groups['deployment_nodes'] %}
+                  - '{{ hostvars[node].ansible_ceph_public.ipv4.address }}:9283'
+          {% endfor %}
+
     - name: Scrape configs
-      script: "{{ playbook_dir }}/../{{ item }}"
-      args:
-        chdir: "{{ playbook_dir }}/.."
-      environment:
-        CEPH_PUBLIC_IP: "{{ ansible_ceph_public.ipv4.address }}"
-        OPENSTACK_MGMT_IP: "{{ ansible_openstack_mgmt.ipv4.address }}"
-      loop:
-        - scripts/lma/custom-exporter-scrape.sh
-        - scripts/lma/ceph.sh
-        - scripts/lma/prometheus-alerts/copy-rules.sh
-
-
+      script: "{{ playbook_dir }}/../scripts/lma/prometheus-alerts/copy-rules.sh"

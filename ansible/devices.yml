@@ -140,7 +140,7 @@
       script: "{{ playbook_dir }}/../scripts/devices/veth_pair.sh"
       environment:
         NETWORK_VETH_PAIR_GATEWAY: "{{ network_veth_pair_gateway }}"
-      when: development_environment and network_create_veth_pair
+      when: network_create_veth_pair
 
     # when running in development using neutron_ext vlan
     - name: Run script to masquerade vlans when exiting primary interface
