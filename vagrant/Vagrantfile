@@ -12,8 +12,13 @@ Vagrant.configure("2") do |config|
   
   # script
   $script = <<-SCRIPT
+  # allow root ssh
   rm -rf /root/.ssh
   cp -r /home/vagrant/.ssh/ /root/
+
+  # extend root disk
+  lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+  resize2fs /dev/ubuntu-vg/ubuntu-lv
   SCRIPT
 
   config.vm.define "hyper01" do |hyper01|

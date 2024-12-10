@@ -2,9 +2,15 @@
   hosts: deployment_controller
   any_errors_fatal: true
   tasks:
+    - name: Get RGW clients
+      shell: ceph auth list | grep ^client.rgw
+      register: ceph_rgw_clients
+
     - name: Configure RGW
       shell: |
         #!/bin/bash
+
+        . /etc/kolla/admin-openrc.sh
 
         client_name=global
 
@@ -20,9 +26,10 @@
         ceph config set $client_name rgw_swift_url_prefix swift  # this is used to add "/swift" in url, to distinguish from s3
 
         # TODO: Fix for when no an aio
-        {% if (groups['deployment_nodes'] | length) == 1 %}
-        ceph config set $client_name rgw_frontends "beast endpoint={{ network_ceph_public_ip | ansible.netcommon.ipaddr('address') }}:6780"
-        {% endif %}
+        {% for rgw_client in ceph_rgw_clients.stdout_lines %}
+        {% set node = rgw_client.split('.')[3] %}
+        ceph config set {{ rgw_client }} rgw_frontends "beast endpoint={{ hostvars[node].network_ceph_public_ip | ansible.netcommon.ipaddr('address') }}:6780"
+        {% endfor %}
 
 - name: Restart RGW
   hosts: deployment_nodes
