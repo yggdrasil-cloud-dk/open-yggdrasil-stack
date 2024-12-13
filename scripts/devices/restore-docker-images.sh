@@ -1,5 +1,13 @@
 #!/bin/bash
 
+set -xe
+
+if ! mount | grep -q /mnt/winshare; then
+  mkdir -p /mnt/winshare
+  read -s -p "Enter password: " pass
+  mount.cifs -o user=u429780,pass=$pass //u429780.your-storagebox.de/backup /mnt/winshare/
+fi
+
 DOCKER_IMAGES_TAR_FILE_PATH=${DOCKER_IMAGES_TAR_FILE_PATH:-/mnt/winshare/docker_images_2024.1.tar}
 DOCKER_IMAGES_LIST_FILE_PATH=${DOCKER_IMAGES_LIST_FILE_PATH:-/mnt/winshare/docker_images_2024.1.list}
 

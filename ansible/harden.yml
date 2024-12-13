@@ -44,7 +44,7 @@
           export OPENSTACK_MGMT_NET={{ network_openstack_mgmt_ip | ansible.netcommon.ipaddr('network/prefix') }}
           export CEPH_PUBLIC_NET={{ network_ceph_public_ip | ansible.netcommon.ipaddr('network/prefix') }}
           export CEPH_CLUSTER_NET={{ network_ceph_cluster_ip | ansible.netcommon.ipaddr('network/prefix') }}
-          export NETWORK_PROVIDER_NET={{ network_provider_ip | ansible.netcommon.ipaddr('network/prefix') }}
+          export NETWORK_PROVIDER_NET={{ network_provider_gateway_ip | ansible.netcommon.ipaddr('network/prefix') }}
           export NODE_MGMT_NET={{ network_primary_gateway_ip | ansible.netcommon.ipaddr('network/prefix') }}
           
           # node hardening

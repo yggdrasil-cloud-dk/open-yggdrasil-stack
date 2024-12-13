@@ -7,14 +7,13 @@ sudo apt install -y net-tools
 cat > /opt/veth_device.sh <<EOT
 #!/bin/bash
 
-ifconfig veth1 || bash -s <<EOF
+ifconfig veth0 || bash -s <<EOF
 set -xe
-ip link add veth1 type veth peer name veth2
-ip addr add $NETWORK_VETH_PAIR_GATEWAY dev veth2
+ip link add veth0 type veth peer name veth1
+ip link set veth0 up
 ip link set veth1 up
-ip link set veth2 up
+ip link set dev veth1 master br0
 
-iptables -t nat -A POSTROUTING -o $(ip r | grep ^default | head -n 1 | grep -o "dev .*" | cut -d ' ' -f 2) -j MASQUERADE
 EOF
 EOT
 

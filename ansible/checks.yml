@@ -15,15 +15,10 @@
       command: ping -c 1 -W 2 {{ hostvars[item[0]][item[1]] | ansible.netcommon.ipaddr('address') }}
       loop: "{{ groups['deployment_nodes'] | product(['network_openstack_mgmt_ip', 'network_ceph_public_ip', 'network_ceph_cluster_ip']) | list }}"
 
-    - name: Check if neutron is deployed
-      shell: docker ps | grep -q neutron
-      register: check_neutron
-      failed_when: false
-
-    - name: Check nodes could ping each other on neutron external interface if neutron not deployed
-      command: ping -c 1 -W 2 {{ hostvars[item].network_provider_ip | ansible.netcommon.ipaddr('address') }}
+    - name: Check nodes could all ping the gateway of provider network
+      command: ping -c 1 -W 2 {{ hostvars[item].network_provider_gateway_ip | ansible.netcommon.ipaddr('address') }}
       loop: "{{ groups['deployment_nodes'] }}"
-      when: check_neutron.rc == 1
+
 
 - name: Check networking on deployment controller
   hosts: deployment_controller

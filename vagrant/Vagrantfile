@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
     hyper01.vm.provider :libvirt do |domain|
       domain.memory = 65536 
       domain.cpus = 6
-      domain.machine_virtual_size = 150
+      domain.machine_virtual_size = 300
     end
     hyper01.vm.hostname = "hyper01"
     hyper01.vm.network :private_network, :ip => '10.0.80.11', :libvirt__network_name => 'provider'
@@ -36,7 +36,7 @@ Vagrant.configure("2") do |config|
     hyper02.vm.provider :libvirt do |domain|
       domain.memory = 65536
       domain.cpus = 6
-      domain.machine_virtual_size = 150
+      domain.machine_virtual_size = 300
     end
     hyper02.vm.hostname = "hyper02"
     hyper02.vm.network :private_network, :ip => '10.0.80.12', :libvirt__network_name => 'provider'
