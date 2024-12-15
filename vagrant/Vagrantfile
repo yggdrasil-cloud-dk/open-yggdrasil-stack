@@ -17,6 +17,7 @@ Vagrant.configure("2") do |config|
   cp -r /home/vagrant/.ssh/ /root/
 
   # extend root disk
+  growpart /dev/vda 3
   lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
   resize2fs /dev/ubuntu-vg/ubuntu-lv
   SCRIPT
