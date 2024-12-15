@@ -37,3 +37,15 @@
   serial: 1
   tasks:
     - shell: sleep 10 && (systemctl | grep ceph-.*@rgw. | awk '{print $1}' | xargs systemctl restart)
+
+- name: Test RGW
+  hosts: deployment_controller
+  any_errors_fatal: true
+  tasks:
+    - name: Test object storage
+      shell: |
+        #!/bin/bash
+
+        . /etc/kolla/admin-openrc.sh
+
+        openstack container list

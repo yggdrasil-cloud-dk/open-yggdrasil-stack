@@ -49,7 +49,7 @@
         # create router and to make it reachable from octavia worker
         openstack router show lb-mgmt-router || (openstack router create lb-mgmt-router && openstack router add subnet lb-mgmt-router lb-mgmt-subnet)
         openstack router set --disable-snat --external-gateway public1 --fixed-ip subnet=public1-subnet,ip-address=$lb_mgmt_router_external_gatway_ip lb-mgmt-router
-        
+
       args:
         chdir: "{{ playbook_dir }}/../.."
         executable: /bin/bash
@@ -80,3 +80,23 @@
         systemctl enable $service
         systemctl start $service
         
+- name: Test octavia
+  hosts: deployment_controller
+  any_errors_fatal: true
+  tasks:
+    - name: Setup Octavia
+      shell: |
+        #!/bin/bash
+
+        set -xe
+
+        # source venv
+        cd workspace
+        source kolla-venv/bin/activate
+
+        CONFIG_DIR=$(pwd)/etc/kolla
+
+        # source admin rc
+        . $CONFIG_DIR/admin-openrc.sh
+
+        openstack loadbalancer create --name lb1 --vip-network-id demo-net

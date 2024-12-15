@@ -11,6 +11,7 @@ CONFIG_DIR=$(pwd)/etc/kolla
 # source admin rc
 . $CONFIG_DIR/admin-openrc.sh
 
+
 # TODO: Add windows image
 # needs to be done manually for now due to EULA signature at
 # https://cloudbase.it/windows-cloud-images/#download
@@ -22,10 +23,12 @@ image_urls=(
 	https://tarballs.opendev.org/openstack/trove/images/trove-master-guest-ubuntu-jammy.qcow2
 )
 
+# After pipe_cmd, image should be of $image_format type
 for image_url in ${image_urls[@]}; do
 	pipe_cmd=cat
 	# remove file extension
 	image_name=$(echo $(basename $image_url) | grep -o ".*\." | head -c -2)
+	image_format=qcow2
 	if [[ "$image_url" == *".xz" ]]; then
 		echo Image detected to be xz compressed. Will decompress.
 		# removing file extension again - (probably .qcow2 or .img)
@@ -37,7 +40,11 @@ for image_url in ${image_urls[@]}; do
 		image_name=$(echo $image_name | grep -o ".*\." | head -c -2)
 		pipe_cmd="gunzip -cd"
 	fi
-	image_format=qcow2
-	openstack image show $image_name || ((curl $image_url --output - || exit 1) | $pipe_cmd | openstack image create $image_name --disk-format $image_format)
+	openstack image show $image_name || (
+			(curl $image_url --output - || exit 1) | $pipe_cmd | cat - > $image_name.$image_format
+			qemu-img convert $image_name.$image_format $image_name.raw
+			openstack image create --progress $image_name --file $image_name.raw
+			rm -f $image_name*
+		)
 done
 
