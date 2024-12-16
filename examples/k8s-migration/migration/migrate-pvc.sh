@@ -8,7 +8,7 @@ DEST_KUBECONFIG=$DEST_KUBECONFIG
 DEST_NAMESPACE=$DEST_NAMESPACE
 DEST_PVC_NAME=$DEST_PVC_NAME
 
-STARTUP_COMMANDS="apt update && apt install iproute2 -y"
+STARTUP_COMMANDS="apt update && apt install -y rsync"
 
 # deploy ubuntu pod in both clusters
 
@@ -19,11 +19,13 @@ SOURCE_EXTRA_ARGS="--kubeconfig $SOURCE_KUBECONFIG -n $SOURCE_NAMESPACE"
 DEST_EXTRA_ARGS="--kubeconfig $DEST_KUBECONFIG -n $DEST_NAMESPACE"
 
 # Checks
+
+which pv
+
 source_pvc_used_by=$(kubectl $SOURCE_EXTRA_ARGS describe pvc $SOURCE_PVC_NAME  | grep "^Used By:" | awk '{print $3}')
 test $source_pvc_used_by == "<none>" || ( echo "source pvc used by pod(s) $source_pvc_used_by. Please ensure they are not used. Exiting.." ; exit 1 )
 dest_pvc_used_by=$(kubectl $DEST_EXTRA_ARGS describe pvc $DEST_PVC_NAME  | grep "^Used By:" | awk '{print $3}')
 test $dest_pvc_used_by == "<none>" || ( echo "dest pvc used by pod(s) $dest_pvc_used_by. Please ensure they are not used. Exiting.." ; exit 1 )
-
 
 container_name=ubuntu
 cat <<EOF | kubectl $SOURCE_EXTRA_ARGS apply -f -
@@ -77,6 +79,17 @@ while kubectl $SOURCE_EXTRA_ARGS get pods $container_name --output="jsonpath={.s
 while kubectl $DEST_EXTRA_ARGS get pods $container_name --output="jsonpath={.status.containerStatuses[*].ready}" | grep false; do sleep 5; done
 
 # prepare pods
-( kubectl $SOURCE_EXTRA_ARGS exec -it $container_name -- /bin/bash -c "$STARTUP_COMMANDS" ) &
-( kubectl $DEST_EXTRA_ARGS exec -it $container_name -- /bin/bash -c "$STARTUP_COMMANDS" ) &
+( kubectl $SOURCE_EXTRA_ARGS exec $container_name -- /bin/bash -c "$STARTUP_COMMANDS" ) &
+( kubectl $DEST_EXTRA_ARGS exec $container_name -- /bin/bash -c "$STARTUP_COMMANDS" ) &
+wait
+
+# copy with tar
+kubectl $SOURCE_EXTRA_ARGS exec -i $container_name -- /bin/bash -c 'tar czf - /mnt/' | pv | kubectl $DEST_EXTRA_ARGS exec -i $container_name -- /bin/bash -c 'tar xzf - -C /'
+
+
+sleep 120
+
+# delete pods
+( kubectl $SOURCE_EXTRA_ARGS delete pod $container_name ) &
+( kubectl $DEST_EXTRA_ARGS delete pod $container_name ) &
 wait

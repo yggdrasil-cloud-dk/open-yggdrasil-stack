@@ -46,6 +46,18 @@
       shell: |
         #!/bin/bash
 
-        . /etc/kolla/admin-openrc.sh
+        set -xe
+
+        # source venv
+        cd workspace
+        source kolla-venv/bin/activate
+
+        CONFIG_DIR=$(pwd)/etc/kolla
+
+        # source admin rc
+        . $CONFIG_DIR/admin-openrc.sh
 
         openstack container list
+      args:
+        chdir: "{{ playbook_dir }}/../.."
+        executable: /bin/bash

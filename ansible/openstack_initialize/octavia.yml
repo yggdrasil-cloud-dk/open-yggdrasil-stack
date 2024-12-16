@@ -100,3 +100,7 @@
         . $CONFIG_DIR/admin-openrc.sh
 
         openstack loadbalancer create --name lb1 --vip-network-id demo-net
+
+      args:
+        chdir: "{{ playbook_dir }}/../.."
+        executable: /bin/bash
