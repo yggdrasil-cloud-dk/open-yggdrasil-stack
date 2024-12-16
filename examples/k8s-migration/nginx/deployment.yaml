@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d/
+          name: conf
+        - mountPath: /var/www/html
+          name: site-data
+      securityContext: {}
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: default.conf
+        name: conf
+      - name: site-data
+        persistentVolumeClaim:
+          claimName: demo-pvc-claim

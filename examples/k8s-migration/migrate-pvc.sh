@@ -8,10 +8,6 @@ DEST_KUBECONFIG=$DEST_KUBECONFIG
 DEST_NAMESPACE=$DEST_NAMESPACE
 DEST_PVC_NAME=$DEST_PVC_NAME
 
-STARTUP_COMMANDS="apt update && apt install -y rsync"
-
-# deploy ubuntu pod in both clusters
-
 
 set -xe
 
@@ -80,12 +76,13 @@ while kubectl $SOURCE_EXTRA_ARGS get pods $container_name --output="jsonpath={.s
 while kubectl $DEST_EXTRA_ARGS get pods $container_name --output="jsonpath={.status.containerStatuses[*].ready}" | grep false; do sleep 5; done
 
 # prepare pods
+STARTUP_COMMANDS="echo no pre-migration commands"
 ( kubectl $SOURCE_EXTRA_ARGS exec $container_name -- /bin/bash -c "$STARTUP_COMMANDS" ) &
 ( kubectl $DEST_EXTRA_ARGS exec $container_name -- /bin/bash -c "$STARTUP_COMMANDS" ) &
 wait
 
 # clean destination files (just incase)
-kubectl $DEST_EXTRA_ARGS exec -i $container_name -- /bin/bash -c 'cd /mnt; rm -rf *; rm -rf .*'
+kubectl $DEST_EXTRA_ARGS exec -i $container_name -- /bin/bash -c 'set -x; cd /mnt; echo Deleteing the following: ; ls -a | tail -n +3 | xargs rm -rf '
 
 # copy with tar
 kubectl $SOURCE_EXTRA_ARGS exec -i $container_name -- /bin/bash -c 'tar czf - /mnt/' | pv | kubectl $DEST_EXTRA_ARGS exec -i $container_name -- /bin/bash -c 'tar xzf - -C /'
