@@ -20,6 +20,7 @@ DEST_EXTRA_ARGS="--kubeconfig $DEST_KUBECONFIG -n $DEST_NAMESPACE"
 
 # Checks
 
+# ensure 'pv' command installed
 which pv
 
 source_pvc_used_by=$(kubectl $SOURCE_EXTRA_ARGS describe pvc $SOURCE_PVC_NAME  | grep "^Used By:" | awk '{print $3}')
@@ -83,11 +84,11 @@ while kubectl $DEST_EXTRA_ARGS get pods $container_name --output="jsonpath={.sta
 ( kubectl $DEST_EXTRA_ARGS exec $container_name -- /bin/bash -c "$STARTUP_COMMANDS" ) &
 wait
 
+# clean destination files (just incase)
+kubectl $DEST_EXTRA_ARGS exec -i $container_name -- /bin/bash -c 'cd /mnt; rm -rf *; rm -rf .*'
+
 # copy with tar
 kubectl $SOURCE_EXTRA_ARGS exec -i $container_name -- /bin/bash -c 'tar czf - /mnt/' | pv | kubectl $DEST_EXTRA_ARGS exec -i $container_name -- /bin/bash -c 'tar xzf - -C /'
-
-
-sleep 120
 
 # delete pods
 ( kubectl $SOURCE_EXTRA_ARGS delete pod $container_name ) &

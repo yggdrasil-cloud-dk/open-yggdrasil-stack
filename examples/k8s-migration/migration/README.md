@@ -5,6 +5,7 @@
 3. User has read/write access to pvc
 4. No pods mount the pvc
 5. Run command from location that has access to both cluster apis
+6. 'pv' and 'kubectl' commands installed
 
 e.g usage:
 
