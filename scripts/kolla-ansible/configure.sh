@@ -34,7 +34,6 @@ kolla-genpwd -p $PW_FILE
 
 
 # set global configs
-set_global_config node_config_directory /root/kolla
 set_global_config kolla_base_distro ubuntu
 set_global_config kolla_install_type source
 
