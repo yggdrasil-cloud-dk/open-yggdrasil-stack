@@ -68,3 +68,7 @@ vagrant/.vagrant/
 
 # kubeconfig
 config
+
+# terraform 
+terraform/.terraform*
+terraform/terraform*.tfstate*
