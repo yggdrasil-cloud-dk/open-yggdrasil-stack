@@ -68,7 +68,7 @@
       command: systemctl is-active rc-local
       register: rc_local_is_active
       until: rc_local_is_active.stdout == 'active'
-      retries: 30
+      retries: 60
       delay: 10
 
     - name: Clean up async file
