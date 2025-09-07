@@ -11,6 +11,7 @@ rules=(
   "\-A INPUT -s $CEPH_CLUSTER_NET -j ACCEPT"
   "\-A INPUT -s $NETWORK_PROVIDER_NET -j ACCEPT"
   "\-A INPUT -s $NODE_MGMT_NET -j ACCEPT"
+  "\-A INPUT -p tcp --dport 443 -m state --state NEW --syn -m hashlimit --hashlimit 15/s --hashlimit-burst 30 --hashlimit-mode srcip --hashlimit-srcmask 32 --hashlimit-name synattack -j ACCEPT"
 )
 
 set -x
