@@ -64,12 +64,16 @@
       poll: 0
       register: start_rclocal
 
-    - name: Wait until rc-local service is active
+    - name: Wait until rc-local service run is complete
       command: systemctl is-active rc-local
       register: rc_local_is_active
-      until: rc_local_is_active.stdout == 'active'
+      until: rc_local_is_active.stdout == 'active' or rc_local_is_active.stdout == 'failed'
       retries: 60
       delay: 10
+
+    - name: Ensure rc.local active
+      assert:
+        that: rc_local_is_active.stdout != 'failed'
 
     - name: Clean up async file
       ansible.builtin.async_status:
