@@ -45,7 +45,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.trigger.after :up do |trigger|
-    trigger.run = {inline: "bash -c 'vagrant ssh-config | sed \"s/User vagrant/User root/g\" > ~/.ssh/config'"}
+    trigger.run = {inline: "bash -c 'vagrant ssh-config | sed \"s/User vagrant/User root/g\;s/PasswordAuthentication.*/ForwardAgent true/g" > ~/.ssh/config'"}
   end
 
 end
