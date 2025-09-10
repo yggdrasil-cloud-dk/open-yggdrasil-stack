@@ -91,6 +91,17 @@ openstack-manila:
 openstack-trove-postgres:
 	scripts/tests/trove_postgres.sh
 
+openstack-remove-test-resources:
+	scripts/tests/remove-all.sh
+
+reverse-proxy-nginx-modsec:
+	scripts/api-gateway.sh
+
+reverse-proxy-certs:
+	scripts/certs.sh
+
+
+
 ###########
 # Bundles #
 ###########
@@ -110,7 +121,7 @@ dev-down: vagrant-destroy
 
 all-upgrade: kollaansible-upgrade
 
-openstack-services: openstack-octavia openstack-rgw openstack-magnum  openstack-manila openstack-trove-postgres
+openstack-services: openstack-octavia openstack-rgw openstack-magnum  openstack-manila openstack-trove-postgres openstack-remove-test-resources
 
 all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload symlink-etc-kolla  openstack-services
 
