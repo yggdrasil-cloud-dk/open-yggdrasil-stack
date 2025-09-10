@@ -94,10 +94,10 @@ openstack-trove-postgres:
 openstack-remove-test-resources:
 	scripts/tests/remove-all.sh
 
-reverse-proxy-nginx-modsec:
+api-gateway-nginx-modsec:
 	scripts/api-gateway.sh
 
-reverse-proxy-certs:
+api-gateway-certs:
 	scripts/certs.sh
 
 
@@ -115,7 +115,7 @@ kollaansible-up-upgrade: kollaansible-images kollaansible-prepare kollaansible-p
 
 all-up: infra-up kollaansible-up
 
-dev-up: vagrant-up all-up all-postdeploy
+dev-up: vagrant-up all-up all-postdeploy api-gateway-certs api-gateway-nginx-modsec
 
 dev-down: vagrant-destroy
 
