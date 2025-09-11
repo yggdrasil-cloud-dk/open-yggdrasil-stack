@@ -94,11 +94,11 @@ openstack-trove-postgres:
 openstack-remove-test-resources:
 	scripts/tests/remove-all.sh
 
-api-gateway-nginx-modsec:
-	scripts/api-gateway.sh
-
-api-gateway-certs:
-	scripts/certs.sh
+#api-gateway-nginx-modsec:
+#	scripts/api-gateway.sh
+#
+#api-gateway-certs:
+#	scripts/certs.sh
 
 
 
