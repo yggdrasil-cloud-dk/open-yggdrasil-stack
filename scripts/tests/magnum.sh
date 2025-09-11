@@ -52,3 +52,25 @@ openstack coe cluster template create k8s-cluster-template-$suffix \
 openstack coe cluster create k8s-cluster-$suffix \
     --cluster-template k8s-cluster-template-$suffix \
     --node-count 1
+
+
+timeout_seconds=900
+sleep_time=10
+ready_status=CREATE_COMPLETE
+wip_status=CREATE_IN_PROGRESS
+time=0
+while true; do
+  status=$(openstack coe cluster show k8s-cluster-$suffix -f value -c status)
+  if [[ $time -gt $timeout_seconds ]]; then
+    echo Timeout reached - exiting
+    exit 1
+  elif echo $status | grep -q $ready_status; then
+    echo Now available
+    break
+  elif echo $status | grep -qv $wip_status ; then
+    echo Unexpected status
+    exit 1
+  fi
+  time=$(( $time + $sleep_time ))
+  sleep $sleep_time
+done

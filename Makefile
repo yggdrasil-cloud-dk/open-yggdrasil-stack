@@ -121,7 +121,9 @@ dev-down: vagrant-destroy
 
 all-upgrade: kollaansible-upgrade
 
-openstack-services: openstack-octavia openstack-rgw openstack-magnum  openstack-manila openstack-trove-postgres openstack-remove-test-resources
+openstack-services:
+	$(MAKE) -j 5 -Oline openstack-octavia openstack-rgw openstack-magnum  openstack-manila openstack-trove-postgres
+	$(MAKE) openstack-remove-test-resources
 
 all-postdeploy: kollaansible-postdeploy openstack-client-install openstack-resources-init openstack-images-upload symlink-etc-kolla  openstack-services
 

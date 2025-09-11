@@ -25,7 +25,8 @@ openstack datastore version show --datastore mysql 5.7.29 || openstack datastore
     --image-tags trove,mysql \
     --active --default
 
-openstack database instance create mysql_instance_1 \
+suffix=$RANDOM
+openstack database instance create mysql_instance_$suffix \
     --flavor ds2G \
     --size 5 \
     --nic net-id=$(openstack network show demo-net -f value -c id) \

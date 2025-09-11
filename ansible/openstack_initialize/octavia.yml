@@ -84,7 +84,7 @@
   hosts: deployment_controller
   any_errors_fatal: true
   tasks:
-    - name: Setup Octavia
+    - name: Create test loadbalancer and check status
       shell: |
         #!/bin/bash
 
@@ -100,6 +100,27 @@
         . $CONFIG_DIR/admin-openrc.sh
 
         openstack loadbalancer create --name lb1 --vip-network-id demo-net
+
+        timeout_seconds=300
+        sleep_time=5
+        ready_status=ACTIVE
+        wip_status=PENDING_CREATE
+        time=0
+        while true; do
+          status=$(openstack loadbalancer show lb1 -f value -c provisioning_status)
+          if [[ $time -gt $timeout_seconds ]]; then
+            echo Timeout reached - exiting
+            exit 1
+          elif echo $status | grep -q $ready_status; then
+            echo Now available
+            break
+          elif echo $status | grep -qv $wip_status ; then
+            echo Unexpected status
+            exit 1
+          fi
+          time=$(( $time + $sleep_time ))
+          sleep $sleep_time
+        done
 
       args:
         chdir: "{{ playbook_dir }}/../.."
