@@ -99,7 +99,9 @@
         # source admin rc
         . $CONFIG_DIR/admin-openrc.sh
 
-        openstack loadbalancer create --name lb1 --vip-network-id demo-net
+        openstack loadbalancer show lb1 || openstack loadbalancer create --name lb1 --vip-network-id demo-net
+
+        sleep 60
 
         timeout_seconds=300
         sleep_time=5

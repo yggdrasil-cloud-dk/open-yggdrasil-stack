@@ -35,6 +35,8 @@ openstack database instance create postgresql_instance_$suffix \
     --allowed-cidr 0.0.0.0/0
 
 
+sleep 60
+
 timeout_seconds=300
 sleep_time=5
 ready_status=ACTIVE

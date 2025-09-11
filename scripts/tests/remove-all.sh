@@ -17,6 +17,6 @@ openstack coe cluster template list -f value -c name | xargs -r openstack coe cl
 
 openstack share list -f value -c ID | xargs -r openstack share delete
 
-openstack loadbalancer list -f value -c id | xargs -r openstack loadbalancer delete --cascade
+openstack loadbalancer list -f value -c id | xargs -I% openstack loadbalancer delete --cascade %
 
 openstack database instance list -f value -c ID | xargs -r openstack database instance delete

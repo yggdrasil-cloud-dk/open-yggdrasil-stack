@@ -14,7 +14,7 @@ CONFIG_DIR=$(pwd)/etc/kolla
 manila type-show default_share_type || manila type-create default_share_type True
 
 openstack image show manila-service-image || (
-  (ls manila-service-image-master.qcow2 || wget http://tarballs.openstack.org/manila-image-elements/images/manila-service-image-master.qcow2) && \
+  (ls manila-service-image-master.qcow2 || wget --no-verbose http://tarballs.openstack.org/manila-image-elements/images/manila-service-image-master.qcow2) && \
   openstack image create "manila-service-image" \
     --file manila-service-image-master.qcow2 \
     --disk-format qcow2 --container-format bare && \
