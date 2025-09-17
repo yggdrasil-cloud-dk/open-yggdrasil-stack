@@ -36,6 +36,7 @@ sleep 3
 suffix=${RANDOM}
 
 openstack coe cluster template create k8s-cluster-template-$suffix \
+    --public \
     --image $fedora_image \
     --keypair testkey \
     --external-network public1 \

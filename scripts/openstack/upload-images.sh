@@ -48,3 +48,5 @@ for image_url in ${image_urls[@]}; do
 		)
 done
 
+openstack image set --public --os-distro ubuntu jammy-server-cloudimg-amd64
+openstack image set --public --os-distro fedora fedora-coreos-38.20230806.3.0-openstack.x86_64
