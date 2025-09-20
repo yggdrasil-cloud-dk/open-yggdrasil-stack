@@ -100,7 +100,7 @@
         . $CONFIG_DIR/admin-openrc.sh
 
         suffix=$RANDOM
-        openstack loadbalancer show lb-$suffix || openstack loadbalancer create --name lb1 --vip-network-id demo-net
+        openstack loadbalancer show lb-$suffix || openstack loadbalancer create --name lb-$suffix --vip-network-id demo-net
 
         sleep 60
 
