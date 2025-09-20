@@ -99,7 +99,8 @@
         # source admin rc
         . $CONFIG_DIR/admin-openrc.sh
 
-        openstack loadbalancer show lb1 || openstack loadbalancer create --name lb1 --vip-network-id demo-net
+        suffix=$RANDOM
+        openstack loadbalancer show lb-$suffix || openstack loadbalancer create --name lb1 --vip-network-id demo-net
 
         sleep 60
 
@@ -109,7 +110,7 @@
         wip_status=PENDING_CREATE
         time=0
         while true; do
-          status=$(openstack loadbalancer show lb1 -f value -c provisioning_status)
+          status=$(openstack loadbalancer show lb-$suffix -f value -c provisioning_status)
           if [[ $time -gt $timeout_seconds ]]; then
             echo Timeout reached - exiting
             exit 1

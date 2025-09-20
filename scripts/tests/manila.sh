@@ -30,14 +30,15 @@ manila share-network-show demo-share-network1 || (
 nova flavor-show  manila-service-flavor || nova flavor-create manila-service-flavor 100 2048 30 2
 
 
-manila show demo-share1 || manila create CIFS 1 --name demo-share1 --share-network demo-share-network1 --share-type default_share_type
+suffix=$RANDOM
+manila show demo-share1 || manila create CIFS 1 --name demo-share-$suffix --share-network demo-share-network1 --share-type default_share_type
 
 timeout_seconds=300
 sleep_time=5
 time=0
 exit_status=('available' 'error' 'inactive')
 while true; do
-  status=$(openstack share show demo-share1 -f value -c status)
+  status=$(openstack share show demo-share-$suffix -f value -c status)
   if [[ $time -gt $timeout_seconds ]]; then
     echo Timeout reached - exiting
     exit 1
