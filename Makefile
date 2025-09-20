@@ -115,6 +115,7 @@ dev-down: vagrant-destroy
 all-upgrade: kollaansible-upgrade
 
 openstack-services:
+	ls ~/.ssh/id_rsa.pub || ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
 	$(MAKE) -j 5 -Oline openstack-octavia openstack-rgw openstack-magnum  openstack-manila openstack-trove-postgres
 	$(MAKE) openstack-remove-test-resources
 
