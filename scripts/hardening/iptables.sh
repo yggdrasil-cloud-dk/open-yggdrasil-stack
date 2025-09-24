@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ -z $NETWORK_PROVIDER_NET ]] || [[ -z $OPENSTACK_MGMT_NET ]] || [[ -z $CEPH_PUBLIC_NET ]] || [[ -z $CEPH_CLUSTER_NET ]] || [[ -z $NETWORK_PROVIDER_NET ]] || [[ -z $NODE_MGMT_NET ]]; then
+  echo Empty Env Var. Exitting..
+  exit 1
+fi
+
 rules=(
   "\-A INPUT -i lo -j ACCEPT"
   "\-A INPUT -p icmp -j ACCEPT"

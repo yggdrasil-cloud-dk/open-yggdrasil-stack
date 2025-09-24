@@ -21,6 +21,7 @@
         src: "{{ playbook_dir }}/../scripts/hardening"
         dest: /opt/
         mode: preserve
+      tags: copy_only
 
     - name: Find hardening files
       find:
