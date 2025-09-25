@@ -104,10 +104,10 @@ infra-up: prepare-ansible harden devices-configure checks cephadm-deploy
 kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 
 #== TRYING TO PARALLELIZE ABOVE ==#
-infra-up-v2: prepare-ansible harden devices-configure
+infra-up-v2: prepare-ansible harden devices-configure checks kollaansible-prepare
 
 infra-kolla-ansible-parallel:
-	 $(MAKE) -j 5 cephadm-deploy kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap
+	 $(MAKE) -j 5 cephadm-deploy kollaansible-images kollaansible-create-certs kollaansible-bootstrap
 
 kolla-ansible-serial:	kollaansible-prechecks kollaansible-deploy kollaansible-lma
 #==============
