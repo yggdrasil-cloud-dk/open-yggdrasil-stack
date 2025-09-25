@@ -102,11 +102,18 @@ openstack-remove-test-resources:
 infra-up: prepare-ansible harden devices-configure checks cephadm-deploy 
 
 kollaansible-up: kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
-#kollaansible-up: kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap kollaansible-prechecks kollaansible-deploy kollaansible-lma
 
-kollaansible-up-upgrade: kollaansible-images kollaansible-prepare kollaansible-prechecks kollaansible-upgrade kollaansible-lma
+#== TRYING TO PARALLELIZE ABOVE ==#
+infra-up-v2: prepare-ansible harden devices-configure
+
+infra-kolla-ansible-parallel:
+	 $(MAKE) -j 5 cephadm-deploy kollaansible-images kollaansible-prepare kollaansible-create-certs kollaansible-bootstrap
+
+kolla-ansible-serial:	kollaansible-prechecks kollaansible-deploy kollaansible-lma
+#==============
 
 all-up: infra-up kollaansible-up
+all-up-v2: infra-up-v2 infra-kolla-ansible-parallel kolla-ansible-serial
 
 dev-up: vagrant-up all-up all-postdeploy
 
@@ -160,6 +167,8 @@ kollaansible-fromtag-deploy: kollaansible-prepare print-tags
 	all_tags=$$(cat /tmp/print-tags) && \
 	remaining_tags=$$(echo $$all_tags | grep -o $(TAGS).*) && \
 	scripts/kolla-ansible/kolla-ansible.sh deploy -t $$remaining_tags
+
+kollaansible-up-upgrade: kollaansible-images kollaansible-prepare kollaansible-prechecks kollaansible-upgrade kollaansible-lma
 
 kollaansible-tags-reconfigure: kollaansible-prepare
 	scripts/kolla-ansible/kolla-ansible.sh reconfigure -t $(TAGS) -v
