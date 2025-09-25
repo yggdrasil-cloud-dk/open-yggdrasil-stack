@@ -45,7 +45,7 @@ kollaansible-prechecks:
 	scripts/kolla-ansible/kolla-ansible.sh prechecks
 
 kollaansible-deploy:
-	scripts/kolla-ansible/kolla-ansible.sh deploy
+	scripts/kolla-ansible/kolla-ansible.sh deploy || scripts/kolla-ansible/kolla-ansible.sh deploy
 
 kollaansible-upgrade:
 	scripts/kolla-ansible/kolla-ansible.sh upgrade
