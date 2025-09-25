@@ -45,8 +45,10 @@ for image_url in ${image_urls[@]}; do
 			qemu-img convert $image_name.$image_format $image_name.raw
 			openstack image create --progress $image_name --file $image_name.raw
 			rm -f $image_name*
-		)
+		) &
 done
+
+wait
 
 openstack image set --public --os-distro ubuntu jammy-server-cloudimg-amd64
 openstack image set --public --os-distro fedora fedora-coreos-38.20230806.3.0-openstack.x86_64
