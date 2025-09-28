@@ -40,12 +40,13 @@ for image_url in ${image_urls[@]}; do
 		image_name=$(echo $image_name | grep -o ".*\." | head -c -2)
 		pipe_cmd="gunzip -cd"
 	fi
-	openstack image show $image_name || (
+	openstack image show $image_name || echo "$(
+			echo ========== $image_name ===========
 			(curl $image_url --output - || exit 1) | $pipe_cmd | cat - > $image_name.$image_format
 			qemu-img convert $image_name.$image_format $image_name.raw
 			openstack image create --progress $image_name --file $image_name.raw
 			rm -f $image_name*
-		) &
+		)" &
 done
 
 wait
