@@ -8,7 +8,7 @@
         images:
           - image: quay.io/openstack.kolla/nova-novncproxy:{{ openstack_release }}-ubuntu-jammy
             custom_cmds: |
-              sed -i '123i\ \ \ \ \ \ \ \ expected_protos.append('https')' /var/lib/kolla/venv/lib/python3.10/site-packages/nova/console/websocketproxy.py
+              sed -i "123i\ \ \ \ \ \ \ \ expected_protos.append('https')" /var/lib/kolla/venv/lib/python3.10/site-packages/nova/console/websocketproxy.py
           - image: quay.io/openstack.kolla/horizon:{{ openstack_release }}-ubuntu-jammy
             custom_cmds: |
               apt update
