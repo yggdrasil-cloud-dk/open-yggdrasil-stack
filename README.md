@@ -12,9 +12,9 @@ ansible-galaxy collection install ansible.netcommon:2.5.1
 git clone git@github.com:yggdrasil-cloud-dk/open-yggdrasil-stack.git
 ```
 
-### 3. Deploy All-in-one
+### 3. Deploy Dev environment on 2 Vagrant VMs with KVM (all prerequisites installed on the fly)
 ```
-make dev-up ENV=aio
+make dev-up
 ```
 
 
@@ -24,5 +24,5 @@ make dev-up ENV=aio
 ```
 cp -r ansible/inventory/aio ansible/inventory/<env_name>
 vim ansible/inventory/<env_name>
-make dev-up ENV=<env_name>
+make all-up all-postdeploy ENV=<env_name>
 ```
